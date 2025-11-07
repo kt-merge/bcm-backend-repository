@@ -23,11 +23,15 @@ public class User {
 
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @Builder
-    private User (String nickname, String email, String password) {
+    private User (String nickname, String email, String password, Role role) {
         this.nickname = nickname;
         this.email = email;
         this.password = password;
+        this.role = role;
     }
 
     public void encodePassword(String encodedPassword) {
@@ -39,6 +43,7 @@ public class User {
                 .nickname(request.nickname())
                 .email(request.email())
                 .password(request.password())
+                .role(Role.USER)
                 .build();
     }
 
