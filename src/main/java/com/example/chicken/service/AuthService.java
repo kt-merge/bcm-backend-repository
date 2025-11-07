@@ -1,6 +1,9 @@
 package com.example.chicken.service;
 
+import com.example.chicken.common.jwt.JwtTokenProvider;
 import com.example.chicken.domain.User;
+import com.example.chicken.dto.SignInRequestDto;
+import com.example.chicken.dto.SignInResponseDto;
 import com.example.chicken.dto.UserRequestDto;
 import com.example.chicken.dto.UserResponseDto;
 import com.example.chicken.repository.UserRepository;
@@ -15,6 +18,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider tokenProvider;
 
     @Transactional
     public UserResponseDto signUp(UserRequestDto request) {
@@ -28,6 +32,17 @@ public class AuthService {
         user.encodePassword(encodedPassword);
 
         return UserResponseDto.from(user);
+    }
+
+    public SignInResponseDto signIn(SignInRequestDto request) {
+        User user =
+                this.userRepository.findByEmail(request.email()).orElseThrow(IllegalArgumentException::new);
+
+        if(!this.passwordEncoder.matches(request.password(), user.getPassword())) throw new IllegalArgumentException();
+
+        String jwt = this.tokenProvider.createJWT(user.getEmail(), user.getRole());
+
+        return new SignInResponseDto(jwt);
     }
 
 }

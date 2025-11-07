@@ -1,5 +1,7 @@
 package com.example.chicken.controller;
 
+import com.example.chicken.dto.SignInRequestDto;
+import com.example.chicken.dto.SignInResponseDto;
 import com.example.chicken.dto.UserRequestDto;
 import com.example.chicken.dto.UserResponseDto;
 import com.example.chicken.service.AuthService;
@@ -28,8 +30,9 @@ public class AuthController {
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<Object> signIn() {
-        return ResponseEntity.ok().body(null);
+    public ResponseEntity<SignInResponseDto> signIn(@RequestBody SignInRequestDto request) {
+        SignInResponseDto result = this.authService.signIn(request);
+        return ResponseEntity.ok().body(result);
     }
 
 }
