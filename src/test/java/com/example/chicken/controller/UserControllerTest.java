@@ -49,6 +49,7 @@ class UserControllerTest {
 		String email = "yoojinlee.dev@gmail.com";
 		String password = "1q2w3e4r!";
 		String nickname = "yoojinLee";
+		String phoneNumber = "01012345678";
 		Role role = Role.USER;
 
 		this.user = User.builder()
@@ -56,6 +57,7 @@ class UserControllerTest {
 			.password(this.passwordEncoder.encode(password))
 			.nickname(nickname)
 			.role(role)
+			.phoneNumber(phoneNumber)
 			.build();
 
 		this.userRepository.save(user);

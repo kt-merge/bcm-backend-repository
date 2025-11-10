@@ -1,6 +1,7 @@
 package com.example.chicken.domain;
 
 import com.example.chicken.dto.UserRequestDto;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -13,38 +14,42 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 
-    private String nickname;
+	private String nickname;
 
-    private String email;
+	private String email;
 
-    private String password;
+	private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+	@Enumerated(EnumType.STRING)
+	private Role role;
 
-    @Builder
-    private User (String nickname, String email, String password, Role role) {
-        this.nickname = nickname;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
+	private String phoneNumber;
 
-    public void encodePassword(String encodedPassword) {
-        this.password = encodedPassword;
-    }
+	@Builder
+	private User(String nickname, String email, String password, Role role, String phoneNumber) {
+		this.nickname = nickname;
+		this.email = email;
+		this.password = password;
+		this.role = role;
+		this.phoneNumber = phoneNumber;
+	}
 
-    public static User from(UserRequestDto request) {
-        return User.builder()
-                .nickname(request.nickname())
-                .email(request.email())
-                .password(request.password())
-                .role(Role.USER)
-                .build();
-    }
+	public void encodePassword(String encodedPassword) {
+		this.password = encodedPassword;
+	}
+
+	public static User from(UserRequestDto request) {
+		return User.builder()
+			.nickname(request.nickname())
+			.email(request.email())
+			.password(request.password())
+			.role(Role.USER)
+			.phoneNumber(request.phoneNumber())
+			.build();
+	}
 
 }
