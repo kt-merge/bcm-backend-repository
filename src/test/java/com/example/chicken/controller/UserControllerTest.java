@@ -18,6 +18,7 @@ import com.example.chicken.ChickenApplication;
 import com.example.chicken.common.jwt.JwtTokenProvider;
 import com.example.chicken.domain.Role;
 import com.example.chicken.domain.User;
+import com.example.chicken.dto.UpdateUserNicknameDto;
 import com.example.chicken.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -62,12 +63,12 @@ class UserControllerTest {
 
 		this.userRepository.save(user);
 
-		token = "Bearer "+ tokenProvider.createJWT(email, role);
+		token = "Bearer " + tokenProvider.createJWT(email, role);
 	}
 
 	@Test
 	@DisplayName("내 정보 불러오기 성공")
-	void signUp() throws Exception {
+	void getMyUserInfo() throws Exception {
 		//when
 
 		mockMvc.perform(get("/api/users/me")
@@ -77,6 +78,23 @@ class UserControllerTest {
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.id").exists());
+	}
+
+	@Test
+	@DisplayName("내 별명 변경 성공")
+	void patchMyUserNickname() throws Exception {
+		//when
+		String newNickname = "newNickName";
+		UpdateUserNicknameDto request = new UpdateUserNicknameDto(newNickname);
+		mockMvc.perform(patch("/api/users/me/nickname")
+							.header("Authorization", token)
+							.contentType(MediaType.APPLICATION_JSON)
+							.content(objectMapper.writeValueAsBytes(request)))
+			//then
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.id").exists())
+			.andExpect(jsonPath("$.nickname").value(newNickname));
 	}
 
 }

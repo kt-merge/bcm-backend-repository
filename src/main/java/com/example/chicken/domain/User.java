@@ -42,6 +42,10 @@ public class User {
 		this.password = encodedPassword;
 	}
 
+	public void updateNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
 	public static User from(UserRequestDto request) {
 		return User.builder()
 			.nickname(request.nickname())
