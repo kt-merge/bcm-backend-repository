@@ -35,7 +35,8 @@ public class Product {
 	@Column(length = 1000)
 	private String description;
 
-	private String category;
+	@Enumerated(EnumType.STRING)
+	private Category category;
 
 	private BigDecimal price;
 

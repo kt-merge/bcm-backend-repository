@@ -11,7 +11,7 @@ public class SecurityConstants {
 	};
 
 	protected static final String[] USER_WHITELIST = {
-		"/api/users/**"
+		"/api/users/**", "/api/products/**"
 	};
 
 }
