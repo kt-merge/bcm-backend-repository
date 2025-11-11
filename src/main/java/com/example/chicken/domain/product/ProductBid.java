@@ -2,6 +2,7 @@ package com.example.chicken.domain.product;
 
 import java.math.BigDecimal;
 
+import com.example.chicken.common.entity.BaseTimeEntity;
 import com.example.chicken.domain.User;
 
 import jakarta.persistence.Entity;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "product_bids")
-public class ProductBid {
+public class ProductBid extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
