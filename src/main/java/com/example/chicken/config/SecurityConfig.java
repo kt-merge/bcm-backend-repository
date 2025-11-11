@@ -39,7 +39,6 @@ public class SecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(SecurityConstants.AUTH_WHITELIST).permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-				.requestMatchers("/api/products/**").hasAnyRole(Role.USER.name())
 				.requestMatchers(SecurityConstants.USER_WHITELIST).hasAnyRole(Role.USER.name())
 				.anyRequest().authenticated())
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
