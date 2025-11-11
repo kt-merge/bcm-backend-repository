@@ -16,6 +16,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -49,5 +50,22 @@ public class Product {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private User user;
+
+	@Builder
+	private Product(String name,
+					String description,
+					Category category,
+					BigDecimal price,
+					ProductStatus productStatus,
+					String imageUrl,
+					User user) {
+		this.name = name;
+		this.description = description;
+		this.category = category;
+		this.price = price;
+		this.productStatus = productStatus;
+		this.imageUrl = imageUrl;
+		this.user = user;
+	}
 
 }
