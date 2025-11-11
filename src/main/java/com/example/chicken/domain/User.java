@@ -1,5 +1,6 @@
 package com.example.chicken.domain;
 
+import com.example.chicken.common.entity.BaseTimeEntity;
 import com.example.chicken.dto.UserRequestDto;
 
 import jakarta.persistence.*;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
+public class User extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
