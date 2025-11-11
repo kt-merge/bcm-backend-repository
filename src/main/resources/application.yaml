@@ -1,6 +1,8 @@
 spring:
   application:
     name: chicken
+  jpa:
+    show-sql: true
 jwt:
   secret-key: and0U2VjcmV0a2V5bXVzdGJlbG9uZ2VydGhhbjMyY2hhcmFjdGVyc2JlY2FyZWZ1bHdoZW55b3VjaGFuZ2VpdA==
   expiration-time: 3000

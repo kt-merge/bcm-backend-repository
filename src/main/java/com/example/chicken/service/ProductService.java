@@ -1,5 +1,7 @@
 package com.example.chicken.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,5 +43,19 @@ public class ProductService {
 		Product savedProduct = this.productRepository.save(product);
 
 		return ProductResponseDto.from(savedProduct);
+	}
+
+	@Transactional(readOnly = true)
+	public ProductResponseDto getProduct(Long productId) {
+		Product product = this.productRepository.findById(productId)
+			.orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+		return ProductResponseDto.from(product);
+	}
+
+	public Page<ProductResponseDto> getProducts(Pageable pageable) {
+		Page<Product> products = this.productRepository.findAll(pageable);
+
+		return products.map(ProductResponseDto::from);
 	}
 }
