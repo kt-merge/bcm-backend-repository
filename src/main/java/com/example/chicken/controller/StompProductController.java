@@ -29,9 +29,9 @@ public class StompProductController {
 	@MessageMapping("/products/{productId}/product-bids")
 	public void handleProductBid(@DestinationVariable Long productId, ProductBidRequestDto request) {
 
-		boolean result = this.productService.updateProductBid(productId, request);
+		boolean isSuccess = this.productService.updateProductBid(productId, request);
 
-		ProductBidResponseDto value = this.productBidService.getLastBidForProduct(productId);
+		ProductBidResponseDto result = this.productBidService.getLastBidForProduct(productId);
 
 		String destination = new StringBuilder()
 			.append("/topic")
@@ -40,9 +40,8 @@ public class StompProductController {
 			.append("/product-bids")
 			.toString();
 
-		if(result) {
-			this.messageTemplate.convertAndSend(destination, value);
-		}
+		if(isSuccess) this.messageTemplate.convertAndSend(destination, result);
+		
 	}
 
 }
