@@ -44,6 +44,8 @@ public class Product extends BaseTimeEntity {
 
 	private BigDecimal bidPrice;
 
+	private Long bidCount;
+
 	@Enumerated(EnumType.STRING)
 	private ProductStatus productStatus;
 
@@ -73,4 +75,16 @@ public class Product extends BaseTimeEntity {
 		this.user = user;
 	}
 
+	public boolean isBidPriceLowerThan(BigDecimal price) {
+		return this.bidPrice.compareTo(price) < 0;
+	}
+
+	public void updateBidPrice(BigDecimal price) {
+		this.bidPrice = price;
+	}
+
+	public void incrementBidCount() {
+		if (this.bidCount == null) this.bidCount = 0L;
+		this.bidCount += 1;
+	}
 }

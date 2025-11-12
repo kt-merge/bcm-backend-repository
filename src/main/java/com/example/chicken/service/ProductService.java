@@ -8,8 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.chicken.domain.User;
 import com.example.chicken.domain.product.Product;
+import com.example.chicken.domain.product.ProductBid;
+import com.example.chicken.dto.product.ProductBidRequestDto;
 import com.example.chicken.dto.product.ProductRequestDto;
 import com.example.chicken.dto.product.ProductResponseDto;
+import com.example.chicken.repository.ProductBidRepository;
 import com.example.chicken.repository.ProductRepository;
 import com.example.chicken.repository.UserRepository;
 
@@ -21,6 +24,7 @@ public class ProductService {
 
 	private final UserRepository userRepository;
 	private final ProductRepository productRepository;
+	private final ProductBidRepository productBidRepository;
 
 	@Transactional
 	public ProductResponseDto createProduct(ProductRequestDto request) {
@@ -54,9 +58,37 @@ public class ProductService {
 		return ProductResponseDto.from(product);
 	}
 
+	@Transactional(readOnly = true)
 	public Page<ProductResponseDto> getProducts(Pageable pageable) {
 		Page<Product> products = this.productRepository.findAll(pageable);
 
 		return products.map(ProductResponseDto::from);
 	}
+
+	@Transactional
+	public void updateProductBid(Long productId, ProductBidRequestDto request) {
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+		User user = this.userRepository.findByEmail(email)
+			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+		Product product = this.productRepository.findById(productId)
+			.orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+		if (product.isBidPriceLowerThan(request.price())) {
+			product.updateBidPrice(request.price());
+			product.incrementBidCount();
+		}
+
+		Product savedProduct = this.productRepository.save(product);
+
+		ProductBid productBid = ProductBid.builder()
+			.price(request.price())
+			.user(user)
+			.product(savedProduct)
+			.build();
+
+		this.productBidRepository.save(productBid);
+	}
+
 }
