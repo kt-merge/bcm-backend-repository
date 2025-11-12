@@ -66,10 +66,9 @@ public class ProductService {
 	}
 
 	@Transactional
-	public void updateProductBid(Long productId, ProductBidRequestDto request) {
-		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+	public boolean updateProductBid(Long productId, ProductBidRequestDto request) {
 
-		User user = this.userRepository.findByEmail(email)
+		User user = this.userRepository.findByEmail(request.email())
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
 		Product product = this.productRepository.findById(productId)
@@ -78,17 +77,21 @@ public class ProductService {
 		if (product.isBidPriceLowerThan(request.price())) {
 			product.updateBidPrice(request.price());
 			product.incrementBidCount();
+
+			Product savedProduct = this.productRepository.save(product);
+
+			ProductBid productBid = ProductBid.builder()
+				.price(request.price())
+				.user(user)
+				.product(savedProduct)
+				.build();
+
+			this.productBidRepository.save(productBid);
+
+			return true;
 		}
 
-		Product savedProduct = this.productRepository.save(product);
-
-		ProductBid productBid = ProductBid.builder()
-			.price(request.price())
-			.user(user)
-			.product(savedProduct)
-			.build();
-
-		this.productBidRepository.save(productBid);
+		return false;
 	}
 
 }
