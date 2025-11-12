@@ -2,6 +2,7 @@ package com.example.chicken.domain.product;
 
 import java.math.BigDecimal;
 
+import com.example.chicken.common.entity.BaseTimeEntity;
 import com.example.chicken.domain.User;
 
 import jakarta.persistence.Column;
@@ -24,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "products")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Product {
+public class Product extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -39,7 +40,9 @@ public class Product {
 	@Enumerated(EnumType.STRING)
 	private Category category;
 
-	private BigDecimal price;
+	private BigDecimal startPrice;
+
+	private BigDecimal bidPrice;
 
 	@Enumerated(EnumType.STRING)
 	private ProductStatus productStatus;
@@ -55,14 +58,16 @@ public class Product {
 	private Product(String name,
 					String description,
 					Category category,
-					BigDecimal price,
+					BigDecimal startPrice,
+					BigDecimal bidPrice,
 					ProductStatus productStatus,
 					String imageUrl,
 					User user) {
 		this.name = name;
 		this.description = description;
 		this.category = category;
-		this.price = price;
+		this.startPrice = startPrice;
+		this.bidPrice = bidPrice;
 		this.productStatus = productStatus;
 		this.imageUrl = imageUrl;
 		this.user = user;
