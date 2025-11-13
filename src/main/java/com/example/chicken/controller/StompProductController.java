@@ -2,6 +2,7 @@ package com.example.chicken.controller;
 
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 
@@ -27,7 +28,7 @@ public class StompProductController {
 	 * @param request 입찰 정보요청 DTO
 	 */
 	@MessageMapping("/products/{productId}/product-bids")
-	public void handleProductBid(@DestinationVariable Long productId, ProductBidRequestDto request) {
+	public void handleProductBid(@DestinationVariable Long productId, @Payload ProductBidRequestDto request) {
 
 		boolean isSuccess = this.productService.updateProductBid(productId, request);
 

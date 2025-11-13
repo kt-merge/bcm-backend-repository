@@ -12,7 +12,7 @@ import lombok.Builder;
 
 @Builder
 public record ProductResponseDto(Long id, String name, String description, Category category, BigDecimal startPrice,
-								 BigDecimal bidPrice, ProductStatus productStatus, String imageUrl,
+								 BigDecimal bidPrice, Long bidCount, ProductStatus productStatus, String imageUrl,
 								 UserResponseDto user, LocalDateTime createdAt, LocalDateTime modifiedAt) {
 
 	public static ProductResponseDto from(Product product) {
@@ -23,6 +23,7 @@ public record ProductResponseDto(Long id, String name, String description, Categ
 			.category(product.getCategory())
 			.startPrice(product.getStartPrice())
 			.bidPrice(product.getBidPrice())
+			.bidCount(product.getBidCount())
 			.productStatus(product.getProductStatus())
 			.imageUrl(product.getImageUrl())
 			.user(UserResponseDto.from(product.getUser()))

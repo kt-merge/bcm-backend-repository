@@ -40,6 +40,7 @@ public class ProductService {
 			.category(request.category())
 			.startPrice(request.price())
 			.bidPrice(request.price())
+			.bidCount(0L)
 			.productStatus(request.productStatus())
 			.imageUrl(request.imageUrl())
 			.user(user)

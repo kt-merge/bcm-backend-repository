@@ -62,6 +62,7 @@ public class Product extends BaseTimeEntity {
 					Category category,
 					BigDecimal startPrice,
 					BigDecimal bidPrice,
+					Long bidCount,
 					ProductStatus productStatus,
 					String imageUrl,
 					User user) {
@@ -70,6 +71,7 @@ public class Product extends BaseTimeEntity {
 		this.category = category;
 		this.startPrice = startPrice;
 		this.bidPrice = bidPrice;
+		this.bidCount = bidCount;
 		this.productStatus = productStatus;
 		this.imageUrl = imageUrl;
 		this.user = user;
