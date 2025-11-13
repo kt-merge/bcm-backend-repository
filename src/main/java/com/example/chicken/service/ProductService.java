@@ -74,6 +74,17 @@ public class ProductService {
 		return products.map(ProductResponseDto::from);
 	}
 
+	@Transactional(readOnly = true)
+	public List<ProductResponseDto> getMyProducts() {
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		User user = this.userRepository.findByEmail(email)
+			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+		return this.productRepository.findTop10ByUserOrderByCreatedAtDesc(user)
+			.stream().map(ProductResponseDto::from)
+			.toList();
+	}
+
 	@Transactional
 	public boolean updateProductBid(Long productId, ProductBidRequestDto request) {
 

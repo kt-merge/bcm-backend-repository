@@ -1,5 +1,7 @@
 package com.example.chicken.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.chicken.dto.UpdateUserNicknameDto;
 import com.example.chicken.dto.UserResponseDto;
+import com.example.chicken.dto.product.ProductResponseDto;
+import com.example.chicken.service.ProductService;
 import com.example.chicken.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
 	private final UserService userService;
+	private final ProductService productService;
 
 	@GetMapping("/me")
 	public ResponseEntity<UserResponseDto> getUserInfo() {
@@ -30,6 +35,11 @@ public class UserController {
 	public ResponseEntity<UserResponseDto> updateNickname(@RequestBody UpdateUserNicknameDto request) {
 		UserResponseDto result = this.userService.updateNickname(request);
 		return ResponseEntity.ok(result);
+	}
+
+	@GetMapping("/me/products")
+	public ResponseEntity<List<ProductResponseDto>> getUserProducts() {
+		return ResponseEntity.ok(this.productService.getMyProducts());
 	}
 
 }
