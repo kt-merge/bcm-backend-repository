@@ -86,6 +86,13 @@ public class Product extends BaseTimeEntity {
 		return this.bidPrice.compareTo(price) < 0;
 	}
 
+	public boolean isBidUnactive() {
+		return this.bidCount == 0L;
+	}
+	public void activeBid() {
+		this.bidStatus = BidStatus.BIDDED;
+	}
+
 	public void updateBidPrice(BigDecimal price) {
 		this.bidPrice = price;
 	}

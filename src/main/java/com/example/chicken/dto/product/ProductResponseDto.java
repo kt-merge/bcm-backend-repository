@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.chicken.domain.product.BidStatus;
 import com.example.chicken.domain.product.Category;
 import com.example.chicken.domain.product.Product;
 import com.example.chicken.domain.product.ProductStatus;
@@ -14,7 +15,7 @@ import lombok.Builder;
 
 @Builder
 public record ProductResponseDto(Long id, String name, String description, Category category, BigDecimal startPrice,
-								 BigDecimal bidPrice, Long bidCount, String bidStatus, ProductStatus productStatus,
+								 BigDecimal bidPrice, Long bidCount, BidStatus bidStatus, ProductStatus productStatus,
 								 String imageUrl, UserResponseDto user, LocalDateTime createdAt,
 								 LocalDateTime modifiedAt, List<ProductBidInfoResponseDto> productBids) {
 
@@ -27,7 +28,7 @@ public record ProductResponseDto(Long id, String name, String description, Categ
 			.startPrice(product.getStartPrice())
 			.bidPrice(product.getBidPrice())
 			.bidCount(product.getBidCount())
-			.bidStatus(product.getBidStatus().getDescription())
+			.bidStatus(product.getBidStatus())
 			.productStatus(product.getProductStatus())
 			.imageUrl(product.getImageUrl())
 			.user(UserResponseDto.from(product.getUser()))
@@ -46,7 +47,7 @@ public record ProductResponseDto(Long id, String name, String description, Categ
 			.startPrice(product.getStartPrice())
 			.bidPrice(product.getBidPrice())
 			.bidCount(product.getBidCount())
-			.bidStatus(product.getBidStatus().getDescription())
+			.bidStatus(product.getBidStatus())
 			.productStatus(product.getProductStatus())
 			.imageUrl(product.getImageUrl())
 			.user(UserResponseDto.from(product.getUser()))

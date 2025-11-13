@@ -96,6 +96,8 @@ public class ProductService {
 		Product product = this.productRepository.findById(productId)
 			.orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
+		if(product.isBidUnactive()) product.activeBid();
+
 		if (product.isBidPriceLowerThan(request.price())) {
 			product.updateBidPrice(request.price());
 			product.incrementBidCount();
