@@ -14,9 +14,9 @@ import lombok.Builder;
 
 @Builder
 public record ProductResponseDto(Long id, String name, String description, Category category, BigDecimal startPrice,
-								 BigDecimal bidPrice, Long bidCount, ProductStatus productStatus, String imageUrl,
-								 UserResponseDto user, LocalDateTime createdAt, LocalDateTime modifiedAt,
-								 List<ProductBidInfoResponseDto> productBids) {
+								 BigDecimal bidPrice, Long bidCount, String bidStatus, ProductStatus productStatus,
+								 String imageUrl, UserResponseDto user, LocalDateTime createdAt,
+								 LocalDateTime modifiedAt, List<ProductBidInfoResponseDto> productBids) {
 
 	public static ProductResponseDto from(Product product) {
 		return ProductResponseDto.builder()
@@ -27,6 +27,7 @@ public record ProductResponseDto(Long id, String name, String description, Categ
 			.startPrice(product.getStartPrice())
 			.bidPrice(product.getBidPrice())
 			.bidCount(product.getBidCount())
+			.bidStatus(product.getBidStatus().getDescription())
 			.productStatus(product.getProductStatus())
 			.imageUrl(product.getImageUrl())
 			.user(UserResponseDto.from(product.getUser()))
@@ -45,6 +46,7 @@ public record ProductResponseDto(Long id, String name, String description, Categ
 			.startPrice(product.getStartPrice())
 			.bidPrice(product.getBidPrice())
 			.bidCount(product.getBidCount())
+			.bidStatus(product.getBidStatus().getDescription())
 			.productStatus(product.getProductStatus())
 			.imageUrl(product.getImageUrl())
 			.user(UserResponseDto.from(product.getUser()))

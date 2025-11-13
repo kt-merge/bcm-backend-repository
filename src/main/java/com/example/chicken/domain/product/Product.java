@@ -44,6 +44,9 @@ public class Product extends BaseTimeEntity {
 
 	private BigDecimal bidPrice;
 
+	@Enumerated(EnumType.STRING)
+	private BidStatus bidStatus;
+
 	private Long bidCount;
 
 	@Enumerated(EnumType.STRING)
@@ -63,6 +66,7 @@ public class Product extends BaseTimeEntity {
 					BigDecimal startPrice,
 					BigDecimal bidPrice,
 					Long bidCount,
+					BidStatus bidStatus,
 					ProductStatus productStatus,
 					String imageUrl,
 					User user) {
@@ -72,6 +76,7 @@ public class Product extends BaseTimeEntity {
 		this.startPrice = startPrice;
 		this.bidPrice = bidPrice;
 		this.bidCount = bidCount;
+		this.bidStatus = bidStatus;
 		this.productStatus = productStatus;
 		this.imageUrl = imageUrl;
 		this.user = user;

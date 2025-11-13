@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.chicken.domain.User;
+import com.example.chicken.domain.product.BidStatus;
 import com.example.chicken.domain.product.Product;
 import com.example.chicken.domain.product.ProductBid;
 import com.example.chicken.dto.product.ProductBidInfoResponseDto;
@@ -44,6 +45,7 @@ public class ProductService {
 			.startPrice(request.price())
 			.bidPrice(request.price())
 			.bidCount(0L)
+			.bidStatus(BidStatus.NOT_BIDDED)
 			.productStatus(request.productStatus())
 			.imageUrl(request.imageUrl())
 			.user(user)
