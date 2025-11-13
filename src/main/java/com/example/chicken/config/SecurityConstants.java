@@ -7,7 +7,12 @@ import lombok.NoArgsConstructor;
 public class SecurityConstants {
 
 	protected static final String[] AUTH_WHITELIST = {
-		"/api/auth/**", "/connect/**", "/springwolf/**"
+		"/api/auth/**",
+		"/connect/**",
+		"/springwolf/**",
+		"/swagger-ui/**",
+		"/swagger-ui.html",
+		"/v3/api-docs/**"
 	};
 
 	protected static final String[] USER_WHITELIST = {
