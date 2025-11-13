@@ -1,5 +1,7 @@
 package com.example.chicken.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.chicken.domain.User;
 import com.example.chicken.domain.product.Product;
 import com.example.chicken.domain.product.ProductBid;
+import com.example.chicken.dto.product.ProductBidInfoResponseDto;
 import com.example.chicken.dto.product.ProductBidRequestDto;
 import com.example.chicken.dto.product.ProductRequestDto;
 import com.example.chicken.dto.product.ProductResponseDto;
@@ -56,7 +59,12 @@ public class ProductService {
 		Product product = this.productRepository.findById(productId)
 			.orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-		return ProductResponseDto.from(product);
+		List<ProductBidInfoResponseDto> productBidResponses = this.productBidRepository
+			.findTop5ByProductIdOrderByCreatedAtDesc(productId)
+			.stream().map(ProductBidInfoResponseDto::from)
+			.toList();
+
+		return ProductResponseDto.of(product, productBidResponses);
 	}
 
 	@Transactional(readOnly = true)
