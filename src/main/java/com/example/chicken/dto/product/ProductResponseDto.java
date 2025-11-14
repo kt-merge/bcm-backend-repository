@@ -17,7 +17,8 @@ import lombok.Builder;
 public record ProductResponseDto(Long id, String name, String description, Category category, BigDecimal startPrice,
 								 BigDecimal bidPrice, Long bidCount, BidStatus bidStatus, ProductStatus productStatus,
 								 String imageUrl, UserResponseDto user, LocalDateTime createdAt,
-								 LocalDateTime modifiedAt, List<ProductBidInfoResponseDto> productBids) {
+								 LocalDateTime modifiedAt, LocalDateTime bidEndDate,
+								 List<ProductBidInfoResponseDto> productBids) {
 
 	public static ProductResponseDto from(Product product) {
 		return ProductResponseDto.builder()
@@ -34,6 +35,7 @@ public record ProductResponseDto(Long id, String name, String description, Categ
 			.user(UserResponseDto.from(product.getUser()))
 			.createdAt(product.getCreatedAt())
 			.modifiedAt(product.getModifiedAt())
+			.bidEndDate(product.getBidEndDate())
 			.productBids(new ArrayList<>())
 			.build();
 	}
@@ -53,6 +55,7 @@ public record ProductResponseDto(Long id, String name, String description, Categ
 			.user(UserResponseDto.from(product.getUser()))
 			.createdAt(product.getCreatedAt())
 			.modifiedAt(product.getModifiedAt())
+			.bidEndDate(product.getBidEndDate())
 			.productBids(productBids)
 			.build();
 	}

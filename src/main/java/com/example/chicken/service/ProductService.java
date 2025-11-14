@@ -47,6 +47,7 @@ public class ProductService {
 			.bidCount(0L)
 			.bidStatus(BidStatus.NOT_BIDDED)
 			.productStatus(request.productStatus())
+			.bidEndDate(request.bidEndDate())
 			.imageUrl(request.imageUrl())
 			.user(user)
 			.build();

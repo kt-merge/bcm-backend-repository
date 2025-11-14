@@ -1,6 +1,7 @@
 package com.example.chicken.domain.product;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import com.example.chicken.common.entity.BaseTimeEntity;
 import com.example.chicken.domain.User;
@@ -49,6 +50,8 @@ public class Product extends BaseTimeEntity {
 
 	private Long bidCount;
 
+	private LocalDateTime bidEndDate;
+
 	@Enumerated(EnumType.STRING)
 	private ProductStatus productStatus;
 
@@ -66,6 +69,7 @@ public class Product extends BaseTimeEntity {
 					BigDecimal startPrice,
 					BigDecimal bidPrice,
 					Long bidCount,
+					LocalDateTime bidEndDate,
 					BidStatus bidStatus,
 					ProductStatus productStatus,
 					String imageUrl,
@@ -77,6 +81,7 @@ public class Product extends BaseTimeEntity {
 		this.bidPrice = bidPrice;
 		this.bidCount = bidCount;
 		this.bidStatus = bidStatus;
+		this.bidEndDate = bidEndDate;
 		this.productStatus = productStatus;
 		this.imageUrl = imageUrl;
 		this.user = user;
@@ -89,6 +94,7 @@ public class Product extends BaseTimeEntity {
 	public boolean isBidUnactive() {
 		return this.bidCount == 0L;
 	}
+
 	public void activeBid() {
 		this.bidStatus = BidStatus.BIDDED;
 	}
@@ -98,7 +104,8 @@ public class Product extends BaseTimeEntity {
 	}
 
 	public void incrementBidCount() {
-		if (this.bidCount == null) this.bidCount = 0L;
+		if (this.bidCount == null)
+			this.bidCount = 0L;
 		this.bidCount += 1;
 	}
 }
