@@ -2,7 +2,7 @@ package com.example.chicken.domain.product;
 
 
 public enum Category {
-	ELECTONICS,
+	ELECTRONICS,
 	FASHION,
 	GOODS,
 	BOOKS,
