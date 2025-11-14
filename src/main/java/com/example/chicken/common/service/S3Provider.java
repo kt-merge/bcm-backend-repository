@@ -24,10 +24,11 @@ public class S3Provider {
 	private final S3Presigner s3Presigner;
 
 	public String generateUploadUrl(String key) {
+		String pathKey = "products/" + key;
 
 		PutObjectRequest objectRequest = PutObjectRequest.builder()
 			.bucket(this.bucketName)
-			.key(key)
+			.key(pathKey)
 			.contentType(extractExtension(key))
 			.build();
 
