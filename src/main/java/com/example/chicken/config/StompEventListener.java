@@ -20,11 +20,15 @@ public class StompEventListener {
 	public void connectHandle(SessionConnectEvent event) {
 		StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
 		sessions.add(accessor.getSessionId());
+
+		log.info("New WebSocket connection, sessionId: {}, session Count: {}", accessor.getSessionId(), sessions.size());
 	}
 
 	@EventListener
 	public void disconnectHandle(SessionDisconnectEvent event) {
 		StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
 		sessions.remove(accessor.getSessionId());
+
+		log.info("WebSocket disconnected, sessionId: {}, session Count: {}", accessor.getSessionId(), sessions.size());
 	}
 }

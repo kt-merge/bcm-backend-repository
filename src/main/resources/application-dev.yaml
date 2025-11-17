@@ -2,7 +2,7 @@ spring:
   application:
     name: chicken
   jpa:
-    show-sql: true
+    show-sql: false
     database: postgresql
     hibernate:
       ddl-auto: update
