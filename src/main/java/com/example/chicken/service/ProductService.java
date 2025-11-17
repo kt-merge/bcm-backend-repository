@@ -2,6 +2,7 @@ package com.example.chicken.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +27,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductService {
 
+	@Value("${s3.product-bucket-url}")
+	private String s3BucketUrl;
+
 	private final UserRepository userRepository;
 	private final ProductRepository productRepository;
 	private final ProductBidRepository productBidRepository;
@@ -38,6 +42,8 @@ public class ProductService {
 		User user = this.userRepository.findByEmail(email)
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+		String imageUrl = s3BucketUrl + request.imageUrl();
+
 		Product product = Product.builder()
 			.name(request.name())
 			.description(request.description())
@@ -48,7 +54,7 @@ public class ProductService {
 			.bidStatus(BidStatus.NOT_BIDDED)
 			.productStatus(request.productStatus())
 			.bidEndDate(request.bidEndDate())
-			.imageUrl(request.imageUrl())
+			.imageUrl(imageUrl)
 			.user(user)
 			.build();
 

@@ -3,6 +3,14 @@ spring:
     name: chicken
   jpa:
     show-sql: true
+    database: postgresql
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:postgresql://3.35.24.8:5432/kt_db
+    username: kt
+    password: qwer1234
+    driver-class-name: org.postgresql.Driver
 jwt:
   secret-key: and0U2VjcmV0a2V5bXVzdGJlbG9uZ2VydGhhbjMyY2hhcmFjdGVyc2JlY2FyZWZ1bHdoZW55b3VjaGFuZ2VpdA==
   expiration-time: 3000
