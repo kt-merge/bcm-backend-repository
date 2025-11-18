@@ -33,9 +33,7 @@ public class AuctionEndJobService {
 		// 이미 완료된 경매인 경우 아무 작업도 수행하지 않음
 		if (product.getBidStatus().equals(BidStatus.COMPLETED)) return;
 
-		Optional<ProductBid> productBid = this.productBidRepository.findTopByProductIdAndPriceOrderByPriceDesc(
-			product.getId(),
-			product.getBidPrice());
+		Optional<ProductBid> productBid = this.productBidRepository.findTopByProductIdOrderByPriceDesc(product.getId());
 
 		if (productBid.isPresent()) {
 			HighestBidder highestBidder = HighestBidder.builder()

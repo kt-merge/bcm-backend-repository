@@ -10,5 +10,6 @@ import com.example.chicken.domain.product.Product;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	List<Product> findTop10ByUserOrderByCreatedAtDesc(User user);
+	List<Product> findByUser(User user);
 
 }

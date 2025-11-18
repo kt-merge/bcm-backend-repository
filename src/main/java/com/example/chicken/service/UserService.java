@@ -1,5 +1,7 @@
 package com.example.chicken.service;
 
+import java.util.List;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,7 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.chicken.domain.User;
 import com.example.chicken.dto.UpdateUserNicknameDto;
 import com.example.chicken.dto.UserResponseDto;
+import com.example.chicken.dto.product.ProductResponseDto;
 import com.example.chicken.dto.user.UpdateUserInfoDto;
+import com.example.chicken.repository.ProductRepository;
 import com.example.chicken.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -17,10 +21,17 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 
 	private final UserRepository userRepository;
+	private final ProductRepository productRepository;
 
 	@Transactional(readOnly = true)
 	public UserResponseDto getUserInfo() {
-		return UserResponseDto.from(getUser());
+		User user = getUser();
+		List<ProductResponseDto> productResponse = this.productRepository.findByUser(user)
+			.stream()
+			.map(ProductResponseDto::from)
+			.toList();
+
+		return UserResponseDto.of(user, productResponse);
 	}
 
 	@Transactional

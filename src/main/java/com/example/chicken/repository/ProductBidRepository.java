@@ -1,6 +1,5 @@
 package com.example.chicken.repository;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +14,7 @@ public interface ProductBidRepository extends JpaRepository<ProductBid, Long> {
 	Optional<ProductBid> findTopByProductIdOrderByCreatedAtDesc(Long productId);
 
 	@EntityGraph(attributePaths = {"user"})
-	Optional<ProductBid> findTopByProductIdAndPriceOrderByPriceDesc(Long productId, BigDecimal price);
+	Optional<ProductBid> findTopByProductIdOrderByPriceDesc(Long productId);
 
 
 	@EntityGraph(attributePaths = {"user", "product"})
