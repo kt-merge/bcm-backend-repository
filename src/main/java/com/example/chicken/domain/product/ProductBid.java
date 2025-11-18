@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,6 +37,13 @@ public class ProductBid extends BaseTimeEntity {
 	@JoinColumn(name = "product_id")
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Product product;
+
+	@OneToOne(mappedBy = "productBid")
+	private HighestBidder highestBidder;
+
+	public boolean isHighestBidderNotExists() {
+		return this.highestBidder == null;
+	}
 
 	@Builder
 	private ProductBid(BigDecimal price, User user, Product product) {

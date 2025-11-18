@@ -8,6 +8,7 @@ import com.example.chicken.domain.product.Product;
 import com.example.chicken.domain.product.ProductBid;
 
 public record ProductBidResponseDto(Long productId,
+									String productName,
 									BigDecimal price,
 									String bidderNickname,
 									Long bidCount,
@@ -20,6 +21,7 @@ public record ProductBidResponseDto(Long productId,
 		User user = productBid.getUser();
 
 		return new ProductBidResponseDto(product.getId(),
+										 product.getName(),
 										 productBid.getPrice(),
 										 user.getNickname(),
 										 product.getBidCount(),

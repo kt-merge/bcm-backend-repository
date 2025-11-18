@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.example.chicken.domain.product.ProductBid;
 
@@ -16,11 +17,19 @@ public interface ProductBidRepository extends JpaRepository<ProductBid, Long> {
 	@EntityGraph(attributePaths = {"user"})
 	Optional<ProductBid> findTopByProductIdOrderByPriceDesc(Long productId);
 
-
 	@EntityGraph(attributePaths = {"user", "product"})
 	List<ProductBid> findTop5ByProductIdOrderByCreatedAtDesc(Long productId);
 
-	@EntityGraph(attributePaths = {"product", "user"})
+	@Query("""
+		SELECT pb FROM ProductBid pb
+		WHERE pb.id IN (
+		SELECT MAX(pbb.id)
+		FROM ProductBid pbb
+		WHERE pbb.user.id = :userId
+		GROUP BY pbb.product.id
+		)
+		ORDER BY pb.createdAt DESC
+		""")
 	List<ProductBid> findDistinctByUserId(Long userId);
 
 }

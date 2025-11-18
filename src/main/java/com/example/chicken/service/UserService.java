@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.chicken.domain.User;
+import com.example.chicken.domain.product.ProductBid;
 import com.example.chicken.dto.UpdateUserNicknameDto;
 import com.example.chicken.dto.UserResponseDto;
 import com.example.chicken.dto.product.ProductBidResponseDto;
@@ -38,7 +39,9 @@ public class UserService {
 			.toList();
 
 		List<ProductBidResponseDto> productBids = this.productBidRepository.findDistinctByUserId(user.getId())
-			.stream().map(ProductBidResponseDto::from)
+			.stream()
+			.filter(ProductBid::isHighestBidderNotExists)
+			.map(ProductBidResponseDto::from)
 			.toList();
 
 		List<ProductResponseDto> productResponse = this.productRepository.findByUser(user)
