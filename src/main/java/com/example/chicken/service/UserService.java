@@ -9,8 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.chicken.domain.User;
 import com.example.chicken.dto.UpdateUserNicknameDto;
 import com.example.chicken.dto.UserResponseDto;
+import com.example.chicken.dto.product.ProductBidResponseDto;
 import com.example.chicken.dto.product.ProductResponseDto;
 import com.example.chicken.dto.user.UpdateUserInfoDto;
+import com.example.chicken.dto.user.WinnerResponseDto;
+import com.example.chicken.repository.HighestBidderRepository;
+import com.example.chicken.repository.ProductBidRepository;
 import com.example.chicken.repository.ProductRepository;
 import com.example.chicken.repository.UserRepository;
 
@@ -22,16 +26,27 @@ public class UserService {
 
 	private final UserRepository userRepository;
 	private final ProductRepository productRepository;
+	private final ProductBidRepository productBidRepository;
+	private final HighestBidderRepository highestBidderRepository;
 
 	@Transactional(readOnly = true)
 	public UserResponseDto getUserInfo() {
 		User user = getUser();
+
+		List<WinnerResponseDto> winnerResponse = this.highestBidderRepository.findByWinnerId(user.getId())
+			.stream().map(WinnerResponseDto::from)
+			.toList();
+
+		List<ProductBidResponseDto> productBids = this.productBidRepository.findDistinctByUserId(user.getId())
+			.stream().map(ProductBidResponseDto::from)
+			.toList();
+
 		List<ProductResponseDto> productResponse = this.productRepository.findByUser(user)
 			.stream()
 			.map(ProductResponseDto::from)
 			.toList();
 
-		return UserResponseDto.of(user, productResponse);
+		return UserResponseDto.of(user, winnerResponse, productBids, productResponse);
 	}
 
 	@Transactional

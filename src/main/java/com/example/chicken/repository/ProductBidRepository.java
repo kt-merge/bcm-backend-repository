@@ -20,5 +20,7 @@ public interface ProductBidRepository extends JpaRepository<ProductBid, Long> {
 	@EntityGraph(attributePaths = {"user", "product"})
 	List<ProductBid> findTop5ByProductIdOrderByCreatedAtDesc(Long productId);
 
+	@EntityGraph(attributePaths = {"product", "user"})
+	List<ProductBid> findDistinctByUserId(Long userId);
 
 }
