@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.chicken.dto.UpdateUserNicknameDto;
 import com.example.chicken.dto.UserResponseDto;
 import com.example.chicken.dto.product.ProductResponseDto;
+import com.example.chicken.dto.user.UpdateUserInfoDto;
 import com.example.chicken.service.ProductService;
 import com.example.chicken.service.UserService;
 
@@ -28,6 +30,12 @@ public class UserController {
 	@GetMapping("/me")
 	public ResponseEntity<UserResponseDto> getUserInfo() {
 		UserResponseDto result = this.userService.getUserInfo();
+		return ResponseEntity.ok(result);
+	}
+
+	@PutMapping("/me")
+	public ResponseEntity<UserResponseDto> updateUserInfo(@RequestBody UpdateUserInfoDto request) {
+		UserResponseDto result = this.userService.updateUserInfo(request);
 		return ResponseEntity.ok(result);
 	}
 

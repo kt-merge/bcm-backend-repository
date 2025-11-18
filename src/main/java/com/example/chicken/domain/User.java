@@ -2,6 +2,7 @@ package com.example.chicken.domain;
 
 import com.example.chicken.common.entity.BaseTimeEntity;
 import com.example.chicken.dto.UserRequestDto;
+import com.example.chicken.dto.user.UpdateUserInfoDto;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -57,4 +58,8 @@ public class User extends BaseTimeEntity {
 			.build();
 	}
 
+	public void updateUserInfo(UpdateUserInfoDto request) {
+		this.nickname = request.nickname();
+		this.phoneNumber = request.phoneNumber();
+	}
 }

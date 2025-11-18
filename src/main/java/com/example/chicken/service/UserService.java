@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.chicken.domain.User;
 import com.example.chicken.dto.UpdateUserNicknameDto;
 import com.example.chicken.dto.UserResponseDto;
+import com.example.chicken.dto.user.UpdateUserInfoDto;
 import com.example.chicken.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,15 @@ public class UserService {
 		User savedUser = this.userRepository.save(user);
 
 		return UserResponseDto.from(savedUser);
+	}
+
+	@Transactional
+	public UserResponseDto updateUserInfo(UpdateUserInfoDto request) {
+		User user = getUser();
+
+		user.updateUserInfo(request);
+
+		return UserResponseDto.from(this.userRepository.save(user));
 	}
 
 	private User getUser() {
