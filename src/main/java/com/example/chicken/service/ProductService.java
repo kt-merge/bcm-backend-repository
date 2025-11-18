@@ -33,6 +33,7 @@ public class ProductService {
 	private final UserRepository userRepository;
 	private final ProductRepository productRepository;
 	private final ProductBidRepository productBidRepository;
+	private final ProductSchedulerService productSchedulerService;
 
 	@Transactional
 	public ProductResponseDto createProduct(ProductRequestDto request) {
@@ -59,6 +60,8 @@ public class ProductService {
 			.build();
 
 		Product savedProduct = this.productRepository.save(product);
+
+		this.productSchedulerService.scheduleAuctionEnd(savedProduct.getId(), savedProduct.getBidEndDate());
 
 		return ProductResponseDto.from(savedProduct);
 	}
@@ -103,7 +106,8 @@ public class ProductService {
 		Product product = this.productRepository.findById(productId)
 			.orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-		if(product.isBidUnactive()) product.activeBid();
+		if (product.isBidUnactive())
+			product.activeBid();
 
 		if (product.isBidPriceLowerThan(request.price())) {
 			product.updateBidPrice(request.price());

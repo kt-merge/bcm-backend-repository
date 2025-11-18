@@ -108,4 +108,9 @@ public class Product extends BaseTimeEntity {
 			this.bidCount = 0L;
 		this.bidCount += 1;
 	}
+
+	public void completeBid() {
+		this.bidStatus = BidStatus.COMPLETED;
+	}
+
 }

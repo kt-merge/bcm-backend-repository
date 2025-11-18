@@ -63,7 +63,7 @@ public class S3Provider {
 
 		return switch (extension) {
 			case "png" -> ContentType.IMAGE_PNG.getMimeType();
-			case "jpg", "jpge" -> ContentType.IMAGE_JPEG.getMimeType();
+			case "jpg", "jpeg" -> ContentType.IMAGE_JPEG.getMimeType();
 			case "gif" -> ContentType.IMAGE_GIF.getMimeType();
 			case "webp" -> ContentType.IMAGE_WEBP.getMimeType();
 			default -> ContentType.APPLICATION_OCTET_STREAM.getMimeType();
