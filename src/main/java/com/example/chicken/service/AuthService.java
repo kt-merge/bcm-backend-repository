@@ -40,9 +40,7 @@ public class AuthService {
 
         if(!this.passwordEncoder.matches(request.password(), user.getPassword())) throw new IllegalArgumentException();
 
-        String jwt = this.tokenProvider.createJWT(user.getEmail(), user.getRole());
-
-        return new SignInResponseDto(jwt);
+        return this.tokenProvider.createTokens(request);
     }
 
 }

@@ -110,7 +110,8 @@ class AuthControllerTest {
 			//then
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.accessToken").exists());
+			.andExpect(jsonPath("$.accessToken").exists())
+			.andExpect(jsonPath("$.refreshToken").exists());
 	}
 
 }
