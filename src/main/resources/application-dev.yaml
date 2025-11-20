@@ -11,6 +11,10 @@ spring:
     username: kt
     password: qwer1234
     driver-class-name: org.postgresql.Driver
+  data:
+    redis:
+      host: redis
+      port: 6379
 jwt:
   secret-key: and0U2VjcmV0a2V5bXVzdGJlbG9uZ2VydGhhbjMyY2hhcmFjdGVyc2JlY2FyZWZ1bHdoZW55b3VjaGFuZ2VpdA==
   expiration-time: 3000
