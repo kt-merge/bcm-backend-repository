@@ -1,4 +1,6 @@
 package com.example.chicken.dto;
 
-public record SignInRequestDto(String email, String password) {
+import jakarta.validation.constraints.NotBlank;
+
+public record SignInRequestDto(@NotBlank String email,@NotBlank String password) {
 }

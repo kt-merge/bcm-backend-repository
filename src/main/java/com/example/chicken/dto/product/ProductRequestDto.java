@@ -6,6 +6,13 @@ import java.time.LocalDateTime;
 import com.example.chicken.domain.product.Category;
 import com.example.chicken.domain.product.ProductStatus;
 
-public record ProductRequestDto(String name, String description, Category category, BigDecimal price,
-								ProductStatus productStatus, LocalDateTime bidEndDate, String imageUrl) {
+import jakarta.validation.constraints.NotBlank;
+
+public record ProductRequestDto(@NotBlank String name,
+								String description,
+								@NotBlank Category category,
+								@NotBlank BigDecimal price,
+								@NotBlank ProductStatus productStatus,
+								LocalDateTime bidEndDate,
+								@NotBlank String imageUrl) {
 }
