@@ -55,8 +55,6 @@ class AuthControllerTest {
 
 	String refreshToken;
 
-
-
 	@BeforeEach
 	void setUp() {
 		String email = "yoojinlee.dev@gmail.com";
@@ -106,7 +104,7 @@ class AuthControllerTest {
 	}
 
 	@Test
-	@DisplayName("회원가입 Validation 검증")
+	@DisplayName("회원가입 시 유효성 검증 실패")
 	void signUp_validation() throws Exception {
 		//given
 		UserRequestDto request = UserRequestDto.newInstance();
@@ -135,12 +133,13 @@ class AuthControllerTest {
 			//then
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.accessToken").exists())
-			.andExpect(jsonPath("$.refreshToken").exists());
+			.andExpect(cookie().exists("refresh-token"))
+			.andExpect(cookie().value("refresh-token", not(this.refreshToken)))
+			.andExpect(jsonPath("$.accessToken").exists());
 	}
 
 	@Test
-	@DisplayName("AuthHeader reissue 성공")
+	@DisplayName("토큰 재발급 성공")
 	void reissue() throws Exception {
 		//given
 		Cookie cookie = new Cookie("refresh-token", this.refreshToken);
@@ -158,7 +157,7 @@ class AuthControllerTest {
 	}
 
 	@Test
-	@DisplayName("AuthHeader validate 검증")
+	@DisplayName("토큰 재발급 시 유효성 검증 실패")
 	void reissue_validate() throws Exception {
 		//given
 		String authValue = "";
@@ -172,6 +171,5 @@ class AuthControllerTest {
 			.andDo(print())
 			.andExpect(status().isBadRequest());
 	}
-
 
 }

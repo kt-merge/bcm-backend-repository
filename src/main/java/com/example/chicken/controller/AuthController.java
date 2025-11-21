@@ -32,6 +32,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthController {
 
+	private static final Long MAX_AGE = 15L * 24L * 60L * 60L;
+
 	private static final String USER_BASE_URL = "/api/users/me";
 
 	private final AuthService authService;
@@ -43,9 +45,17 @@ public class AuthController {
 	}
 
 	@PostMapping("/sign-in")
-	public ResponseEntity<SignInResponseDto> signIn(@RequestBody @Valid SignInRequestDto request) {
+	public ResponseEntity<AccessTokenResponseDto> signIn(@RequestBody
+														 @Valid SignInRequestDto request,
+														 HttpServletResponse response) {
 
-		SignInResponseDto result = this.authService.signIn(request);
+		SignInResponseDto tokens = this.authService.signIn(request);
+
+		Cookie cookie = CookieUtil.generateCookie("refresh-token", tokens.refreshToken(), MAX_AGE);
+
+		response.addCookie(cookie);
+
+		AccessTokenResponseDto result = AccessTokenResponseDto.from(tokens.accessToken());
 
 		return ResponseEntity.ok(result);
 	}
@@ -60,7 +70,7 @@ public class AuthController {
 
 		Cookie cookie = CookieUtil.generateCookie("refresh-token",
 												  tokens.refreshToken(),
-												  15L * 24L * 60L * 60L);
+												  MAX_AGE);
 
 		response.addCookie(cookie);
 
