@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.example.chicken.domain.Role;
 import com.example.chicken.dto.SignInRequestDto;
 import com.example.chicken.dto.SignInResponseDto;
+import com.example.chicken.dto.user.TokenResponseDto;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -46,6 +47,12 @@ public class JwtTokenProvider {
 			createJWT(request.email(), Role.USER),
 			createRefreshJWT(request.email())
 		);
+	}
+
+	public TokenResponseDto createTokens(String email) {
+		return TokenResponseDto.of(
+			createJWT(email, Role.USER),
+			createRefreshJWT(email));
 	}
 
 	public String createRefreshJWT(String email) {

@@ -1,14 +1,9 @@
 package com.example.chicken.controller;
 
-import com.example.chicken.ChickenApplication;
-import com.example.chicken.domain.Role;
-import com.example.chicken.domain.User;
-import com.example.chicken.dto.SignInRequestDto;
-import com.example.chicken.dto.UserRequestDto;
-import com.example.chicken.repository.UserRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.transaction.Transactional;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,9 +16,19 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.example.chicken.ChickenApplication;
+import com.example.chicken.common.jwt.JwtTokenProvider;
+import com.example.chicken.domain.Role;
+import com.example.chicken.domain.User;
+import com.example.chicken.domain.auth.RefreshToken;
+import com.example.chicken.dto.SignInRequestDto;
+import com.example.chicken.dto.UserRequestDto;
+import com.example.chicken.repository.RefreshTokenRepository;
+import com.example.chicken.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.transaction.Transactional;
 
 @Transactional
 @AutoConfigureMockMvc
@@ -40,7 +45,17 @@ class AuthControllerTest {
 	@Autowired
 	PasswordEncoder passwordEncoder;
 
+	@Autowired
+	JwtTokenProvider tokenProvider;
+
+	@Autowired
+	RefreshTokenRepository tokenRepository;
+
 	User user;
+
+	String refreshToken;
+
+
 
 	@BeforeEach
 	void setUp() {
@@ -49,14 +64,24 @@ class AuthControllerTest {
 		String nickname = "yoojinLee";
 		Role role = Role.USER;
 
-		this.user = User.builder()
+		User userValue = User.builder()
 			.email(email)
 			.password(this.passwordEncoder.encode(password))
 			.nickname(nickname)
 			.role(role)
 			.build();
 
-		this.userRepository.save(user);
+		user = this.userRepository.save(userValue);
+
+		this.refreshToken = this.tokenProvider.createTokens(user.getEmail()).refreshToken();
+
+		RefreshToken refreshToken = RefreshToken.builder()
+			.email(user.getEmail())
+			.refreshToken(this.refreshToken)
+			.build();
+
+		this.tokenRepository.save(refreshToken);
+
 	}
 
 	@Test
@@ -113,5 +138,40 @@ class AuthControllerTest {
 			.andExpect(jsonPath("$.accessToken").exists())
 			.andExpect(jsonPath("$.refreshToken").exists());
 	}
+
+	@Test
+	@DisplayName("AuthHeader reissue 성공")
+	void reissue() throws Exception {
+		//given
+		Cookie cookie = new Cookie("refresh-token", this.refreshToken);
+
+		//when
+		mockMvc.perform(post("/api/auth/reissue")
+							.cookie(cookie)
+							.contentType(MediaType.APPLICATION_JSON))
+			//then
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(cookie().exists("refresh-token"))
+			.andExpect(cookie().value("refresh-token", not(this.refreshToken)))
+			.andExpect(jsonPath("$.accessToken").exists());
+	}
+
+	@Test
+	@DisplayName("AuthHeader validate 검증")
+	void reissue_validate() throws Exception {
+		//given
+		String authValue = "";
+		Cookie cookie = new Cookie("refresh-token", authValue);
+
+		//when
+		mockMvc.perform(post("/api/auth/reissue")
+							.cookie(cookie)
+							.contentType(MediaType.APPLICATION_JSON))
+			//then
+			.andDo(print())
+			.andExpect(status().isBadRequest());
+	}
+
 
 }

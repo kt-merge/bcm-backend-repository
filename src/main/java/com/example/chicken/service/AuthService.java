@@ -1,46 +1,75 @@
 package com.example.chicken.service;
 
 import com.example.chicken.common.jwt.JwtTokenProvider;
+import com.example.chicken.common.jwt.JwtUtil;
 import com.example.chicken.domain.User;
+import com.example.chicken.domain.auth.RefreshToken;
 import com.example.chicken.dto.SignInRequestDto;
 import com.example.chicken.dto.SignInResponseDto;
 import com.example.chicken.dto.UserRequestDto;
 import com.example.chicken.dto.UserResponseDto;
+import com.example.chicken.dto.user.TokenResponseDto;
+import com.example.chicken.repository.RefreshTokenRepository;
 import com.example.chicken.repository.UserRepository;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider tokenProvider;
+	private final UserRepository userRepository;
+	private final RefreshTokenRepository refreshTokenRepository;
+	private final PasswordEncoder passwordEncoder;
+	private final JwtTokenProvider tokenProvider;
+	private final JwtUtil jwtUtil;
 
-    @Transactional
-    public UserResponseDto signUp(UserRequestDto request) {
-        if(this.userRepository.findByEmail(request.email()).isPresent())
-            throw new IllegalArgumentException("이미 가입된 이메일입니다.");
+	public UserResponseDto signUp(UserRequestDto request) {
+		if (this.userRepository.findByEmail(request.email()).isPresent())
+			throw new IllegalArgumentException("이미 가입된 이메일입니다.");
 
-        User user = this.userRepository.save(User.from(request));
+		User user = this.userRepository.save(User.from(request));
 
-        String encodedPassword = this.passwordEncoder.encode(request.password());
+		String encodedPassword = this.passwordEncoder.encode(request.password());
 
-        user.encodePassword(encodedPassword);
+		user.encodePassword(encodedPassword);
 
-        return UserResponseDto.from(user);
-    }
+		return UserResponseDto.from(user);
+	}
 
-    public SignInResponseDto signIn(SignInRequestDto request) {
-        User user =
-                this.userRepository.findByEmail(request.email()).orElseThrow(IllegalArgumentException::new);
+	public SignInResponseDto signIn(SignInRequestDto request) {
+		User user =
+			this.userRepository.findByEmail(request.email()).orElseThrow(IllegalArgumentException::new);
 
-        if(!this.passwordEncoder.matches(request.password(), user.getPassword())) throw new IllegalArgumentException();
+		if (!this.passwordEncoder.matches(request.password(), user.getPassword()))
+			throw new IllegalArgumentException();
 
-        return this.tokenProvider.createTokens(request);
-    }
+		return this.tokenProvider.createTokens(request);
+	}
+
+	@Transactional
+	public TokenResponseDto reissue(String refreshToken) {
+		if (!jwtUtil.validate(refreshToken))
+			throw new IllegalArgumentException("리프레시 토큰이 유효하지 않습니다.");
+
+		String email = jwtUtil.parseClaims(refreshToken).getSubject();
+
+		RefreshToken savedToken = this.refreshTokenRepository.findById(email)
+			.orElseThrow(() -> new IllegalArgumentException("리프레시 토큰이 존재하지 않습니다."));
+
+		if (!savedToken.getRefreshJwt().equals(refreshToken))
+			throw new IllegalArgumentException("리프레시 토큰이 일치하지 않습니다.");
+
+		String refreshJWT = this.tokenProvider.createRefreshJWT(email);
+
+		savedToken.setRefreshToken(refreshJWT);
+		this.refreshTokenRepository.save(savedToken);
+
+		return this.tokenProvider.createTokens(email);
+	}
 
 }

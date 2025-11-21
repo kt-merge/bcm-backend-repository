@@ -4,5 +4,5 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.example.chicken.domain.auth.RefreshToken;
 
-public interface RefreshTokenRepository extends CrudRepository<RefreshToken, Long> {
+public interface RefreshTokenRepository extends CrudRepository<RefreshToken, String> {
 }

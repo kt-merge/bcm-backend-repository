@@ -8,6 +8,7 @@ public class SecurityConstants {
 
 	protected static final String[] AUTH_WHITELIST = {
 		"/api/auth/**",
+		"/api/auth/reissue",
 		"/connect/**",
 		"/springwolf/**",
 		"/swagger-ui/**",

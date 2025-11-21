@@ -66,11 +66,11 @@ public class JwtUtil {
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
-    public Claims parseClaims(String accessToken) {
+    public Claims parseClaims(String token) {
 
         try {
             return Jwts.parserBuilder().setSigningKey(this.key).build()
-                    .parseClaimsJws(accessToken)
+                    .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
