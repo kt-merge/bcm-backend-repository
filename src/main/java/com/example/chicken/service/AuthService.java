@@ -28,17 +28,18 @@ public class AuthService {
 	private final JwtTokenProvider tokenProvider;
 	private final JwtUtil jwtUtil;
 
+	@Transactional
 	public UserResponseDto signUp(UserRequestDto request) {
 		if (this.userRepository.findByEmail(request.email()).isPresent())
 			throw new IllegalArgumentException("이미 가입된 이메일입니다.");
 
-		User user = this.userRepository.save(User.from(request));
+		User userEntity = User.from(request);
 
-		String encodedPassword = this.passwordEncoder.encode(request.password());
+		userEntity.encodePassword(passwordEncoder.encode(request.password()));
 
-		user.encodePassword(encodedPassword);
+		User result = this.userRepository.save(userEntity);
 
-		return UserResponseDto.from(user);
+		return UserResponseDto.from(result);
 	}
 
 	public SignInResponseDto signIn(SignInRequestDto request) {
