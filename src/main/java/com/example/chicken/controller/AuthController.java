@@ -1,7 +1,10 @@
 package com.example.chicken.controller;
 
 import java.net.URI;
+import java.time.Duration;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -51,9 +54,11 @@ public class AuthController {
 
 		SignInResponseDto tokens = this.authService.signIn(request);
 
-		Cookie cookie = CookieUtil.generateCookie("refresh-token", tokens.refreshToken(), MAX_AGE);
+		ResponseCookie cookie = CookieUtil.generateCookieResponse("refresh-token",
+																   tokens.refreshToken(),
+																   Duration.ofDays(15));
 
-		response.addCookie(cookie);
+		response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
 		AccessTokenResponseDto result = AccessTokenResponseDto.from(tokens.accessToken());
 

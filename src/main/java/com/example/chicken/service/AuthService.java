@@ -44,7 +44,8 @@ public class AuthService {
 
 	public SignInResponseDto signIn(SignInRequestDto request) {
 		User user =
-			this.userRepository.findByEmail(request.email()).orElseThrow(IllegalArgumentException::new);
+			this.userRepository.findByEmail(request.email())
+				.orElseThrow(IllegalArgumentException::new);
 
 		if (!this.passwordEncoder.matches(request.password(), user.getPassword()))
 			throw new IllegalArgumentException();
