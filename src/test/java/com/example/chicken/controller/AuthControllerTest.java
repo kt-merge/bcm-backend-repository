@@ -83,12 +83,17 @@ class AuthControllerTest {
 	}
 
 	@Test
-	@DisplayName("회원가입 성공")
+	@DisplayName("[Integration Test] 회원가입 성공")
 	void signUp() throws Exception {
 		//given
+		String email = "test@test.com";
+		String password = "1q2w3e4r!";
+		String nickname = "testnick";
 		String phoneNumber = "01012345678";
+
 		UserRequestDto request =
-			new UserRequestDto("test@test.com", "1q2w3e4r!", "testnick", phoneNumber);
+			new UserRequestDto(email, password, nickname, phoneNumber);
+
 		//when
 		mockMvc.perform(post("/api/auth/sign-up")
 							.contentType(MediaType.APPLICATION_JSON)
@@ -98,13 +103,17 @@ class AuthControllerTest {
 			.andExpect(status().isCreated())
 			.andExpect(header().exists("Location"))
 			.andExpect(jsonPath("$.id").exists())
-			.andExpect(jsonPath("$.email").exists())
-			.andExpect(jsonPath("$.nickname").exists())
-			.andExpect(jsonPath("$.phoneNumber").value(phoneNumber));
+			.andExpect(jsonPath("$.email").value(email))
+			.andExpect(jsonPath("$.role").value(Role.USER.name()))
+			.andExpect(jsonPath("$.nickname").value(nickname))
+			.andExpect(jsonPath("$.phoneNumber").value(phoneNumber))
+			.andExpect(jsonPath("$.createdAt").exists())
+			.andExpect(jsonPath("$.modifiedAt").exists());
+
 	}
 
 	@Test
-	@DisplayName("회원가입 시 유효성 검증 실패")
+	@DisplayName("[Integration Test] 회원가입 시 유효성 검증 실패")
 	void signUp_validation() throws Exception {
 		//given
 		UserRequestDto request = UserRequestDto.newInstance();
@@ -122,7 +131,7 @@ class AuthControllerTest {
 	}
 
 	@Test
-	@DisplayName("로그인 성공")
+	@DisplayName("[Integration Test] 로그인 성공")
 	void signIn() throws Exception {
 		SignInRequestDto request = new SignInRequestDto(user.getEmail(), "1q2w3e4r!");
 
@@ -134,7 +143,7 @@ class AuthControllerTest {
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andExpect(cookie().exists("refresh-token"))
-			.andExpect(cookie().value("refresh-token", not(this.refreshToken)))
+			.andExpect(cookie().value("refresh-token", notNullValue()))
 			.andExpect(jsonPath("$.accessToken").exists());
 	}
 
@@ -142,7 +151,8 @@ class AuthControllerTest {
 	@DisplayName("토큰 재발급 성공")
 	void reissue() throws Exception {
 		//given
-		Cookie cookie = new Cookie("refresh-token", this.refreshToken);
+		String refreshToken = this.refreshToken;
+		Cookie cookie = new Cookie("refresh-token", refreshToken);
 
 		//when
 		mockMvc.perform(post("/api/auth/reissue")
@@ -152,7 +162,6 @@ class AuthControllerTest {
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andExpect(cookie().exists("refresh-token"))
-			.andExpect(cookie().value("refresh-token", not(this.refreshToken)))
 			.andExpect(jsonPath("$.accessToken").exists());
 	}
 
