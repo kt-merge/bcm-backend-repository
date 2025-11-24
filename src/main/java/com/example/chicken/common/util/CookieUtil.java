@@ -4,8 +4,6 @@ import java.time.Duration;
 
 import org.springframework.http.ResponseCookie;
 
-import jakarta.servlet.http.Cookie;
-
 public class CookieUtil {
 
 	private CookieUtil() {
@@ -22,13 +20,4 @@ public class CookieUtil {
 			.build();
 	}
 
-	public static Cookie generateCookie(String name, String value, Long maxAge) {
-		Cookie cookie = new Cookie(name, value);
-		cookie.setHttpOnly(true);
-		cookie.setSecure(true);
-		cookie.setPath("/");
-		cookie.setMaxAge(Integer.parseInt(maxAge.toString()));
-
-		return cookie;
-	}
 }
