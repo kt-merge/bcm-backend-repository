@@ -2,6 +2,7 @@ package com.example.chicken.service;
 
 import com.example.chicken.common.jwt.JwtTokenProvider;
 import com.example.chicken.common.jwt.JwtUtil;
+import com.example.chicken.domain.Role;
 import com.example.chicken.domain.User;
 import com.example.chicken.domain.auth.RefreshToken;
 import com.example.chicken.dto.SignInRequestDto;
@@ -13,11 +14,13 @@ import com.example.chicken.repository.RefreshTokenRepository;
 import com.example.chicken.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -42,6 +45,7 @@ public class AuthService {
 		return UserResponseDto.from(result);
 	}
 
+	@Transactional
 	public SignInResponseDto signIn(SignInRequestDto request) {
 		User user =
 			this.userRepository.findByEmail(request.email())
@@ -50,11 +54,23 @@ public class AuthService {
 		if (!this.passwordEncoder.matches(request.password(), user.getPassword()))
 			throw new IllegalArgumentException();
 
-		return this.tokenProvider.createTokens(request);
+		String refreshToken = this.tokenProvider.createRefreshJWT(request.email());
+
+		RefreshToken tokenEntity = RefreshToken.builder()
+			.email(request.email())
+			.refreshToken(refreshToken)
+			.build();
+
+		this.refreshTokenRepository.save(tokenEntity);
+
+		String accessToken = this.tokenProvider.createJWT(request.email(), Role.USER);
+
+		return new SignInResponseDto(accessToken, refreshToken);
 	}
 
 	@Transactional
 	public TokenResponseDto reissue(String refreshToken) {
+
 		if (!jwtUtil.validate(refreshToken))
 			throw new IllegalArgumentException("리프레시 토큰이 유효하지 않습니다.");
 

@@ -23,7 +23,6 @@ import com.example.chicken.dto.user.AccessTokenResponseDto;
 import com.example.chicken.dto.user.TokenResponseDto;
 import com.example.chicken.service.AuthService;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -34,8 +33,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping(value = "/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-
-	private static final Long MAX_AGE = 15L * 24L * 60L * 60L;
 
 	private static final String USER_BASE_URL = "/api/users/me";
 
@@ -73,11 +70,11 @@ public class AuthController {
 
 		TokenResponseDto tokens = this.authService.reissue(refreshToken);
 
-		Cookie cookie = CookieUtil.generateCookie("refresh-token",
-												  tokens.refreshToken(),
-												  MAX_AGE);
+		ResponseCookie cookie = CookieUtil.generateCookieResponse("refresh-token",
+																  tokens.refreshToken(),
+																  Duration.ofDays(15));
 
-		response.addCookie(cookie);
+		response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
 		AccessTokenResponseDto result = AccessTokenResponseDto.from(tokens.accessToken());
 
