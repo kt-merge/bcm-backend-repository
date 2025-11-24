@@ -1,5 +1,9 @@
 package com.example.chicken.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.chicken.common.jwt.JwtTokenProvider;
 import com.example.chicken.common.jwt.JwtUtil;
 import com.example.chicken.domain.Role;
@@ -15,10 +19,6 @@ import com.example.chicken.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -86,6 +86,15 @@ public class AuthService {
 		this.refreshTokenRepository.save(savedToken);
 
 		return this.tokenProvider.createTokens(email);
+	}
+
+	@Transactional
+	public void logout(String refreshToken) {
+
+		String email = jwtUtil.parseClaims(refreshToken).getSubject();
+
+		this.refreshTokenRepository.findById(email)
+			.ifPresent(this.refreshTokenRepository::delete);
 	}
 
 }

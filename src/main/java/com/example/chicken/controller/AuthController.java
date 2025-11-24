@@ -4,6 +4,7 @@ import java.net.URI;
 import java.time.Duration;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.chicken.common.constant.CookieConstant;
 import com.example.chicken.common.jwt.annotation.IsJwt;
 import com.example.chicken.common.util.CookieUtil;
 import com.example.chicken.dto.SignInRequestDto;
@@ -51,9 +53,9 @@ public class AuthController {
 
 		SignInResponseDto tokens = this.authService.signIn(request);
 
-		ResponseCookie cookie = CookieUtil.generateCookieResponse("refresh-token",
-																   tokens.refreshToken(),
-																   Duration.ofDays(15));
+		ResponseCookie cookie = CookieUtil.generateCookieResponse(CookieConstant.REFRESH_TOKEN_NAME,
+																  tokens.refreshToken(),
+																  Duration.ofDays(15));
 
 		response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
@@ -63,22 +65,37 @@ public class AuthController {
 	}
 
 	@PostMapping("/reissue")
-	public ResponseEntity<AccessTokenResponseDto> reissue(@CookieValue("refresh-token")
+	public ResponseEntity<AccessTokenResponseDto> reissue(@CookieValue(CookieConstant.REFRESH_TOKEN_NAME)
 														  @NotBlank
-														  @IsJwt String refreshToken,
-														  HttpServletResponse response) {
+														  @IsJwt String refreshToken) {
 
 		TokenResponseDto tokens = this.authService.reissue(refreshToken);
 
-		ResponseCookie cookie = CookieUtil.generateCookieResponse("refresh-token",
+		ResponseCookie cookie = CookieUtil.generateCookieResponse(CookieConstant.REFRESH_TOKEN_NAME,
 																  tokens.refreshToken(),
 																  Duration.ofDays(15));
 
-		response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
 		AccessTokenResponseDto result = AccessTokenResponseDto.from(tokens.accessToken());
 
-		return ResponseEntity.ok(result);
+		return ResponseEntity
+			.status(HttpStatus.OK)
+			.header(HttpHeaders.SET_COOKIE, cookie.toString())
+			.body(result);
+	}
+
+	@PostMapping("/logout")
+	public ResponseEntity<Object> logout(@CookieValue(CookieConstant.REFRESH_TOKEN_NAME)
+										 @NotBlank
+										 @IsJwt String refreshToken) {
+
+		this.authService.logout(refreshToken);
+
+		ResponseCookie cookie =
+			CookieUtil.generateCookieResponse(CookieConstant.REFRESH_TOKEN_NAME, null, Duration.ofSeconds(0));
+
+		return ResponseEntity.noContent()
+			.header(HttpHeaders.SET_COOKIE, cookie.toString())
+			.build();
 	}
 
 }

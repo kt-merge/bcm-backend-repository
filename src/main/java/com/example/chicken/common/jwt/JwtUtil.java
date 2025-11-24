@@ -55,7 +55,6 @@ public class JwtUtil {
 	}
 
 	public Claims parseClaims(String token) {
-
 		try {
 			return Jwts.parserBuilder().setSigningKey(this.key).build()
 				.parseClaimsJws(token)
@@ -63,7 +62,6 @@ public class JwtUtil {
 		} catch (ExpiredJwtException e) {
 			return e.getClaims();
 		}
-
 	}
 
 }

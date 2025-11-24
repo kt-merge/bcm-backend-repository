@@ -55,21 +55,18 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    //JWT
+
+	//JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-
-	// Provides the documentation API
-	implementation 'io.github.springwolf:springwolf-stomp:1.19.0'
-	runtimeOnly 'io.github.springwolf:springwolf-ui:1.19.0'
 
 	implementation 'com.amazonaws:aws-java-sdk-s3:1.12.767'
 	implementation 'software.amazon.awssdk:s3:2.27.3'
 	implementation 'software.amazon.awssdk:s3control:2.27.3'
 	implementation 'software.amazon.awssdk:s3outposts:2.27.3'
 
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 
 	implementation 'org.postgresql:postgresql:42.7.3'
 }
