@@ -10,9 +10,9 @@ import jakarta.validation.constraints.NotBlank;
 
 public record ProductRequestDto(@NotBlank String name,
 								String description,
-								@NotBlank Category category,
-								@NotBlank BigDecimal price,
-								@NotBlank ProductStatus productStatus,
+								Category category,
+								BigDecimal price,
+								ProductStatus productStatus,
 								LocalDateTime bidEndDate,
 								@NotBlank String imageUrl) {
 }
