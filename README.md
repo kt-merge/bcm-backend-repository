@@ -16,6 +16,7 @@
 - 테스트
 - API 요약
 - 데이터베이스 및 마이그레이션
+- 구현 중점
 - 배포
 - 개발 규칙 / 코딩 컨벤션
 - 기여 방법
@@ -32,11 +33,11 @@
 - 알림(이메일/푸시) 등
 
 기술 스택
-- 애플리케이션 언어: [예: Java / Kotlin / Node.js / Python] (채워주세요)
-- 프레임워크: [예: Spring Boot / Express / Django] (채워주세요)
-- 빌드 도구: [Maven / Gradle / npm / yarn] (채워주세요)
-- DB: [예: PostgreSQL / MySQL / MongoDB] (채워주세요)
-- 기타: Docker, Redis, S3 등 (필요 시 기재)
+- 애플리케이션 언어: Java 17
+- 프레임워크: Spring Boot
+- 빌드 도구: Gradle
+- DB: PostgreSQL
+- 기타: Redis, S3
 
 빠른 시작
 
@@ -100,6 +101,13 @@ API 요약 (예시)
 - DB 초기화: Flyway / Liquibase 사용 여부(확인 후 기입)
 - 샘플 데이터 로딩 방법 (SQL 스크립트 또는 데이터 시더)
 - Docker Compose 예시 (있다면 추가)
+
+## 🚀 Performance Improvements
+
+### Redis Soreted Set을 활용한 경매 종료 시스템 성능 개선
+1. 서버 재시작 시 경매 종류 스케쥴 유실 방지로 운영 안정성 향상
+2. Quartz 제거로 인한 설정 복잡도 및 운영 복잡도 감소
+3. Quartz JDBC Store 대비 약 20배 이상 빠른 응답 구현
 
 배포
 - 빌드 아티팩트 생성: mvn package / ./gradlew bootJar

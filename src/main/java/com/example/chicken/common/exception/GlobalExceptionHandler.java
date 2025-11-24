@@ -15,6 +15,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.example.chicken.common.dto.ExceptionResponseDto;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +26,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+	@ExceptionHandler({SecurityException.class, MalformedJwtException.class, ExpiredJwtException.class,
+		UnsupportedJwtException.class, SignatureException.class})
+	public ResponseEntity<ExceptionResponseDto> handleJwtException() {
+
+		ExceptionResponseDto response = new ExceptionResponseDto(401, "Invalid JWT token", null);
+
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ExceptionResponseDto> handleValidationException(MethodArgumentNotValidException exception) {

@@ -33,7 +33,7 @@ public class ProductService {
 	private final UserRepository userRepository;
 	private final ProductRepository productRepository;
 	private final ProductBidRepository productBidRepository;
-	private final ProductSchedulerService productSchedulerService;
+	private final BidScheduleService bidScheduleService;
 
 	@Transactional
 	public ProductResponseDto createProduct(ProductRequestDto request) {
@@ -61,7 +61,7 @@ public class ProductService {
 
 		Product savedProduct = this.productRepository.save(product);
 
-		this.productSchedulerService.scheduleAuctionEnd(savedProduct.getId(), savedProduct.getBidEndDate());
+		this.bidScheduleService.register(savedProduct.getId(), savedProduct.getBidEndDate());
 
 		return ProductResponseDto.from(savedProduct);
 	}

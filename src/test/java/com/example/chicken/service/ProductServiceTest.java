@@ -36,7 +36,7 @@ class ProductServiceTest {
 	ProductRepository productRepository;
 
 	@Mock
-	ProductSchedulerService productSchedulerService;
+	BidScheduleService bidScheduleService;
 
 	@Mock
 	UserRepository userRepository;
@@ -99,8 +99,8 @@ class ProductServiceTest {
 
 		ReflectionTestUtils.setField(saved, "id", 1L);
 
-		doNothing().when(this.productSchedulerService)
-				.scheduleAuctionEnd(anyLong(), any(LocalDateTime.class));
+		doNothing().when(this.bidScheduleService)
+			.register(anyLong(), any(LocalDateTime.class));
 
 		when(this.productRepository.save(any(Product.class)))
 			.thenReturn(saved);
@@ -111,7 +111,7 @@ class ProductServiceTest {
 		assertNotNull(result);
 		verify(this.userRepository, times(1)).findByEmail(email);
 		verify(this.productRepository, times(1)).save(any(Product.class));
-		verify(this.productSchedulerService, times(1))
-			.scheduleAuctionEnd(eq(1L), any(LocalDateTime.class));
+		verify(this.bidScheduleService, times(1))
+			.register(eq(1L), any(LocalDateTime.class));
 	}
 }
