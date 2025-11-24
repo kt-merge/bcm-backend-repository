@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,61 +22,48 @@ import java.util.Collection;
 @Component
 public class JwtUtil {
 
-    private final Key key;
+	private final Key key;
 
-    public JwtUtil(@Value("${jwt.secret-key}") String secret) {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
-    }
+	public JwtUtil(@Value("${jwt.secret-key}") String secret) {
+		byte[] keyBytes = Decoders.BASE64.decode(secret);
+		this.key = Keys.hmacShaKeyFor(keyBytes);
+	}
 
-    public boolean validate(String token) {
-        try {
+	public boolean validate(String token) {
+		Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
 
-            Jwts.parserBuilder().setSigningKey(key)
-                    .build().parseClaimsJws(token);
+		return true;
+	}
 
-            return true;
-        } catch (SecurityException | MalformedJwtException e) {
-            log.info("Invalid JWT Token", e);
-        } catch (ExpiredJwtException e) {
-            log.info("Expired JWT Token", e);
-        } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT Token", e);
-        } catch (IllegalArgumentException e) {
-            log.info("JWT claims string is empty", e);
-        }
+	public Authentication getAuthentication(String accessToken) {
 
-        return false;
-    }
+		Claims claims = parseClaims(accessToken);
 
-    public Authentication getAuthentication(String accessToken) {
+		if (claims.get("role") == null)
+			throw new IllegalArgumentException();
 
-        Claims claims = parseClaims(accessToken);
+		// 클레임에서 권한 정보 가져오기
+		Collection<? extends GrantedAuthority> authorities =
+			Arrays.stream(claims.get("role").toString().split(","))
+				.map(SimpleGrantedAuthority::new)
+				.toList();
 
-        if (claims.get("role") == null) throw new IllegalArgumentException();
+		UserDetails principal =
+			new User(claims.getSubject(), "", authorities);
 
-        // 클레임에서 권한 정보 가져오기
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get("role").toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .toList();
+		return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+	}
 
-        UserDetails principal =
-                new User(claims.getSubject(), "", authorities);
+	public Claims parseClaims(String token) {
 
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
-    }
+		try {
+			return Jwts.parserBuilder().setSigningKey(this.key).build()
+				.parseClaimsJws(token)
+				.getBody();
+		} catch (ExpiredJwtException e) {
+			return e.getClaims();
+		}
 
-    public Claims parseClaims(String token) {
-
-        try {
-            return Jwts.parserBuilder().setSigningKey(this.key).build()
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
-        }
-
-    }
+	}
 
 }
