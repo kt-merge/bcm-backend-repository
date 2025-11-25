@@ -63,7 +63,7 @@ class UserControllerTest {
 
 		this.userRepository.save(user);
 
-		token = "Bearer " + tokenProvider.createJWT(email, role);
+		token = "Bearer " + tokenProvider.createJWT(email, nickname, role);
 	}
 
 	@Test

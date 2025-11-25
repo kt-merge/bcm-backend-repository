@@ -61,7 +61,7 @@ public class AuthService {
 
 		this.refreshTokenRepository.save(tokenEntity);
 
-		String accessToken = this.tokenProvider.createJWT(request.email(), Role.USER);
+		String accessToken = this.tokenProvider.createJWT(user.getEmail(), user.getNickname(), Role.USER);
 
 		return new SignInResponseDto(accessToken, refreshToken);
 	}
@@ -74,6 +74,8 @@ public class AuthService {
 
 		String email = jwtUtil.parseClaims(refreshToken).getSubject();
 
+		User user = this.userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new);
+
 		RefreshToken savedToken = this.refreshTokenRepository.findById(email)
 			.orElseThrow(() -> new IllegalArgumentException("리프레시 토큰이 존재하지 않습니다."));
 
@@ -85,7 +87,7 @@ public class AuthService {
 		savedToken.setRefreshToken(refreshJWT);
 		this.refreshTokenRepository.save(savedToken);
 
-		return this.tokenProvider.createTokens(email);
+		return this.tokenProvider.createTokens(user.getEmail(), user.getPassword());
 	}
 
 	@Transactional

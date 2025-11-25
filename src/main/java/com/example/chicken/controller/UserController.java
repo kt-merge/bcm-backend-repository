@@ -39,6 +39,10 @@ public class UserController {
 		return ResponseEntity.ok(result);
 	}
 
+	/**
+	 * @deprecated 닉네임 변경은 updateUserInfo로 대체됩니다.
+	 */
+	@Deprecated
 	@PatchMapping("/me/nickname")
 	public ResponseEntity<UserResponseDto> updateNickname(@RequestBody UpdateUserNicknameDto request) {
 		UserResponseDto result = this.userService.updateNickname(request);

@@ -71,7 +71,7 @@ class AuthControllerTest {
 
 		user = this.userRepository.save(userValue);
 
-		this.refreshToken = this.tokenProvider.createTokens(user.getEmail()).refreshToken();
+		this.refreshToken = this.tokenProvider.createTokens(user.getEmail(), user.getNickname()).refreshToken();
 
 		RefreshToken refreshToken = RefreshToken.builder()
 			.email(user.getEmail())

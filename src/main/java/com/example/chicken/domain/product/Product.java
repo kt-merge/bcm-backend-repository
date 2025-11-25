@@ -32,7 +32,7 @@ public class Product extends BaseTimeEntity {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@Column(length = 500)
+	@Column(length = 500, nullable = false)
 	private String name;
 
 	@Column(length = 1000)

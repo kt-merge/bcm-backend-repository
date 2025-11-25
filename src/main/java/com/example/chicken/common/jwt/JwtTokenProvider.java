@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.example.chicken.domain.Role;
-import com.example.chicken.dto.SignInRequestDto;
-import com.example.chicken.dto.SignInResponseDto;
 import com.example.chicken.dto.user.TokenResponseDto;
 
 import io.jsonwebtoken.Claims;
@@ -42,16 +40,9 @@ public class JwtTokenProvider {
 							  SignatureAlgorithm.HS512.getJcaName());
 	}
 
-	public SignInResponseDto createTokens(SignInRequestDto request) {
-		return new SignInResponseDto(
-			createJWT(request.email(), Role.USER),
-			createRefreshJWT(request.email())
-		);
-	}
-
-	public TokenResponseDto createTokens(String email) {
+	public TokenResponseDto createTokens(String email, String nickname) {
 		return TokenResponseDto.of(
-			createJWT(email, Role.USER),
+			createJWT(email, nickname, Role.USER),
 			createRefreshJWT(email));
 	}
 
@@ -69,11 +60,12 @@ public class JwtTokenProvider {
 			.compact();
 	}
 
-	public String createJWT(String email, Role role) {
+	public String createJWT(String email, String nickname, Role role) {
 		Claims claims = Jwts.claims().setSubject(email);
 
 		String userRole = "ROLE_" + role.name();
 		claims.put("role", userRole);
+		claims.put("nickname", nickname);
 		claims.put("type", "access_token");
 
 		Date now = new Date();
