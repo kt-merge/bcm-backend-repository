@@ -1,5 +1,7 @@
 package com.example.chicken.config;
 
+import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -19,5 +21,9 @@ public class SecurityConstants {
 	protected static final String[] USER_WHITELIST = {
 		"/api/users/**", "/api/products/**", "/api/s3/**"
 	};
+
+	protected static final List<String> ALLOWED_METHODS = List.of(
+		"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
+	);
 
 }

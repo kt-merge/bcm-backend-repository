@@ -1,8 +1,8 @@
 package com.example.chicken.config;
 
-import java.util.List;
+import static com.example.chicken.config.SecurityConstants.*;
 
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +21,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.chicken.domain.Role;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -37,9 +39,9 @@ public class SecurityConfig {
 			.sessionManagement(session ->
 								   session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers(SecurityConstants.AUTH_WHITELIST).permitAll()
+				.requestMatchers(AUTH_WHITELIST).permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-				.requestMatchers(SecurityConstants.USER_WHITELIST).hasAnyRole(Role.USER.name())
+				.requestMatchers(USER_WHITELIST).hasAnyRole(Role.USER.name())
 				.anyRequest().authenticated())
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -50,7 +52,7 @@ public class SecurityConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOriginPatterns(List.of("*"));
-		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+		configuration.setAllowedMethods(ALLOWED_METHODS);
 		configuration.setAllowedHeaders(List.of("*"));
 		configuration.setAllowCredentials(true);
 
