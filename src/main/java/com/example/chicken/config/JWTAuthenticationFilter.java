@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +30,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JWTAuthenticationFilter extends GenericFilterBean {
 
+	private static final String BEARER_PREFIX = "Bearer";
 	private final JwtUtil jwtUtil;
 
 	@Override
@@ -61,9 +63,9 @@ public class JWTAuthenticationFilter extends GenericFilterBean {
 	}
 
 	private String resolveToken(HttpServletRequest request) {
-		String bearerToken = request.getHeader("Authorization");
+		String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer"))
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX))
 			return bearerToken.substring(7);
 
 		return null;
