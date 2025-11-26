@@ -2,6 +2,7 @@ package com.example.chicken.service;
 
 import java.util.Optional;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,6 +10,7 @@ import com.example.chicken.domain.product.BidStatus;
 import com.example.chicken.domain.product.HighestBidder;
 import com.example.chicken.domain.product.Product;
 import com.example.chicken.domain.product.ProductBid;
+import com.example.chicken.dto.mail.AuctionWonEvent;
 import com.example.chicken.repository.HighestBidderRepository;
 import com.example.chicken.repository.ProductBidRepository;
 import com.example.chicken.repository.ProductRepository;
@@ -22,6 +24,7 @@ public class AuctionEndJobService {
 	private final ProductRepository productRepository;
 	private final ProductBidRepository productBidRepository;
 	private final HighestBidderRepository highestBidderRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
 	public void endProductAuction(Long productId) {
@@ -42,6 +45,9 @@ public class AuctionEndJobService {
 				.build();
 
 			this.highestBidderRepository.save(highestBidder);
+
+			AuctionWonEvent event = new AuctionWonEvent(product.getName(), productBid.get().getUser().getEmail());
+			this.eventPublisher.publishEvent(event);
 		}
 
 		product.completeBid();
