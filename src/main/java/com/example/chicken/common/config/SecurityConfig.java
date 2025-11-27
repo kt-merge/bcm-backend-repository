@@ -19,7 +19,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.example.chicken.domain.Role;
+import com.example.chicken.domain.auth.entity.user.Role;
 
 import lombok.RequiredArgsConstructor;
 

@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.chicken.domain.Role;
-import com.example.chicken.domain.User;
+import com.example.chicken.domain.auth.entity.user.Role;
+import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.dto.product.ProductBidResponseDto;
 import com.example.chicken.dto.product.ProductResponseDto;
 import com.example.chicken.dto.user.WinnerResponseDto;

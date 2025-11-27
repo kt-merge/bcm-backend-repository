@@ -3,7 +3,7 @@ package com.example.chicken.domain.product.entity;
 import java.math.BigDecimal;
 
 import com.example.chicken.common.entity.BaseTimeEntity;
-import com.example.chicken.domain.User;
+import com.example.chicken.domain.auth.entity.user.User;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

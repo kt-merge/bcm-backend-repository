@@ -3,7 +3,7 @@ package com.example.chicken.dto.product;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.example.chicken.domain.User;
+import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.product.entity.ProductBid;
 
 public record ProductBidInfoResponseDto(Long productBidId,

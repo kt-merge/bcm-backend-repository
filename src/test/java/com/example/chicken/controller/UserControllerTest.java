@@ -16,8 +16,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.example.chicken.ChickenApplication;
 import com.example.chicken.common.jwt.JwtTokenProvider;
-import com.example.chicken.domain.Role;
-import com.example.chicken.domain.User;
+import com.example.chicken.domain.auth.entity.user.Role;
+import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.dto.UpdateUserNicknameDto;
 import com.example.chicken.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -8,7 +8,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.example.chicken.domain.Role;
+import com.example.chicken.domain.auth.entity.user.Role;
 import com.example.chicken.dto.user.TokenResponseDto;
 
 import io.jsonwebtoken.Claims;

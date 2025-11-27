@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.chicken.common.error.exception.user.UserNotFoundException;
-import com.example.chicken.domain.User;
+import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.product.entity.BidStatus;
 import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.entity.ProductBid;

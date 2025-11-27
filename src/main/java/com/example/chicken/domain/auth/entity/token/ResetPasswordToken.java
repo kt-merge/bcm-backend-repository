@@ -1,4 +1,4 @@
-package com.example.chicken.domain.auth.entity;
+package com.example.chicken.domain.auth.entity.token;
 
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.RedisKeyValueAdapter;

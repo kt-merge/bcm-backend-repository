@@ -1,4 +1,4 @@
-package com.example.chicken.domain;
+package com.example.chicken.domain.auth.entity.user;
 
 import com.example.chicken.common.entity.BaseTimeEntity;
 import com.example.chicken.dto.UserRequestDto;
@@ -38,10 +38,6 @@ public class User extends BaseTimeEntity {
 		this.password = password;
 		this.role = role;
 		this.phoneNumber = phoneNumber;
-	}
-
-	public void encodePassword(String encodedPassword) {
-		this.password = encodedPassword;
 	}
 
 	public void updateNickname(String nickname) {

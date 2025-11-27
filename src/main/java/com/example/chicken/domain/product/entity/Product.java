@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.example.chicken.common.entity.BaseTimeEntity;
-import com.example.chicken.domain.User;
+import com.example.chicken.domain.auth.entity.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

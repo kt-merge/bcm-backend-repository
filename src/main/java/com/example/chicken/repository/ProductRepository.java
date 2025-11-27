@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.chicken.domain.User;
+import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.product.entity.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
