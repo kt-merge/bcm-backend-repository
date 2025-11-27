@@ -18,7 +18,7 @@ public class RefreshToken {
 
 	@Id
 	private String id;
-
+	
 	private String refreshJwt;
 
 	@Builder

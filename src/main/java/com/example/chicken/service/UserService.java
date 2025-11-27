@@ -7,10 +7,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.chicken.common.error.exception.auth.ResetTokenExpiredException;
 import com.example.chicken.common.error.exception.user.UserNotFoundException;
 import com.example.chicken.domain.User;
 import com.example.chicken.domain.auth.entity.ResetPasswordToken;
+import com.example.chicken.domain.auth.exception.ResetTokenExpiredException;
 import com.example.chicken.domain.product.entity.ProductBid;
 import com.example.chicken.dto.UpdateUserNicknameDto;
 import com.example.chicken.dto.UserResponseDto;

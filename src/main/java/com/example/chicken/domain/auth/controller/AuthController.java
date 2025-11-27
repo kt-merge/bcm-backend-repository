@@ -1,4 +1,4 @@
-package com.example.chicken.controller;
+package com.example.chicken.domain.auth.controller;
 
 import static com.example.chicken.common.constant.PathConstant.Auth.*;
 
@@ -88,8 +88,8 @@ public class AuthController {
 	}
 
 	@PostMapping(LOGOUT)
-	public ResponseEntity<Object> logout(@CookieValue(CookieConstant.REFRESH_TOKEN_NAME)
-										 @NotBlank @IsJwt String refreshToken) {
+	public ResponseEntity<Void> logout(@CookieValue(CookieConstant.REFRESH_TOKEN_NAME)
+									   @NotBlank @IsJwt String refreshToken) {
 
 		this.authService.logout(refreshToken);
 
@@ -102,20 +102,26 @@ public class AuthController {
 	}
 
 	@PostMapping(Password.REQUEST_RESET)
-	public ResponseEntity<Object> requestPasswordReset(@RequestBody @Valid RequestResetPasswordDto requestDto) {
+	public ResponseEntity<Void> requestPasswordReset(@RequestBody @Valid RequestResetPasswordDto requestDto) {
+
 		this.authService.requestPasswordReset(requestDto.email());
+
 		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping(Password.VERIFY)
 	public ResponseEntity<Boolean> verifyResetToken(@RequestParam @NotBlank String token) {
+
 		this.authService.verifyResetToken(token);
+
 		return ResponseEntity.ok().body(true);
 	}
 
 	@PostMapping(Password.RESET)
-	public ResponseEntity<Object> resetPassword(@RequestBody @Valid ResetPasswordDto request) {
+	public ResponseEntity<Void> resetPassword(@RequestBody @Valid ResetPasswordDto request) {
+
 		this.userService.updatePassword(request.password(), request.resetToken());
+
 		return ResponseEntity.noContent().build();
 	}
 
