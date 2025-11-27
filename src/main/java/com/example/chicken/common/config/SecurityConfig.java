@@ -1,6 +1,6 @@
-package com.example.chicken.config;
+package com.example.chicken.common.config;
 
-import static com.example.chicken.config.SecurityConstants.*;
+import static com.example.chicken.common.config.SecurityConstants.*;
 
 import java.util.List;
 

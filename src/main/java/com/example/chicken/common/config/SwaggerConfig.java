@@ -1,4 +1,4 @@
-package com.example.chicken.config;
+package com.example.chicken.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

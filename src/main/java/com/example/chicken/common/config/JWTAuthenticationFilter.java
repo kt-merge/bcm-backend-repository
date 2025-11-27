@@ -1,4 +1,4 @@
-package com.example.chicken.config;
+package com.example.chicken.common.config;
 
 import com.example.chicken.common.dto.ExceptionResponseDto;
 import com.example.chicken.common.jwt.JwtUtil;

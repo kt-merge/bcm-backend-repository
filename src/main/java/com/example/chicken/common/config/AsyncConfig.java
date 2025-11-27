@@ -1,4 +1,4 @@
-package com.example.chicken.config;
+package com.example.chicken.common.config;
 
 import java.util.concurrent.Executor;
 

@@ -1,4 +1,4 @@
-package com.example.chicken.config;
+package com.example.chicken.common.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
