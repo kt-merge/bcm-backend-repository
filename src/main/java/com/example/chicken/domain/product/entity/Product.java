@@ -91,8 +91,8 @@ public class Product extends BaseTimeEntity {
 		return this.bidPrice.compareTo(price) < 0;
 	}
 
-	public boolean isBidUnactive() {
-		return this.bidCount == 0L;
+	public boolean isBidInactive() {
+		return this.bidStatus.equals(BidStatus.NOT_BIDDED);
 	}
 
 	public void activeBid() {

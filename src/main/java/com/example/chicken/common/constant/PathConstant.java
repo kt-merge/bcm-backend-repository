@@ -33,4 +33,17 @@ public class PathConstant {
 		}
 	}
 
+	public static class User {
+
+		private User() {
+			throw new IllegalStateException("Constant class");
+		}
+
+		public static final String USER_PREFIX = "/api/users";
+
+		public static final String ME = "/me";
+		public static final String MY_PRODUCTS = ME + "/products";
+
+	}
+
 }

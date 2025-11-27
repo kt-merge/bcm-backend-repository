@@ -26,7 +26,7 @@ import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.entity.ProductStatus;
 import com.example.chicken.dto.product.ProductRequestDto;
 import com.example.chicken.dto.product.ProductResponseDto;
-import com.example.chicken.repository.ProductRepository;
+import com.example.chicken.domain.auth.repository.ProductRepository;
 import com.example.chicken.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)

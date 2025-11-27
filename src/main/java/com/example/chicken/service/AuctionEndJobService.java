@@ -13,7 +13,7 @@ import com.example.chicken.domain.product.entity.ProductBid;
 import com.example.chicken.dto.mail.AuctionWonEvent;
 import com.example.chicken.repository.HighestBidderRepository;
 import com.example.chicken.repository.ProductBidRepository;
-import com.example.chicken.repository.ProductRepository;
+import com.example.chicken.domain.auth.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 

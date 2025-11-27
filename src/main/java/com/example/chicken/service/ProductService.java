@@ -1,5 +1,6 @@
 package com.example.chicken.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -9,17 +10,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.chicken.common.error.exception.user.UserNotFoundException;
+import com.example.chicken.domain.auth.exception.UserNotFoundException;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.product.entity.BidStatus;
 import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.entity.ProductBid;
+import com.example.chicken.domain.product.exception.ProductNotFoundException;
 import com.example.chicken.dto.product.ProductBidInfoResponseDto;
 import com.example.chicken.dto.product.ProductBidRequestDto;
 import com.example.chicken.dto.product.ProductRequestDto;
 import com.example.chicken.dto.product.ProductResponseDto;
 import com.example.chicken.repository.ProductBidRepository;
-import com.example.chicken.repository.ProductRepository;
+import com.example.chicken.domain.auth.repository.ProductRepository;
 import com.example.chicken.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -69,7 +71,7 @@ public class ProductService {
 	@Transactional(readOnly = true)
 	public ProductResponseDto getProduct(Long productId) {
 		Product product = this.productRepository.findById(productId)
-			.orElseThrow(() -> new IllegalArgumentException("Product not found"));
+			.orElseThrow(() -> new ProductNotFoundException(productId.toString()));
 
 		List<ProductBidInfoResponseDto> productBidResponses = this.productBidRepository
 			.findTop5ByProductIdOrderByCreatedAtDesc(productId)
@@ -89,8 +91,9 @@ public class ProductService {
 	@Transactional(readOnly = true)
 	public List<ProductResponseDto> getMyProducts() {
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
 		User user = this.userRepository.findByEmail(email)
-			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+			.orElseThrow(() -> new UserNotFoundException(email));
 
 		return this.productRepository.findTop10ByUserOrderByCreatedAtDesc(user)
 			.stream().map(ProductResponseDto::from)
@@ -100,25 +103,25 @@ public class ProductService {
 	@Transactional
 	public boolean updateProductBid(Long productId, ProductBidRequestDto request) {
 
-		User user = this.userRepository.findByEmail(request.email())
-			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+		String email = request.email();
+		BigDecimal price = request.price();
+
+		User user = this.userRepository.findByEmail(email)
+			.orElseThrow(() -> new UserNotFoundException(email));
 
 		Product product = this.productRepository.findById(productId)
-			.orElseThrow(() -> new IllegalArgumentException("Product not found"));
+			.orElseThrow(() -> new ProductNotFoundException(productId.toString()));
 
-		if (product.isBidUnactive())
-			product.activeBid();
+		if (product.isBidInactive()) product.activeBid();
 
-		if (product.isBidPriceLowerThan(request.price())) {
-			product.updateBidPrice(request.price());
+		if (product.isBidPriceLowerThan(price)) {
+			product.updateBidPrice(price);
 			product.incrementBidCount();
 
-			Product savedProduct = this.productRepository.save(product);
-
 			ProductBid productBid = ProductBid.builder()
-				.price(request.price())
+				.price(price)
 				.user(user)
-				.product(savedProduct)
+				.product(product)
 				.build();
 
 			this.productBidRepository.save(productBid);

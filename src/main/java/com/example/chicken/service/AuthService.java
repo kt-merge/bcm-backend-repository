@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.chicken.common.error.exception.user.UserAlreadyExists;
-import com.example.chicken.common.error.exception.user.UserNotFoundException;
+import com.example.chicken.domain.auth.exception.UserNotFoundException;
 import com.example.chicken.common.jwt.JwtTokenProvider;
 import com.example.chicken.common.jwt.JwtUtil;
 import com.example.chicken.domain.auth.entity.user.Role;

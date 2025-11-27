@@ -7,12 +7,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.chicken.common.error.exception.user.UserNotFoundException;
+import com.example.chicken.domain.auth.exception.UserNotFoundException;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.entity.token.ResetPasswordToken;
 import com.example.chicken.domain.auth.exception.ResetTokenExpiredException;
 import com.example.chicken.domain.product.entity.ProductBid;
-import com.example.chicken.dto.UpdateUserNicknameDto;
 import com.example.chicken.dto.UserResponseDto;
 import com.example.chicken.dto.product.ProductBidResponseDto;
 import com.example.chicken.dto.product.ProductResponseDto;
@@ -20,7 +19,7 @@ import com.example.chicken.dto.user.UpdateUserInfoDto;
 import com.example.chicken.dto.user.WinnerResponseDto;
 import com.example.chicken.repository.HighestBidderRepository;
 import com.example.chicken.repository.ProductBidRepository;
-import com.example.chicken.repository.ProductRepository;
+import com.example.chicken.domain.auth.repository.ProductRepository;
 import com.example.chicken.repository.ResetPasswordTokenRepository;
 import com.example.chicken.repository.UserRepository;
 
@@ -57,17 +56,6 @@ public class UserService {
 			.toList();
 
 		return UserResponseDto.of(user, winnerResponse, productBids, productResponse);
-	}
-
-	@Transactional
-	public UserResponseDto updateNickname(UpdateUserNicknameDto request) {
-		User user = getUser();
-
-		user.updateNickname(request.nickname());
-
-		User savedUser = this.userRepository.save(user);
-
-		return UserResponseDto.from(savedUser);
 	}
 
 	@Transactional

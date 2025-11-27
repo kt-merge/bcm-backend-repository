@@ -1,4 +1,4 @@
-package com.example.chicken.common.error.exception.user;
+package com.example.chicken.domain.auth.exception;
 
 import com.example.chicken.common.error.exception.EntityNotFoundException;
 
