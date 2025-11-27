@@ -9,12 +9,14 @@ import com.example.chicken.common.jwt.JwtUtil;
 import com.example.chicken.domain.Role;
 import com.example.chicken.domain.User;
 import com.example.chicken.domain.auth.RefreshToken;
+import com.example.chicken.domain.auth.ResetPasswordToken;
 import com.example.chicken.dto.SignInRequestDto;
 import com.example.chicken.dto.SignInResponseDto;
 import com.example.chicken.dto.UserRequestDto;
 import com.example.chicken.dto.UserResponseDto;
 import com.example.chicken.dto.user.TokenResponseDto;
 import com.example.chicken.repository.RefreshTokenRepository;
+import com.example.chicken.repository.ResetPasswordTokenRepository;
 import com.example.chicken.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class AuthService {
 	private final EmailService emailService;
 	private final UserRepository userRepository;
 	private final RefreshTokenRepository refreshTokenRepository;
+	private final ResetPasswordTokenRepository resetPasswordTokenRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtTokenProvider tokenProvider;
 	private final JwtUtil jwtUtil;
@@ -106,6 +109,15 @@ public class AuthService {
 		this.userRepository.findByEmail(email).orElseThrow(() -> new
 			IllegalArgumentException("존재하지 않는 이메일입니다."));
 
-		this.emailService.sendPasswordChangeEmail(email);
+		String token = tokenProvider.createRefreshJWT(email);
+
+		ResetPasswordToken resetPasswordToken = ResetPasswordToken.builder()
+			.email(email)
+			.resetToken(token)
+			.build();
+
+		this.resetPasswordTokenRepository.save(resetPasswordToken);
+
+		this.emailService.sendPasswordChangeEmail(email, token);
 	}
 }

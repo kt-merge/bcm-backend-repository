@@ -29,12 +29,15 @@ public class EmailService {
 	}
 
 	@Async
-	public void sendPasswordChangeEmail(String to) {
+	public void sendPasswordChangeEmail(String to, String resetToken) {
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setTo(to);
 		message.setSubject("[Big Chicken Market] 비밀번호 변경 안내");
 
-		String text = "회원님의 비밀번호가 성공적으로 변경되었습니다.";
+		String text = "아래 링크를 통해 비밀번호를 변경하세요:\n"
+					  + "http://localhost:8080/auth/reset-password?token="
+					  + resetToken;
+
 		message.setText(text);
 		mailSender.send(message);
 	}
