@@ -2,6 +2,7 @@ package com.example.chicken.service;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -26,4 +27,16 @@ public class EmailService {
 		message.setText(text);
 		mailSender.send(message);
 	}
+
+	@Async
+	public void sendPasswordChangeEmail(String to) {
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setTo(to);
+		message.setSubject("[Big Chicken Market] 비밀번호 변경 안내");
+
+		String text = "회원님의 비밀번호가 성공적으로 변경되었습니다.";
+		message.setText(text);
+		mailSender.send(message);
+	}
+
 }

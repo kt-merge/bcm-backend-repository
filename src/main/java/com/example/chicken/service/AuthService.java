@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AuthService {
 
+	private final EmailService emailService;
 	private final UserRepository userRepository;
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final PasswordEncoder passwordEncoder;
@@ -100,4 +101,11 @@ public class AuthService {
 			.ifPresent(this.refreshTokenRepository::delete);
 	}
 
+	@Transactional
+	public void requestPasswordReset(String email) {
+		this.userRepository.findByEmail(email).orElseThrow(() -> new
+			IllegalArgumentException("존재하지 않는 이메일입니다."));
+
+		this.emailService.sendPasswordChangeEmail(email);
+	}
 }

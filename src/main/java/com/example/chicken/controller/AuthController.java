@@ -21,6 +21,7 @@ import com.example.chicken.dto.SignInRequestDto;
 import com.example.chicken.dto.SignInResponseDto;
 import com.example.chicken.dto.UserRequestDto;
 import com.example.chicken.dto.UserResponseDto;
+import com.example.chicken.dto.auth.ResetPasswordRequestDto;
 import com.example.chicken.dto.user.AccessTokenResponseDto;
 import com.example.chicken.dto.user.TokenResponseDto;
 import com.example.chicken.service.AuthService;
@@ -96,6 +97,12 @@ public class AuthController {
 		return ResponseEntity.noContent()
 			.header(HttpHeaders.SET_COOKIE, cookie.toString())
 			.build();
+	}
+
+	@PostMapping("/password/request-reset")
+	public ResponseEntity<Object> requestPasswordReset(@RequestBody @Valid ResetPasswordRequestDto requestDto) {
+		this.authService.requestPasswordReset(requestDto.email());
+		return ResponseEntity.noContent().build();
 	}
 
 }
