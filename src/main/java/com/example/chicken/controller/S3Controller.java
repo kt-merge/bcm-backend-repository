@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.chicken.common.service.S3Provider;
+import com.example.chicken.domain.s3.service.S3Provider;
 import com.example.chicken.dto.S3FileNameDto;
 
 import lombok.RequiredArgsConstructor;

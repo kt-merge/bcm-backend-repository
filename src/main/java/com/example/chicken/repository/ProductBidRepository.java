@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.example.chicken.domain.product.ProductBid;
+import com.example.chicken.domain.product.entity.ProductBid;
 
 public interface ProductBidRepository extends JpaRepository<ProductBid, Long> {
 

@@ -3,8 +3,8 @@ package com.example.chicken.dto.product;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.example.chicken.domain.product.Category;
-import com.example.chicken.domain.product.ProductStatus;
+import com.example.chicken.domain.product.entity.Category;
+import com.example.chicken.domain.product.entity.ProductStatus;
 
 import jakarta.validation.constraints.NotBlank;
 

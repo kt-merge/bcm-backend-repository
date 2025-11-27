@@ -5,10 +5,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.chicken.domain.product.BidStatus;
-import com.example.chicken.domain.product.Category;
-import com.example.chicken.domain.product.Product;
-import com.example.chicken.domain.product.ProductStatus;
+import com.example.chicken.domain.product.entity.BidStatus;
+import com.example.chicken.domain.product.entity.Category;
+import com.example.chicken.domain.product.entity.Product;
+import com.example.chicken.domain.product.entity.ProductStatus;
 import com.example.chicken.dto.UserResponseDto;
 
 import lombok.Builder;

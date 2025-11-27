@@ -2,9 +2,9 @@ package com.example.chicken.dto.user;
 
 import java.math.BigDecimal;
 
-import com.example.chicken.domain.product.HighestBidder;
-import com.example.chicken.domain.product.Product;
-import com.example.chicken.domain.product.ProductStatus;
+import com.example.chicken.domain.product.entity.HighestBidder;
+import com.example.chicken.domain.product.entity.Product;
+import com.example.chicken.domain.product.entity.ProductStatus;
 
 public record WinnerResponseDto(Long productId, String productName, ProductStatus productStatus, BigDecimal bidPrice) {
 

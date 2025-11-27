@@ -1,4 +1,4 @@
-package com.example.chicken.domain.product;
+package com.example.chicken.domain.product.entity;
 
 
 public enum Category {

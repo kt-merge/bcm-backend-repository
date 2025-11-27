@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.example.chicken.domain.User;
-import com.example.chicken.domain.product.Product;
-import com.example.chicken.domain.product.ProductBid;
+import com.example.chicken.domain.product.entity.Product;
+import com.example.chicken.domain.product.entity.ProductBid;
 
 public record ProductBidResponseDto(Long productId,
 									String productName,

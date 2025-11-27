@@ -1,4 +1,4 @@
-package com.example.chicken.common.service;
+package com.example.chicken.domain.s3.service;
 
 import java.time.Duration;
 
@@ -21,10 +21,12 @@ public class S3Provider {
 
 	@Value("${s3.bucket-name}")
 	private String bucketName;
+
+	private static final String PRODUCT_DIR = "products/";
 	private final S3Presigner s3Presigner;
 
 	public String generateUploadUrl(String key) {
-		String pathKey = "products/" + key;
+		String pathKey = PRODUCT_DIR + key;
 
 		PutObjectRequest objectRequest = PutObjectRequest.builder()
 			.bucket(this.bucketName)
@@ -32,12 +34,12 @@ public class S3Provider {
 			.contentType(extractExtension(key))
 			.build();
 
-		PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+		PutObjectPresignRequest presignedRequest = PutObjectPresignRequest.builder()
 			.putObjectRequest(objectRequest)
 			.signatureDuration(Duration.ofMinutes(5))
 			.build();
 
-		PresignedPutObjectRequest presigned = s3Presigner.presignPutObject(presignRequest);
+		PresignedPutObjectRequest presigned = s3Presigner.presignPutObject(presignedRequest);
 
 		return presigned.url().toString();
 	}

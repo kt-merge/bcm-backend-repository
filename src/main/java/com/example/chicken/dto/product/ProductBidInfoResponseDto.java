@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.example.chicken.domain.User;
-import com.example.chicken.domain.product.ProductBid;
+import com.example.chicken.domain.product.entity.ProductBid;
 
 public record ProductBidInfoResponseDto(Long productBidId,
 										BigDecimal price,

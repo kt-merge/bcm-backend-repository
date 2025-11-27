@@ -1,4 +1,4 @@
-package com.example.chicken.domain.product;
+package com.example.chicken.domain.product.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

@@ -6,10 +6,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.chicken.domain.product.BidStatus;
-import com.example.chicken.domain.product.HighestBidder;
-import com.example.chicken.domain.product.Product;
-import com.example.chicken.domain.product.ProductBid;
+import com.example.chicken.domain.product.entity.BidStatus;
+import com.example.chicken.domain.product.entity.HighestBidder;
+import com.example.chicken.domain.product.entity.Product;
+import com.example.chicken.domain.product.entity.ProductBid;
 import com.example.chicken.dto.mail.AuctionWonEvent;
 import com.example.chicken.repository.HighestBidderRepository;
 import com.example.chicken.repository.ProductBidRepository;

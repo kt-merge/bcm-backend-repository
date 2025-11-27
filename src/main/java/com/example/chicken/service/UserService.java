@@ -11,7 +11,7 @@ import com.example.chicken.common.error.exception.auth.ResetTokenExpiredExceptio
 import com.example.chicken.common.error.exception.user.UserNotFoundException;
 import com.example.chicken.domain.User;
 import com.example.chicken.domain.auth.ResetPasswordToken;
-import com.example.chicken.domain.product.ProductBid;
+import com.example.chicken.domain.product.entity.ProductBid;
 import com.example.chicken.dto.UpdateUserNicknameDto;
 import com.example.chicken.dto.UserResponseDto;
 import com.example.chicken.dto.product.ProductBidResponseDto;

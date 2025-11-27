@@ -9,10 +9,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.chicken.common.error.exception.user.UserNotFoundException;
 import com.example.chicken.domain.User;
-import com.example.chicken.domain.product.BidStatus;
-import com.example.chicken.domain.product.Product;
-import com.example.chicken.domain.product.ProductBid;
+import com.example.chicken.domain.product.entity.BidStatus;
+import com.example.chicken.domain.product.entity.Product;
+import com.example.chicken.domain.product.entity.ProductBid;
 import com.example.chicken.dto.product.ProductBidInfoResponseDto;
 import com.example.chicken.dto.product.ProductBidRequestDto;
 import com.example.chicken.dto.product.ProductRequestDto;
@@ -40,8 +41,7 @@ public class ProductService {
 
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-		User user = this.userRepository.findByEmail(email)
-			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+		User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
 
 		String imageUrl = s3BucketUrl + request.imageUrl();
 

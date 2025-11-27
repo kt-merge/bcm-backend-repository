@@ -3,7 +3,7 @@ package com.example.chicken.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.chicken.domain.product.ProductBid;
+import com.example.chicken.domain.product.entity.ProductBid;
 import com.example.chicken.dto.product.ProductBidResponseDto;
 import com.example.chicken.repository.ProductBidRepository;
 

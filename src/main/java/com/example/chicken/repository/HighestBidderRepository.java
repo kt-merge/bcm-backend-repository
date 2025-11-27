@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.chicken.domain.product.HighestBidder;
+import com.example.chicken.domain.product.entity.HighestBidder;
 
 public interface HighestBidderRepository extends JpaRepository<HighestBidder, Long> {
 
