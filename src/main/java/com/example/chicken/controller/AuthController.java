@@ -9,9 +9,11 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.chicken.common.constant.CookieConstant;
@@ -103,6 +105,12 @@ public class AuthController {
 	public ResponseEntity<Object> requestPasswordReset(@RequestBody @Valid ResetPasswordRequestDto requestDto) {
 		this.authService.requestPasswordReset(requestDto.email());
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/password/reset/verify")
+	public ResponseEntity<Boolean> verifyResetToken(@RequestParam String token) {
+		this.authService.verifyResetToken(token);
+		return ResponseEntity.ok().body(true);
 	}
 
 }

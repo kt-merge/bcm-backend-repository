@@ -1,4 +1,4 @@
-package com.example.chicken.common.exception;
+package com.example.chicken.common.error.exception;
 
 import static com.example.chicken.common.dto.ExceptionResponseDto.*;
 
@@ -43,6 +43,14 @@ public class GlobalExceptionHandler {
 		ExceptionResponseDto response = new ExceptionResponseDto(400, "Field validation fail", fieldErrors);
 
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	}
+
+	@ExceptionHandler(BusinessException.class)
+	public ResponseEntity<ExceptionResponseDto> handleBusinessException(BusinessException e) {
+
+		ErrorCode errorCode = e.getErrorCode();
+
+		return ResponseEntity.status(HttpStatus.valueOf(errorCode.getStatus())).body(from(errorCode));
 	}
 
 	private List<FieldErrors> getFieldErrors(BindingResult bindingResult) {

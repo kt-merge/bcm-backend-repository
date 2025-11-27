@@ -4,6 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.chicken.common.error.exception.auth.ResetTokenExpiredException;
 import com.example.chicken.common.jwt.JwtTokenProvider;
 import com.example.chicken.common.jwt.JwtUtil;
 import com.example.chicken.domain.Role;
@@ -51,7 +52,8 @@ public class AuthService {
 
 	@Transactional
 	public SignInResponseDto signIn(SignInRequestDto request) {
-		User user = this.userRepository.findByEmail(request.email()).orElseThrow(IllegalArgumentException::new);
+		User user = this.userRepository.findByEmail(request.email())
+			.orElseThrow(IllegalArgumentException::new);
 
 		if (!this.passwordEncoder.matches(request.password(), user.getPassword()))
 			throw new IllegalArgumentException();
@@ -119,5 +121,16 @@ public class AuthService {
 		this.resetPasswordTokenRepository.save(resetPasswordToken);
 
 		this.emailService.sendPasswordChangeEmail(email, token);
+	}
+
+	public void verifyResetToken(String token) {
+		String email = jwtUtil.parseClaims(token).getSubject();
+
+		ResetPasswordToken resetPasswordToken = this.resetPasswordTokenRepository.findById(email)
+			.orElseThrow(ResetTokenExpiredException::new);
+
+		if (!resetPasswordToken.getResetToken().equals(token))
+			throw new IllegalArgumentException("토큰이 일치하지 않습니다.");
+
 	}
 }
