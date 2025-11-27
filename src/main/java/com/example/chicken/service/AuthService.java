@@ -4,7 +4,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.chicken.common.error.exception.auth.PasswordNotMatchedException;
 import com.example.chicken.common.error.exception.auth.ResetTokenExpiredException;
+import com.example.chicken.common.error.exception.user.UserAlreadyExists;
+import com.example.chicken.common.error.exception.user.UserNotFoundException;
 import com.example.chicken.common.jwt.JwtTokenProvider;
 import com.example.chicken.common.jwt.JwtUtil;
 import com.example.chicken.domain.Role;
@@ -38,12 +41,14 @@ public class AuthService {
 
 	@Transactional
 	public UserResponseDto signUp(UserRequestDto request) {
-		if (this.userRepository.findByEmail(request.email()).isPresent())
-			throw new IllegalArgumentException("이미 가입된 이메일입니다.");
+		boolean isUserExists = this.userRepository.existsByEmail(request.email());
+
+		if (isUserExists)
+			throw new UserAlreadyExists();
 
 		User userEntity = User.from(request);
 
-		userEntity.encodePassword(passwordEncoder.encode(request.password()));
+		userEntity.updatePassword(passwordEncoder.encode(request.password()));
 
 		User result = this.userRepository.save(userEntity);
 
@@ -52,16 +57,18 @@ public class AuthService {
 
 	@Transactional
 	public SignInResponseDto signIn(SignInRequestDto request) {
-		User user = this.userRepository.findByEmail(request.email())
-			.orElseThrow(IllegalArgumentException::new);
+		String email = request.email();
+
+		User user = this.userRepository.findByEmail(email)
+			.orElseThrow(() -> new UserNotFoundException(email));
 
 		if (!this.passwordEncoder.matches(request.password(), user.getPassword()))
-			throw new IllegalArgumentException();
+			throw new PasswordNotMatchedException();
 
-		String refreshToken = this.tokenProvider.createRefreshJWT(request.email());
+		String refreshToken = this.tokenProvider.createRefreshJWT(email);
 
 		RefreshToken tokenEntity = RefreshToken.builder()
-			.email(request.email())
+			.email(email)
 			.refreshToken(refreshToken)
 			.build();
 
@@ -102,16 +109,16 @@ public class AuthService {
 
 		String email = jwtUtil.parseClaims(refreshToken).getSubject();
 
-		this.refreshTokenRepository.findById(email)
-			.ifPresent(this.refreshTokenRepository::delete);
+		this.refreshTokenRepository.findById(email).ifPresent(this.refreshTokenRepository::delete);
 	}
 
 	@Transactional
 	public void requestPasswordReset(String email) {
-		this.userRepository.findByEmail(email).orElseThrow(() -> new
-			IllegalArgumentException("존재하지 않는 이메일입니다."));
+		boolean isUserExists = this.userRepository.existsByEmail(email);
 
-		String token = tokenProvider.createRefreshJWT(email);
+		if(!isUserExists) throw new UserNotFoundException(email);
+
+		String token = this.tokenProvider.createRefreshJWT(email);
 
 		ResetPasswordToken resetPasswordToken = ResetPasswordToken.builder()
 			.email(email)
@@ -131,6 +138,6 @@ public class AuthService {
 
 		if (!resetPasswordToken.getResetToken().equals(token))
 			throw new IllegalArgumentException("토큰이 일치하지 않습니다.");
-
 	}
+
 }

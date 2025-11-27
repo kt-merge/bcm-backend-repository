@@ -84,7 +84,7 @@ public class UserService {
 			SecurityContextHolder.getContext().getAuthentication().getName();
 
 		return this.userRepository.findByEmail(email)
-			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+			.orElseThrow(() -> new UserNotFoundException(email));
 	}
 
 	@Transactional
