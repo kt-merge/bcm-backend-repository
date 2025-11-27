@@ -15,7 +15,7 @@ import com.example.chicken.dto.UserResponseDto;
 import com.example.chicken.dto.product.ProductResponseDto;
 import com.example.chicken.dto.user.UpdateUserInfoDto;
 import com.example.chicken.service.ProductService;
-import com.example.chicken.service.UserService;
+import com.example.chicken.domain.auth.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 

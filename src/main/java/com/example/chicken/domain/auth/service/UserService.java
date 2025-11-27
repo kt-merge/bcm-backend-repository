@@ -1,4 +1,4 @@
-package com.example.chicken.service;
+package com.example.chicken.domain.auth.service;
 
 import java.util.List;
 

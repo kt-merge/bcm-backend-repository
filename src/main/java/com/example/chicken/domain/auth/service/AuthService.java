@@ -1,4 +1,4 @@
-package com.example.chicken.service;
+package com.example.chicken.domain.auth.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +24,7 @@ import com.example.chicken.dto.user.TokenResponseDto;
 import com.example.chicken.repository.RefreshTokenRepository;
 import com.example.chicken.repository.ResetPasswordTokenRepository;
 import com.example.chicken.repository.UserRepository;
+import com.example.chicken.service.EmailService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
