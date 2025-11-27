@@ -1,4 +1,4 @@
-package com.example.chicken.domain.auth;
+package com.example.chicken.domain.auth.entity;
 
 import org.springframework.data.redis.core.RedisHash;
 
@@ -27,6 +27,12 @@ public class RefreshToken {
 		this.refreshJwt = refreshToken;
 	}
 
+	public static RefreshToken of(String email, String refreshToken) {
+		return RefreshToken.builder()
+			.email(email)
+			.refreshToken(refreshToken)
+			.build();
+	}
 
 	public void renewalToken(String token) {
 		this.refreshJwt = token;

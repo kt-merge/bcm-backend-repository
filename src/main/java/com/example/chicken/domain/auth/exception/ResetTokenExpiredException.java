@@ -1,4 +1,4 @@
-package com.example.chicken.common.error.exception.auth;
+package com.example.chicken.domain.auth.exception;
 
 import com.example.chicken.common.error.exception.BusinessException;
 import com.example.chicken.common.error.exception.ErrorCode;

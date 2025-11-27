@@ -4,16 +4,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.chicken.common.error.exception.auth.PasswordNotMatchedException;
-import com.example.chicken.common.error.exception.auth.ResetTokenExpiredException;
 import com.example.chicken.common.error.exception.user.UserAlreadyExists;
 import com.example.chicken.common.error.exception.user.UserNotFoundException;
 import com.example.chicken.common.jwt.JwtTokenProvider;
 import com.example.chicken.common.jwt.JwtUtil;
 import com.example.chicken.domain.Role;
 import com.example.chicken.domain.User;
-import com.example.chicken.domain.auth.RefreshToken;
-import com.example.chicken.domain.auth.ResetPasswordToken;
+import com.example.chicken.domain.auth.entity.RefreshToken;
+import com.example.chicken.domain.auth.entity.ResetPasswordToken;
+import com.example.chicken.domain.auth.exception.PasswordNotMatchedException;
+import com.example.chicken.domain.auth.exception.RefreshTokenNotFoundException;
+import com.example.chicken.domain.auth.exception.ResetTokenExpiredException;
+import com.example.chicken.domain.auth.exception.TokenInvalidException;
 import com.example.chicken.dto.SignInRequestDto;
 import com.example.chicken.dto.SignInResponseDto;
 import com.example.chicken.dto.UserRequestDto;
@@ -41,10 +43,10 @@ public class AuthService {
 
 	@Transactional
 	public UserResponseDto signUp(UserRequestDto request) {
+
 		boolean isUserExists = this.userRepository.existsByEmail(request.email());
 
-		if (isUserExists)
-			throw new UserAlreadyExists();
+		if (isUserExists) throw new UserAlreadyExists();
 
 		User userEntity = User.from(request);
 
@@ -53,6 +55,7 @@ public class AuthService {
 		User result = this.userRepository.save(userEntity);
 
 		return UserResponseDto.from(result);
+
 	}
 
 	@Transactional
@@ -67,10 +70,7 @@ public class AuthService {
 
 		String refreshToken = this.tokenProvider.createRefreshJWT(email);
 
-		RefreshToken tokenEntity = RefreshToken.builder()
-			.email(email)
-			.refreshToken(refreshToken)
-			.build();
+		RefreshToken tokenEntity = RefreshToken.of(email, refreshToken);
 
 		this.refreshTokenRepository.save(tokenEntity);
 
@@ -82,18 +82,16 @@ public class AuthService {
 	@Transactional
 	public TokenResponseDto reissue(String refreshToken) {
 
-		if (!jwtUtil.validate(refreshToken))
-			throw new IllegalArgumentException("리프레시 토큰이 유효하지 않습니다.");
+		if (!jwtUtil.validate(refreshToken)) throw new TokenInvalidException();
 
 		String email = jwtUtil.parseClaims(refreshToken).getSubject();
 
-		User user = this.userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new);
+		User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
 
 		RefreshToken savedToken = this.refreshTokenRepository.findById(email)
-			.orElseThrow(() -> new IllegalArgumentException("리프레시 토큰이 존재하지 않습니다."));
+			.orElseThrow(() -> new RefreshTokenNotFoundException(email));
 
-		if (!savedToken.getRefreshJwt().equals(refreshToken))
-			throw new IllegalArgumentException("리프레시 토큰이 일치하지 않습니다.");
+		if (!savedToken.getRefreshJwt().equals(refreshToken)) throw new TokenInvalidException();
 
 		String refreshJWT = this.tokenProvider.createRefreshJWT(email);
 
@@ -116,7 +114,8 @@ public class AuthService {
 	public void requestPasswordReset(String email) {
 		boolean isUserExists = this.userRepository.existsByEmail(email);
 
-		if(!isUserExists) throw new UserNotFoundException(email);
+		if (!isUserExists)
+			throw new UserNotFoundException(email);
 
 		String token = this.tokenProvider.createRefreshJWT(email);
 
@@ -137,7 +136,7 @@ public class AuthService {
 			.orElseThrow(ResetTokenExpiredException::new);
 
 		if (!resetPasswordToken.getResetToken().equals(token))
-			throw new IllegalArgumentException("토큰이 일치하지 않습니다.");
+			throw new TokenInvalidException();
 	}
 
 }

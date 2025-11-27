@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 public enum ErrorCode {
 	USER_ALREADY_EXISTS("AUTH001", HttpStatus.CONFLICT.value(), "이미 존재하는 사용자입니다."),
 	PASSWORD_NOT_MATCHED("AUTH002", HttpStatus.UNAUTHORIZED.value(), "비밀번호가 일치하지 않습니다."),
+	TOKEN_INVALID("AUTH003", HttpStatus.UNAUTHORIZED.value(), "유효하지 않은 토큰입니다."),
 
 	ENTITY_NOT_FOUND("COMM001", HttpStatus.NOT_FOUND.value(), "엔티티를 찾을 수 없습니다."),
 

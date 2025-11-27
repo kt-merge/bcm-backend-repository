@@ -1,6 +1,7 @@
 package com.example.chicken.controller;
 
-import java.net.URI;
+import static com.example.chicken.common.constant.PathConstant.Auth.*;
+
 import java.time.Duration;
 
 import org.springframework.http.HttpHeaders;
@@ -19,43 +20,40 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.chicken.common.constant.CookieConstant;
 import com.example.chicken.common.jwt.annotation.IsJwt;
 import com.example.chicken.common.util.CookieUtil;
+import com.example.chicken.domain.auth.dto.RequestResetPasswordDto;
+import com.example.chicken.domain.auth.dto.ResetPasswordDto;
 import com.example.chicken.dto.SignInRequestDto;
 import com.example.chicken.dto.SignInResponseDto;
 import com.example.chicken.dto.UserRequestDto;
 import com.example.chicken.dto.UserResponseDto;
-import com.example.chicken.dto.auth.ResetPasswordDto;
-import com.example.chicken.dto.auth.ResetPasswordRequestDto;
 import com.example.chicken.dto.user.AccessTokenResponseDto;
 import com.example.chicken.dto.user.TokenResponseDto;
 import com.example.chicken.service.AuthService;
 import com.example.chicken.service.UserService;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 
 @Validated
 @RestController
-@RequestMapping(value = "/api/auth")
+@RequestMapping(AUTH_PREFIX)
 @RequiredArgsConstructor
 public class AuthController {
-
-	private static final String USER_BASE_URL = "/api/users/me";
 
 	private final AuthService authService;
 	private final UserService userService;
 
-	@PostMapping("/sign-up")
+	@PostMapping(SIGN_UP)
 	public ResponseEntity<UserResponseDto> signUp(@RequestBody @Valid UserRequestDto request) {
+
 		UserResponseDto result = this.authService.signUp(request);
-		return ResponseEntity.created(URI.create(USER_BASE_URL)).body(result);
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(result);
 	}
 
-	@PostMapping("/sign-in")
-	public ResponseEntity<AccessTokenResponseDto> signIn(@RequestBody
-														 @Valid SignInRequestDto request,
-														 HttpServletResponse response) {
+	@PostMapping(SIGN_IN)
+	public ResponseEntity<AccessTokenResponseDto> signIn(@RequestBody @Valid SignInRequestDto request) {
 
 		SignInResponseDto tokens = this.authService.signIn(request);
 
@@ -63,17 +61,17 @@ public class AuthController {
 																  tokens.refreshToken(),
 																  Duration.ofDays(15));
 
-		response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
 		AccessTokenResponseDto result = AccessTokenResponseDto.from(tokens.accessToken());
 
-		return ResponseEntity.ok(result);
+		return ResponseEntity
+			.status(HttpStatus.OK)
+			.header(HttpHeaders.SET_COOKIE, cookie.toString())
+			.body(result);
 	}
 
-	@PostMapping("/reissue")
+	@PostMapping(REISSUE)
 	public ResponseEntity<AccessTokenResponseDto> reissue(@CookieValue(CookieConstant.REFRESH_TOKEN_NAME)
-														  @NotBlank
-														  @IsJwt String refreshToken) {
+														  @NotBlank @IsJwt String refreshToken) {
 
 		TokenResponseDto tokens = this.authService.reissue(refreshToken);
 
@@ -89,10 +87,9 @@ public class AuthController {
 			.body(result);
 	}
 
-	@PostMapping("/logout")
+	@PostMapping(LOGOUT)
 	public ResponseEntity<Object> logout(@CookieValue(CookieConstant.REFRESH_TOKEN_NAME)
-										 @NotBlank
-										 @IsJwt String refreshToken) {
+										 @NotBlank @IsJwt String refreshToken) {
 
 		this.authService.logout(refreshToken);
 
@@ -104,19 +101,19 @@ public class AuthController {
 			.build();
 	}
 
-	@PostMapping("/password/request-reset")
-	public ResponseEntity<Object> requestPasswordReset(@RequestBody @Valid ResetPasswordRequestDto requestDto) {
+	@PostMapping(Password.REQUEST_RESET)
+	public ResponseEntity<Object> requestPasswordReset(@RequestBody @Valid RequestResetPasswordDto requestDto) {
 		this.authService.requestPasswordReset(requestDto.email());
 		return ResponseEntity.noContent().build();
 	}
 
-	@GetMapping("/password/reset/verify")
-	public ResponseEntity<Boolean> verifyResetToken(@RequestParam String token) {
+	@GetMapping(Password.VERIFY)
+	public ResponseEntity<Boolean> verifyResetToken(@RequestParam @NotBlank String token) {
 		this.authService.verifyResetToken(token);
 		return ResponseEntity.ok().body(true);
 	}
 
-	@PostMapping("/password/reset")
+	@PostMapping(Password.RESET)
 	public ResponseEntity<Object> resetPassword(@RequestBody @Valid ResetPasswordDto request) {
 		this.userService.updatePassword(request.password(), request.resetToken());
 		return ResponseEntity.noContent().build();
