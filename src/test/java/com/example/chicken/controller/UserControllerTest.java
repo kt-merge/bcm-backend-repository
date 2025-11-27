@@ -19,7 +19,7 @@ import com.example.chicken.common.jwt.JwtTokenProvider;
 import com.example.chicken.domain.auth.entity.user.Role;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.dto.UpdateUserNicknameDto;
-import com.example.chicken.repository.UserRepository;
+import com.example.chicken.domain.auth.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;

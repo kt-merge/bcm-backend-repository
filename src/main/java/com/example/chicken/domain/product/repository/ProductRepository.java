@@ -1,4 +1,4 @@
-package com.example.chicken.domain.auth.repository;
+package com.example.chicken.domain.product.repository;
 
 import java.util.List;
 

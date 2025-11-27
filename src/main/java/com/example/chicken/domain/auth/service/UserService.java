@@ -19,9 +19,9 @@ import com.example.chicken.dto.user.UpdateUserInfoDto;
 import com.example.chicken.dto.user.WinnerResponseDto;
 import com.example.chicken.repository.HighestBidderRepository;
 import com.example.chicken.repository.ProductBidRepository;
-import com.example.chicken.domain.auth.repository.ProductRepository;
-import com.example.chicken.repository.ResetPasswordTokenRepository;
-import com.example.chicken.repository.UserRepository;
+import com.example.chicken.domain.product.repository.ProductRepository;
+import com.example.chicken.domain.auth.repository.ResetPasswordTokenRepository;
+import com.example.chicken.domain.auth.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

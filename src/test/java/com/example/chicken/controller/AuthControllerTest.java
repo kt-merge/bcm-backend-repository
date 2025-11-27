@@ -23,8 +23,8 @@ import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.entity.token.RefreshToken;
 import com.example.chicken.dto.SignInRequestDto;
 import com.example.chicken.dto.UserRequestDto;
-import com.example.chicken.repository.RefreshTokenRepository;
-import com.example.chicken.repository.UserRepository;
+import com.example.chicken.domain.auth.repository.RefreshTokenRepository;
+import com.example.chicken.domain.auth.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.Cookie;
