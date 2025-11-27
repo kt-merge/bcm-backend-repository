@@ -3,10 +3,14 @@ package com.example.chicken.service;
 import java.util.List;
 
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.chicken.common.error.exception.auth.ResetTokenExpiredException;
+import com.example.chicken.common.error.exception.user.UserNotFoundException;
 import com.example.chicken.domain.User;
+import com.example.chicken.domain.auth.ResetPasswordToken;
 import com.example.chicken.domain.product.ProductBid;
 import com.example.chicken.dto.UpdateUserNicknameDto;
 import com.example.chicken.dto.UserResponseDto;
@@ -17,6 +21,7 @@ import com.example.chicken.dto.user.WinnerResponseDto;
 import com.example.chicken.repository.HighestBidderRepository;
 import com.example.chicken.repository.ProductBidRepository;
 import com.example.chicken.repository.ProductRepository;
+import com.example.chicken.repository.ResetPasswordTokenRepository;
 import com.example.chicken.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +34,8 @@ public class UserService {
 	private final ProductRepository productRepository;
 	private final ProductBidRepository productBidRepository;
 	private final HighestBidderRepository highestBidderRepository;
+	private final ResetPasswordTokenRepository resetPasswordTokenRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	@Transactional(readOnly = true)
 	public UserResponseDto getUserInfo() {
@@ -78,6 +85,20 @@ public class UserService {
 
 		return this.userRepository.findByEmail(email)
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+	}
+
+	@Transactional
+	public void updatePassword(String password, String token) {
+		ResetPasswordToken resetPasswordToken = this.resetPasswordTokenRepository
+			.findByResetToken(token).orElseThrow(ResetTokenExpiredException::new);
+
+		String email = resetPasswordToken.getId();
+
+		User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+
+		user.updatePassword(this.passwordEncoder.encode(password));
+
+		this.resetPasswordTokenRepository.delete(resetPasswordToken);
 	}
 
 }

@@ -1,6 +1,9 @@
 package com.example.chicken.domain.auth;
 
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.RedisKeyValueAdapter;
+import org.springframework.data.redis.core.index.Indexed;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
@@ -13,11 +16,13 @@ import lombok.ToString;
 @ToString
 @RedisHash(value = "resetToken", timeToLive = 900)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EnableRedisRepositories(enableKeyspaceEvents = RedisKeyValueAdapter.EnableKeyspaceEvents.ON_STARTUP)
 public class ResetPasswordToken {
 
 	@Id
 	private String id;
 
+	@Indexed
 	private String resetToken;
 
 	@Builder

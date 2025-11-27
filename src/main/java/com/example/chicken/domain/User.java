@@ -62,4 +62,8 @@ public class User extends BaseTimeEntity {
 		this.nickname = request.nickname();
 		this.phoneNumber = request.phoneNumber();
 	}
+
+	public void updatePassword(String encodedPassword) {
+		this.password = encodedPassword;
+	}
 }

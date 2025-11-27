@@ -23,10 +23,12 @@ import com.example.chicken.dto.SignInRequestDto;
 import com.example.chicken.dto.SignInResponseDto;
 import com.example.chicken.dto.UserRequestDto;
 import com.example.chicken.dto.UserResponseDto;
+import com.example.chicken.dto.auth.ResetPasswordDto;
 import com.example.chicken.dto.auth.ResetPasswordRequestDto;
 import com.example.chicken.dto.user.AccessTokenResponseDto;
 import com.example.chicken.dto.user.TokenResponseDto;
 import com.example.chicken.service.AuthService;
+import com.example.chicken.service.UserService;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -42,6 +44,7 @@ public class AuthController {
 	private static final String USER_BASE_URL = "/api/users/me";
 
 	private final AuthService authService;
+	private final UserService userService;
 
 	@PostMapping("/sign-up")
 	public ResponseEntity<UserResponseDto> signUp(@RequestBody @Valid UserRequestDto request) {
@@ -111,6 +114,12 @@ public class AuthController {
 	public ResponseEntity<Boolean> verifyResetToken(@RequestParam String token) {
 		this.authService.verifyResetToken(token);
 		return ResponseEntity.ok().body(true);
+	}
+
+	@PostMapping("/password/reset")
+	public ResponseEntity<Object> resetPassword(@RequestBody @Valid ResetPasswordDto request) {
+		this.userService.updatePassword(request.password(), request.resetToken());
+		return ResponseEntity.noContent().build();
 	}
 
 }
