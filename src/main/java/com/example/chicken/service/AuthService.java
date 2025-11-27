@@ -84,7 +84,8 @@ public class AuthService {
 
 		String refreshJWT = this.tokenProvider.createRefreshJWT(email);
 
-		savedToken.setRefreshToken(refreshJWT);
+		savedToken.renewalToken(refreshJWT);
+
 		this.refreshTokenRepository.save(savedToken);
 
 		return this.tokenProvider.createTokens(user.getEmail(), user.getPassword());

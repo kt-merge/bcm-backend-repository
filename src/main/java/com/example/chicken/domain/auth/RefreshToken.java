@@ -27,7 +27,8 @@ public class RefreshToken {
 		this.refreshJwt = refreshToken;
 	}
 
-	public void setRefreshToken(String token) {
+
+	public void renewalToken(String token) {
 		this.refreshJwt = token;
 	}
 
