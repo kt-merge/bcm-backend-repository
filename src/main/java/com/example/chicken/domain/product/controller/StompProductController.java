@@ -1,4 +1,4 @@
-package com.example.chicken.controller;
+package com.example.chicken.domain.product.controller;
 
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
