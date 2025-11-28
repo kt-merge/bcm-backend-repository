@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 public class EmailService {
 
 	private final JavaMailSender mailSender;
-	private static final String BASE_URL = "https://www.ktdarius.shop/";
+	private static final String BASE_URL = "https://www.ktdarius.shop";
 	private static final String SUBJECT = "[Big Chicken Market] 경매 낙찰 안내";
 
 	public void sendAuctionSuccessEmail(String to, String productName) {
