@@ -1,4 +1,6 @@
-package com.example.chicken.controller;
+package com.example.chicken.domain.s3.controller;
+
+import static com.example.chicken.common.constant.PathConstant.S3.*;
 
 import java.util.Map;
 
@@ -11,16 +13,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.chicken.domain.s3.service.S3Provider;
 import com.example.chicken.dto.S3FileNameDto;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/s3")
 @RequiredArgsConstructor
+@RequestMapping(S3_PREFIX)
 public class S3Controller {
+
 	private final S3Provider s3Provider;
 
-	@PostMapping("/upload-url")
-	public ResponseEntity<Map<String, String>> putUploadUrl(@RequestBody S3FileNameDto request) {
+	@PostMapping(UPLOAD_URL)
+	public ResponseEntity<Map<String, String>> putUploadUrl(@RequestBody @Valid S3FileNameDto request) {
 		String presignedUrl = this.s3Provider.generateUploadUrl(request.fileName());
 
 		Map<String, String> result = Map.of("url", presignedUrl);

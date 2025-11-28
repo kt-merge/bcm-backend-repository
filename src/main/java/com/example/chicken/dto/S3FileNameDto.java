@@ -1,4 +1,6 @@
 package com.example.chicken.dto;
 
-public record S3FileNameDto(String fileName) {
+import jakarta.validation.constraints.NotBlank;
+
+public record S3FileNameDto(@NotBlank String fileName) {
 }

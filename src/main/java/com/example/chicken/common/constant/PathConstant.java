@@ -60,4 +60,16 @@ public class PathConstant {
 
 	}
 
+	public static class S3 {
+
+		private S3() {
+			throw new IllegalStateException(ERROR_MESSAGE);
+		}
+
+		public static final String S3_PREFIX = "/api/s3";
+
+		public static final String UPLOAD_URL = "/upload-url";
+
+	}
+
 }
