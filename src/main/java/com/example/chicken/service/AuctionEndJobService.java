@@ -6,6 +6,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.chicken.domain.auth.entity.user.User;
+import com.example.chicken.domain.order.event.OrderCreateRequestedEvent;
+import com.example.chicken.domain.order.service.OrderService;
 import com.example.chicken.domain.product.entity.BidStatus;
 import com.example.chicken.domain.product.entity.HighestBidder;
 import com.example.chicken.domain.product.entity.Product;
@@ -39,15 +42,16 @@ public class AuctionEndJobService {
 		Optional<ProductBid> productBid = this.productBidRepository.findTopByProductIdOrderByPriceDesc(product.getId());
 
 		if (productBid.isPresent()) {
+			User user = productBid.get().getUser();
+
 			HighestBidder highestBidder = HighestBidder.builder()
 				.productBid(productBid.get())
 				.product(product)
 				.build();
 
 			this.highestBidderRepository.save(highestBidder);
-
-			AuctionWonEvent event = new AuctionWonEvent(product.getName(), productBid.get().getUser().getEmail());
-			this.eventPublisher.publishEvent(event);
+			this.eventPublisher.publishEvent(new OrderCreateRequestedEvent(user.getId(), productId));
+			this.eventPublisher.publishEvent(new AuctionWonEvent(product.getName(), user.getEmail()));
 		}
 
 		product.completeBid();
