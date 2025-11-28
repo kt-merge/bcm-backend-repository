@@ -1,4 +1,4 @@
-package com.example.chicken.scheduler;
+package com.example.chicken.common.scheduler;
 
 import java.util.Set;
 
