@@ -1,4 +1,4 @@
-package com.example.chicken.service;
+package com.example.chicken.domain.product.service;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -10,19 +10,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.chicken.domain.auth.exception.UserNotFoundException;
 import com.example.chicken.domain.auth.entity.user.User;
-import com.example.chicken.domain.product.entity.BidStatus;
+import com.example.chicken.domain.auth.exception.UserNotFoundException;
+import com.example.chicken.domain.auth.repository.UserRepository;
 import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.entity.ProductBid;
 import com.example.chicken.domain.product.exception.ProductNotFoundException;
+import com.example.chicken.domain.product.repository.ProductRepository;
 import com.example.chicken.dto.product.ProductBidInfoResponseDto;
 import com.example.chicken.dto.product.ProductBidRequestDto;
 import com.example.chicken.dto.product.ProductRequestDto;
 import com.example.chicken.dto.product.ProductResponseDto;
 import com.example.chicken.repository.ProductBidRepository;
-import com.example.chicken.domain.product.repository.ProductRepository;
-import com.example.chicken.domain.auth.repository.UserRepository;
+import com.example.chicken.service.BidScheduleService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +34,7 @@ public class ProductService {
 	private String s3BucketUrl;
 
 	private final UserRepository userRepository;
+	private final ProductMapper productMapper;
 	private final ProductRepository productRepository;
 	private final ProductBidRepository productBidRepository;
 	private final BidScheduleService bidScheduleService;
@@ -43,33 +44,22 @@ public class ProductService {
 
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-		User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
-
 		String imageUrl = s3BucketUrl + request.imageUrl();
 
-		Product product = Product.builder()
-			.name(request.name())
-			.description(request.description())
-			.category(request.category())
-			.startPrice(request.price())
-			.bidPrice(request.price())
-			.bidCount(0L)
-			.bidStatus(BidStatus.NOT_BIDDED)
-			.productStatus(request.productStatus())
-			.bidEndDate(request.bidEndDate())
-			.imageUrl(imageUrl)
-			.user(user)
-			.build();
+		User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+
+		Product product = this.productMapper.toEntity(request, imageUrl, user);
 
 		Product savedProduct = this.productRepository.save(product);
 
 		this.bidScheduleService.register(savedProduct.getId(), savedProduct.getBidEndDate());
 
-		return ProductResponseDto.from(savedProduct);
+		return this.productMapper.toResponseDto(product);
 	}
 
 	@Transactional(readOnly = true)
 	public ProductResponseDto getProduct(Long productId) {
+
 		Product product = this.productRepository.findById(productId)
 			.orElseThrow(() -> new ProductNotFoundException(productId.toString()));
 
@@ -102,7 +92,6 @@ public class ProductService {
 
 	@Transactional
 	public boolean updateProductBid(Long productId, ProductBidRequestDto request) {
-
 		String email = request.email();
 		BigDecimal price = request.price();
 
@@ -112,7 +101,8 @@ public class ProductService {
 		Product product = this.productRepository.findById(productId)
 			.orElseThrow(() -> new ProductNotFoundException(productId.toString()));
 
-		if (product.isBidInactive()) product.activeBid();
+		if (product.isBidInactive())
+			product.activeBid();
 
 		if (product.isBidPriceLowerThan(price)) {
 			product.updateBidPrice(price);

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.chicken.dto.product.ProductRequestDto;
 import com.example.chicken.dto.product.ProductResponseDto;
-import com.example.chicken.service.ProductService;
+import com.example.chicken.domain.product.service.ProductService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

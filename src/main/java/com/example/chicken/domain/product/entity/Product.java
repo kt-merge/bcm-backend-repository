@@ -104,8 +104,8 @@ public class Product extends BaseTimeEntity {
 	}
 
 	public void incrementBidCount() {
-		if (this.bidCount == null)
-			this.bidCount = 0L;
+		if (this.bidCount == null) this.bidCount = 0L;
+
 		this.bidCount += 1;
 	}
 
