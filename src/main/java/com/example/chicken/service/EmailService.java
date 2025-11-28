@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 public class EmailService {
 
 	private final JavaMailSender mailSender;
+	private static final String BASE_URL = "https://www.ktdarius.shop/";
 	private static final String SUBJECT = "[Big Chicken Market] 경매 낙찰 안내";
 
 	public void sendAuctionSuccessEmail(String to, String productName) {
@@ -35,7 +36,7 @@ public class EmailService {
 		message.setSubject("[Big Chicken Market] 비밀번호 변경 안내");
 
 		String text = "아래 링크를 통해 비밀번호를 변경하세요:\n"
-					  + "http://localhost:8080/auth/reset-password?token="
+					  + BASE_URL + "/reset-password?token="
 					  + resetToken;
 
 		message.setText(text);

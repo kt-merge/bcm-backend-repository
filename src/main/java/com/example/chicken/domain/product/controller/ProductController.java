@@ -1,4 +1,6 @@
-package com.example.chicken.controller;
+package com.example.chicken.domain.product.controller;
+
+import static com.example.chicken.common.constant.PathConstant.Product.*;
 
 import java.net.URI;
 
@@ -23,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/products")
+@RequestMapping(PRODUCT_PREFIX)
 public class ProductController {
 
 	private final ProductService productService;
@@ -45,7 +47,7 @@ public class ProductController {
 		return ResponseEntity.ok(result);
 	}
 
-	@GetMapping("/{productId}")
+	@GetMapping(PRODUCT_ID)
 	public ResponseEntity<ProductResponseDto> getProduct(@PathVariable("productId") Long productId) {
 
 		ProductResponseDto result = this.productService.getProduct(productId);
