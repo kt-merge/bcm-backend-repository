@@ -1,4 +1,4 @@
-package com.example.chicken.controller;
+package com.example.chicken.domain.auth.controller;
 
 import static com.example.chicken.common.constant.PathConstant.User.*;
 
