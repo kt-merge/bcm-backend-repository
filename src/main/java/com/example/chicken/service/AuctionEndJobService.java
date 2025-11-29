@@ -8,14 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.order.event.OrderCreateRequestedEvent;
-import com.example.chicken.domain.order.service.OrderService;
 import com.example.chicken.domain.product.entity.BidStatus;
 import com.example.chicken.domain.product.entity.HighestBidder;
 import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.entity.ProductBid;
 import com.example.chicken.dto.mail.AuctionWonEvent;
-import com.example.chicken.repository.HighestBidderRepository;
-import com.example.chicken.repository.ProductBidRepository;
+import com.example.chicken.domain.product.repository.HighestBidderRepository;
+import com.example.chicken.domain.product.repository.ProductBidRepository;
 import com.example.chicken.domain.product.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;

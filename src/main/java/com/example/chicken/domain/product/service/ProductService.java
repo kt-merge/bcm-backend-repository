@@ -21,7 +21,7 @@ import com.example.chicken.domain.product.dto.ProductBidInfoResponseDto;
 import com.example.chicken.domain.product.dto.ProductBidRequestDto;
 import com.example.chicken.domain.product.dto.ProductRequestDto;
 import com.example.chicken.domain.product.dto.ProductResponseDto;
-import com.example.chicken.repository.ProductBidRepository;
+import com.example.chicken.domain.product.repository.ProductBidRepository;
 import com.example.chicken.service.BidScheduleService;
 
 import lombok.RequiredArgsConstructor;

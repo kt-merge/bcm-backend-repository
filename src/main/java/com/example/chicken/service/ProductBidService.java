@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.chicken.domain.product.entity.ProductBid;
 import com.example.chicken.domain.product.dto.ProductBidResponseDto;
-import com.example.chicken.repository.ProductBidRepository;
+import com.example.chicken.domain.product.repository.ProductBidRepository;
 
 import lombok.RequiredArgsConstructor;
 

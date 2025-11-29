@@ -23,8 +23,8 @@ import com.example.chicken.domain.product.dto.ProductBidResponseDto;
 import com.example.chicken.domain.product.dto.ProductResponseDto;
 import com.example.chicken.domain.auth.dto.user.UpdateUserInfoDto;
 import com.example.chicken.domain.auth.dto.user.WinnerResponseDto;
-import com.example.chicken.repository.HighestBidderRepository;
-import com.example.chicken.repository.ProductBidRepository;
+import com.example.chicken.domain.product.repository.HighestBidderRepository;
+import com.example.chicken.domain.product.repository.ProductBidRepository;
 
 import lombok.RequiredArgsConstructor;
 
