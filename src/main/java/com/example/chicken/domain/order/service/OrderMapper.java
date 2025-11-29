@@ -6,12 +6,17 @@ import com.example.chicken.domain.order.dto.OrderResponseDto;
 import com.example.chicken.domain.order.dto.ShippingInfoRequestDto;
 import com.example.chicken.domain.order.entity.Order;
 import com.example.chicken.domain.order.entity.ShippingInfo;
+import com.example.chicken.domain.product.dto.ProductResponseDto;
 
 @Component
 public class OrderMapper {
 
 	public OrderResponseDto toDto(Order order) {
 		return OrderResponseDto.from(order);
+	}
+
+	public OrderResponseDto toDto(Order order, ProductResponseDto product) {
+		return OrderResponseDto.of(order, product);
 	}
 
 	public ShippingInfo toShippingEntity(ShippingInfoRequestDto requestDto) {

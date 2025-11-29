@@ -3,6 +3,7 @@ package com.example.chicken.domain.order.service;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +15,9 @@ import com.example.chicken.domain.order.entity.OrderStatus;
 import com.example.chicken.domain.order.entity.ShippingInfo;
 import com.example.chicken.domain.order.exception.OrderNotFoundException;
 import com.example.chicken.domain.order.repository.OrderRepository;
+import com.example.chicken.domain.product.dto.ProductResponseDto;
 import com.example.chicken.domain.product.entity.Product;
+import com.example.chicken.domain.product.service.ProductMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +27,7 @@ public class OrderService {
 
 	private final OrderRepository orderRepository;
 	private final OrderMapper orderMapper;
+	private final ProductMapper productMapper;
 
 	@Transactional
 	public Order createOrder(User user, Product product) {
@@ -55,9 +59,15 @@ public class OrderService {
 
 	@Transactional(readOnly = true)
 	public OrderResponseDto getOrder(Long orderId) {
-		Order order = this.orderRepository.findById(orderId)
+
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+		Order order = this.orderRepository.findByIdAndUser(orderId, email)
 			.orElseThrow(() -> new OrderNotFoundException(orderId.toString()));
 
-		return this.orderMapper.toDto(order);
+		ProductResponseDto productResponse = productMapper.toResponseDto(order.getProduct());
+
+		return this.orderMapper.toDto(order, productResponse);
 	}
+
 }
