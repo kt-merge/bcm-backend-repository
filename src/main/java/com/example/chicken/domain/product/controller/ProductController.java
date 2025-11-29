@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.chicken.dto.product.ProductRequestDto;
-import com.example.chicken.dto.product.ProductResponseDto;
+import com.example.chicken.domain.product.dto.ProductRequestDto;
+import com.example.chicken.domain.product.dto.ProductResponseDto;
 import com.example.chicken.domain.product.service.ProductService;
 
 import jakarta.validation.Valid;

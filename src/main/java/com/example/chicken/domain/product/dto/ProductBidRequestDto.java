@@ -1,4 +1,4 @@
-package com.example.chicken.dto.product;
+package com.example.chicken.domain.product.dto;
 
 import java.math.BigDecimal;
 

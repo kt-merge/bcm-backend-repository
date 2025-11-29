@@ -6,8 +6,8 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 
-import com.example.chicken.dto.product.ProductBidRequestDto;
-import com.example.chicken.dto.product.ProductBidResponseDto;
+import com.example.chicken.domain.product.dto.ProductBidRequestDto;
+import com.example.chicken.domain.product.dto.ProductBidResponseDto;
 import com.example.chicken.service.ProductBidService;
 import com.example.chicken.domain.product.service.ProductService;
 

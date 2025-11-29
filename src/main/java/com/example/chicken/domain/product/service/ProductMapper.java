@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.product.entity.BidStatus;
 import com.example.chicken.domain.product.entity.Product;
-import com.example.chicken.dto.product.ProductRequestDto;
-import com.example.chicken.dto.product.ProductResponseDto;
+import com.example.chicken.domain.product.dto.ProductRequestDto;
+import com.example.chicken.domain.product.dto.ProductResponseDto;
 
 @Component
 public class ProductMapper {

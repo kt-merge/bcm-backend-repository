@@ -25,8 +25,8 @@ import com.example.chicken.domain.product.entity.Category;
 import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.entity.ProductStatus;
 import com.example.chicken.domain.product.service.ProductService;
-import com.example.chicken.dto.product.ProductRequestDto;
-import com.example.chicken.dto.product.ProductResponseDto;
+import com.example.chicken.domain.product.dto.ProductRequestDto;
+import com.example.chicken.domain.product.dto.ProductResponseDto;
 import com.example.chicken.domain.product.repository.ProductRepository;
 import com.example.chicken.domain.auth.repository.UserRepository;
 

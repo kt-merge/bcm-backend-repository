@@ -17,10 +17,10 @@ import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.entity.ProductBid;
 import com.example.chicken.domain.product.exception.ProductNotFoundException;
 import com.example.chicken.domain.product.repository.ProductRepository;
-import com.example.chicken.dto.product.ProductBidInfoResponseDto;
-import com.example.chicken.dto.product.ProductBidRequestDto;
-import com.example.chicken.dto.product.ProductRequestDto;
-import com.example.chicken.dto.product.ProductResponseDto;
+import com.example.chicken.domain.product.dto.ProductBidInfoResponseDto;
+import com.example.chicken.domain.product.dto.ProductBidRequestDto;
+import com.example.chicken.domain.product.dto.ProductRequestDto;
+import com.example.chicken.domain.product.dto.ProductResponseDto;
 import com.example.chicken.repository.ProductBidRepository;
 import com.example.chicken.service.BidScheduleService;
 

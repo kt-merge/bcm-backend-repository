@@ -7,8 +7,8 @@ import java.util.List;
 import com.example.chicken.domain.auth.entity.user.Role;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.order.dto.OrderResponseDto;
-import com.example.chicken.dto.product.ProductBidResponseDto;
-import com.example.chicken.dto.product.ProductResponseDto;
+import com.example.chicken.domain.product.dto.ProductBidResponseDto;
+import com.example.chicken.domain.product.dto.ProductResponseDto;
 import com.example.chicken.dto.user.WinnerResponseDto;
 
 public record UserResponseDto(Long id, String nickname, String email, Role role, String phoneNumber,
