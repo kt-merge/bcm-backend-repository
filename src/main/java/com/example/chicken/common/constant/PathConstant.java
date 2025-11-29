@@ -81,7 +81,7 @@ public class PathConstant {
 		public static final String ORDER_PREFIX = "/api/orders";
 
 		public static final String UPLOAD_URL = "/{orderId}";
-
+		public static final String SHIPPING_INFO = UPLOAD_URL + "/shipping-info";
 	}
 
 }

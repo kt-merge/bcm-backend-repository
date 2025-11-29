@@ -66,4 +66,8 @@ public class Order extends BaseTimeEntity {
 		this.product = product;
 	}
 
+	public void addShippingInfo(ShippingInfo shippingInfo) {
+		this.shippingInfo = shippingInfo;
+	}
+
 }
