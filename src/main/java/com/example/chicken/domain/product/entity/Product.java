@@ -95,10 +95,6 @@ public class Product extends BaseTimeEntity {
 		return this.bidStatus.equals(BidStatus.NOT_BIDDED);
 	}
 
-	public void activeBid() {
-		this.bidStatus = BidStatus.BIDDED;
-	}
-
 	public void updateBidPrice(BigDecimal price) {
 		this.bidPrice = price;
 	}
@@ -109,8 +105,17 @@ public class Product extends BaseTimeEntity {
 		this.bidCount += 1;
 	}
 
+	public void activeBid() {
+		this.bidStatus = BidStatus.BIDDED;
+	}
+
+	public void waitPayment() {
+		this.bidStatus = BidStatus.PAYMENT_WAITING;
+	}
+
 	public void completeBid() {
 		this.bidStatus = BidStatus.COMPLETED;
 	}
+
 
 }

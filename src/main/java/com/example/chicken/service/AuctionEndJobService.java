@@ -12,6 +12,7 @@ import com.example.chicken.domain.product.entity.BidStatus;
 import com.example.chicken.domain.product.entity.HighestBidder;
 import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.entity.ProductBid;
+import com.example.chicken.domain.product.exception.ProductNotFoundException;
 import com.example.chicken.dto.mail.AuctionWonEvent;
 import com.example.chicken.domain.product.repository.HighestBidderRepository;
 import com.example.chicken.domain.product.repository.ProductBidRepository;
@@ -31,12 +32,12 @@ public class AuctionEndJobService {
 	@Transactional
 	public void endProductAuction(Long productId) {
 
-		Product product = this.productRepository.findById(productId).orElseThrow(() ->
-																					 new IllegalArgumentException(
-																						 "Product not found"));
+		Product product = this.productRepository.findById(productId)
+			.orElseThrow(() -> new ProductNotFoundException(productId.toString()));
 
 		// 이미 완료된 경매인 경우 아무 작업도 수행하지 않음
-		if (product.getBidStatus().equals(BidStatus.COMPLETED)) return;
+		if (product.getBidStatus().equals(BidStatus.COMPLETED))
+			return;
 
 		Optional<ProductBid> productBid = this.productBidRepository.findTopByProductIdOrderByPriceDesc(product.getId());
 
@@ -53,8 +54,9 @@ public class AuctionEndJobService {
 			this.eventPublisher.publishEvent(new AuctionWonEvent(product.getName(), user.getEmail()));
 		}
 
-		product.completeBid();
+		product.waitPayment();
 
 		this.productRepository.save(product);
 	}
+
 }
