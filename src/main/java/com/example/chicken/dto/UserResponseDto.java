@@ -6,13 +6,15 @@ import java.util.List;
 
 import com.example.chicken.domain.auth.entity.user.Role;
 import com.example.chicken.domain.auth.entity.user.User;
+import com.example.chicken.domain.order.dto.OrderResponseDto;
 import com.example.chicken.dto.product.ProductBidResponseDto;
 import com.example.chicken.dto.product.ProductResponseDto;
 import com.example.chicken.dto.user.WinnerResponseDto;
 
 public record UserResponseDto(Long id, String nickname, String email, Role role, String phoneNumber,
 							  LocalDateTime createdAt, LocalDateTime modifiedAt, List<WinnerResponseDto> winners,
-							  List<ProductBidResponseDto> productBids, List<ProductResponseDto> products) {
+							  List<ProductBidResponseDto> productBids, List<ProductResponseDto> products,
+							  List<OrderResponseDto> orders) {
 
 	public static UserResponseDto from(User user) {
 		return new UserResponseDto(user.getId(),
@@ -24,13 +26,15 @@ public record UserResponseDto(Long id, String nickname, String email, Role role,
 								   user.getModifiedAt(),
 								   new ArrayList<>(),
 								   new ArrayList<>(),
+								   new ArrayList<>(),
 								   new ArrayList<>());
 	}
 
 	public static UserResponseDto of(User user,
 									 List<WinnerResponseDto> winners,
 									 List<ProductBidResponseDto> productBids,
-									 List<ProductResponseDto> products) {
+									 List<ProductResponseDto> products,
+									 List<OrderResponseDto> orders) {
 		return new UserResponseDto(user.getId(),
 								   user.getNickname(),
 								   user.getEmail(),
@@ -40,7 +44,8 @@ public record UserResponseDto(Long id, String nickname, String email, Role role,
 								   user.getModifiedAt(),
 								   winners,
 								   productBids,
-								   products);
+								   products,
+								   orders);
 	}
 
 }

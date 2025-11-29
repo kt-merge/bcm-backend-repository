@@ -7,11 +7,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.chicken.domain.auth.exception.UserNotFoundException;
-import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.entity.token.ResetPasswordToken;
+import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.exception.ResetTokenExpiredException;
+import com.example.chicken.domain.auth.exception.UserNotFoundException;
+import com.example.chicken.domain.auth.repository.ResetPasswordTokenRepository;
+import com.example.chicken.domain.auth.repository.UserRepository;
+import com.example.chicken.domain.order.dto.OrderResponseDto;
+import com.example.chicken.domain.order.repository.OrderRepository;
+import com.example.chicken.domain.order.service.OrderMapper;
 import com.example.chicken.domain.product.entity.ProductBid;
+import com.example.chicken.domain.product.repository.ProductRepository;
 import com.example.chicken.dto.UserResponseDto;
 import com.example.chicken.dto.product.ProductBidResponseDto;
 import com.example.chicken.dto.product.ProductResponseDto;
@@ -19,9 +25,6 @@ import com.example.chicken.dto.user.UpdateUserInfoDto;
 import com.example.chicken.dto.user.WinnerResponseDto;
 import com.example.chicken.repository.HighestBidderRepository;
 import com.example.chicken.repository.ProductBidRepository;
-import com.example.chicken.domain.product.repository.ProductRepository;
-import com.example.chicken.domain.auth.repository.ResetPasswordTokenRepository;
-import com.example.chicken.domain.auth.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +36,8 @@ public class UserService {
 	private final ProductRepository productRepository;
 	private final ProductBidRepository productBidRepository;
 	private final HighestBidderRepository highestBidderRepository;
+	private final OrderRepository orderRepository;
+	private final OrderMapper orderMapper;
 	private final ResetPasswordTokenRepository resetPasswordTokenRepository;
 	private final PasswordEncoder passwordEncoder;
 
@@ -55,7 +60,11 @@ public class UserService {
 			.map(ProductResponseDto::from)
 			.toList();
 
-		return UserResponseDto.of(user, winnerResponse, productBids, productResponse);
+		List<OrderResponseDto> orderResponse = this.orderRepository.findByUser(user)
+			.stream().map(orderMapper::toDto)
+			.toList();
+
+		return UserResponseDto.of(user, winnerResponse, productBids, productResponse, orderResponse);
 	}
 
 	@Transactional

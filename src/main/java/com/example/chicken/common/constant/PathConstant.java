@@ -72,4 +72,16 @@ public class PathConstant {
 
 	}
 
+	public static class Order {
+
+		private Order() {
+			throw new IllegalStateException(ERROR_MESSAGE);
+		}
+
+		public static final String ORDER_PREFIX = "/api/orders";
+
+		public static final String UPLOAD_URL = "/{orderId}";
+
+	}
+
 }
