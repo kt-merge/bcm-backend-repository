@@ -19,7 +19,7 @@ public class SecurityConstants {
 	};
 
 	protected static final String[] USER_WHITELIST = {
-		"/api/users/**", "/api/products/**", "/api/s3/**"
+		"/api/users/**", "/api/products/**", "/api/orders/**", "/api/s3/**"
 	};
 
 	protected static final List<String> ALLOWED_METHODS = List.of(

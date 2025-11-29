@@ -53,4 +53,11 @@ public class OrderService {
 		return this.orderMapper.toDto(order);
 	}
 
+	@Transactional(readOnly = true)
+	public OrderResponseDto getOrder(Long orderId) {
+		Order order = this.orderRepository.findById(orderId)
+			.orElseThrow(() -> new OrderNotFoundException(orderId.toString()));
+
+		return this.orderMapper.toDto(order);
+	}
 }
