@@ -54,7 +54,8 @@ public class AuctionEndJobService {
 			this.eventPublisher.publishEvent(new AuctionWonEvent(product.getName(), user.getEmail()));
 		}
 
-		product.waitPayment();
+		if (product.getBidStatus().equals(BidStatus.NOT_BIDDED)) product.completeBid();
+		else product.waitPayment();
 
 		this.productRepository.save(product);
 	}
