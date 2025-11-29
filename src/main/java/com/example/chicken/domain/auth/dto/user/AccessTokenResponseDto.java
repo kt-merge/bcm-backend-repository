@@ -1,4 +1,4 @@
-package com.example.chicken.dto.user;
+package com.example.chicken.domain.auth.dto.user;
 
 public record AccessTokenResponseDto(String accessToken) {
 

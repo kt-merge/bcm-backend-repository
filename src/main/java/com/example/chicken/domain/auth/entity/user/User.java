@@ -2,7 +2,7 @@ package com.example.chicken.domain.auth.entity.user;
 
 import com.example.chicken.common.entity.BaseTimeEntity;
 import com.example.chicken.dto.UserRequestDto;
-import com.example.chicken.dto.user.UpdateUserInfoDto;
+import com.example.chicken.domain.auth.dto.user.UpdateUserInfoDto;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

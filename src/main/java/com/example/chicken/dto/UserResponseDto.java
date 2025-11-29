@@ -9,7 +9,7 @@ import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.order.dto.OrderResponseDto;
 import com.example.chicken.domain.product.dto.ProductBidResponseDto;
 import com.example.chicken.domain.product.dto.ProductResponseDto;
-import com.example.chicken.dto.user.WinnerResponseDto;
+import com.example.chicken.domain.auth.dto.user.WinnerResponseDto;
 
 public record UserResponseDto(Long id, String nickname, String email, Role role, String phoneNumber,
 							  LocalDateTime createdAt, LocalDateTime modifiedAt, List<WinnerResponseDto> winners,

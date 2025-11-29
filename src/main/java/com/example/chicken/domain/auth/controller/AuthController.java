@@ -26,8 +26,8 @@ import com.example.chicken.dto.SignInRequestDto;
 import com.example.chicken.dto.SignInResponseDto;
 import com.example.chicken.dto.UserRequestDto;
 import com.example.chicken.dto.UserResponseDto;
-import com.example.chicken.dto.user.AccessTokenResponseDto;
-import com.example.chicken.dto.user.TokenResponseDto;
+import com.example.chicken.domain.auth.dto.user.AccessTokenResponseDto;
+import com.example.chicken.domain.auth.dto.user.TokenResponseDto;
 import com.example.chicken.domain.auth.service.AuthService;
 import com.example.chicken.domain.auth.service.UserService;
 

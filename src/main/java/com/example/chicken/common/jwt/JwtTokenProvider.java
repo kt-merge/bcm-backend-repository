@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.example.chicken.domain.auth.entity.user.Role;
-import com.example.chicken.dto.user.TokenResponseDto;
+import com.example.chicken.domain.auth.dto.user.TokenResponseDto;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
