@@ -10,7 +10,7 @@ import com.example.chicken.domain.order.entity.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-	@Query("SELECT o FROM Order o JOIN FETCH o.product WHERE o.user = :user")
+	@Query("SELECT o FROM Order o JOIN FETCH o.product WHERE o.user = :user and o.status NOT IN ('EXPIRED')")
 	List<Order> findByUser(User user);
 
 }
