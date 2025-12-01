@@ -2,6 +2,7 @@ package com.example.chicken.domain.order.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import com.example.chicken.common.entity.BaseTimeEntity;
 import com.example.chicken.domain.auth.entity.user.User;
@@ -64,6 +65,16 @@ public class Order extends BaseTimeEntity {
 		this.shippingInfo = shippingInfo;
 		this.user = user;
 		this.product = product;
+	}
+
+	public static Order pendingOrder(User user, Product product) {
+		return Order.builder()
+			.status(OrderStatus.PAYMENT_PENDING)
+			.finalPrice(product.getBidPrice())
+			.expiredAt(LocalDateTime.now(ZoneOffset.UTC).plusDays(1))
+			.user(user)
+			.product(product)
+			.build();
 	}
 
 	public void addShippingInfo(ShippingInfo shippingInfo) {

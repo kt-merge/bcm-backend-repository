@@ -7,7 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.chicken.domain.auth.entity.user.User;
-import com.example.chicken.domain.order.event.OrderCreateRequestedEvent;
+import com.example.chicken.domain.order.entity.Order;
+import com.example.chicken.domain.order.repository.OrderRepository;
+import com.example.chicken.domain.payment.entity.Payment;
+import com.example.chicken.domain.payment.repository.PaymentRepository;
 import com.example.chicken.domain.product.entity.BidStatus;
 import com.example.chicken.domain.product.entity.HighestBidder;
 import com.example.chicken.domain.product.entity.Product;
@@ -27,8 +30,9 @@ public class AuctionEndJobService {
 	private final ProductRepository productRepository;
 	private final ProductBidRepository productBidRepository;
 	private final HighestBidderRepository highestBidderRepository;
+	private final OrderRepository orderRepository;
+	private final PaymentRepository paymentRepository;
 	private final ApplicationEventPublisher eventPublisher;
-
 	@Transactional
 	public void endProductAuction(Long productId) {
 
@@ -42,13 +46,10 @@ public class AuctionEndJobService {
 		if (productBid.isPresent()) {
 			User user = productBid.get().getUser();
 
-			HighestBidder highestBidder = HighestBidder.builder()
-				.productBid(productBid.get())
-				.product(product)
-				.build();
+			this.highestBidderRepository.save(HighestBidder.of(productBid.get(), product));
+			Order savedOrder = this.orderRepository.save(Order.pendingOrder(user, product));
+			this.paymentRepository.save(Payment.ready(user, savedOrder));
 
-			this.highestBidderRepository.save(highestBidder);
-			this.eventPublisher.publishEvent(new OrderCreateRequestedEvent(user.getId(), productId));
 			this.eventPublisher.publishEvent(new AuctionWonEvent(product.getName(), user.getEmail()));
 		}
 

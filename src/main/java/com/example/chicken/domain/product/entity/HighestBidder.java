@@ -43,5 +43,13 @@ public class HighestBidder {
 		this.lastPrice = productBid.getPrice();
 	}
 
+	public static HighestBidder of(ProductBid productBid, Product product) {
+		return HighestBidder.builder()
+			.productBid(productBid)
+			.product(product)
+			.build();
+	}
+
+
 
 }
