@@ -16,6 +16,8 @@ import com.example.chicken.domain.auth.repository.UserRepository;
 import com.example.chicken.domain.order.entity.Order;
 import com.example.chicken.domain.order.entity.OrderStatus;
 import com.example.chicken.domain.order.repository.OrderRepository;
+import com.example.chicken.domain.payment.entity.Payment;
+import com.example.chicken.domain.payment.repository.PaymentRepository;
 import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.exception.ProductNotFoundException;
 import com.example.chicken.domain.product.repository.ProductRepository;
@@ -29,6 +31,7 @@ public class OrderCreateRequestedListener {
 	private final UserRepository userRepository;
 	private final ProductRepository productRepository;
 	private final OrderRepository orderRepository;
+	private final PaymentRepository paymentRepository;
 
 	@Transactional(propagation = REQUIRES_NEW)
 	@TransactionalEventListener(phase = AFTER_COMMIT)
@@ -54,5 +57,6 @@ public class OrderCreateRequestedListener {
 			.build();
 
 		this.orderRepository.save(order);
+		this.paymentRepository.save(Payment.ready(user, order));
 	}
 }
