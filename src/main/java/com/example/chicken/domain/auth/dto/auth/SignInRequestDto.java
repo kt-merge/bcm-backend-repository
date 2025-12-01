@@ -1,4 +1,4 @@
-package com.example.chicken.dto;
+package com.example.chicken.domain.auth.dto.auth;
 
 import jakarta.validation.constraints.NotBlank;
 

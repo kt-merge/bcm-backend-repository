@@ -21,7 +21,7 @@ import com.example.chicken.common.jwt.JwtTokenProvider;
 import com.example.chicken.domain.auth.entity.user.Role;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.entity.token.RefreshToken;
-import com.example.chicken.dto.SignInRequestDto;
+import com.example.chicken.domain.auth.dto.auth.SignInRequestDto;
 import com.example.chicken.dto.UserRequestDto;
 import com.example.chicken.domain.auth.repository.RefreshTokenRepository;
 import com.example.chicken.domain.auth.repository.UserRepository;
