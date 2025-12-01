@@ -51,4 +51,8 @@ public class Payment {
 			.paymentStatus(PaymentStatus.READY)
 			.build();
 	}
+
+	public void paid() {
+		this.status = PaymentStatus.PAID;
+	}
 }

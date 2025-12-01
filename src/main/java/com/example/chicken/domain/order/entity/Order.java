@@ -77,6 +77,10 @@ public class Order extends BaseTimeEntity {
 			.build();
 	}
 
+	public void paid() {
+		this.status = OrderStatus.PAID;
+	}
+
 	public void addShippingInfo(ShippingInfo shippingInfo) {
 		this.shippingInfo = shippingInfo;
 	}

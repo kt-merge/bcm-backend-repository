@@ -84,4 +84,14 @@ public class PathConstant {
 		public static final String SHIPPING_INFO = ORDER_ID + "/shipping-info";
 	}
 
+	public static class Payment {
+
+		private Payment() {
+			throw new IllegalStateException(ERROR_MESSAGE);
+		}
+
+		public static final String PAYMENT_PREFIX = "/api/payments";
+
+	}
+
 }
