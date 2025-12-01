@@ -44,7 +44,7 @@ public class ProductService {
 
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-		String imageUrl = s3BucketUrl + request.imageUrl();
+		String imageUrl = this.s3BucketUrl + request.imageUrl();
 
 		User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
 
@@ -68,7 +68,7 @@ public class ProductService {
 			.stream().map(ProductBidInfoResponseDto::from)
 			.toList();
 
-		return ProductResponseDto.of(product, productBidResponses);
+		return this.productMapper.toResponseDto(product, productBidResponses);
 	}
 
 	@Transactional(readOnly = true)

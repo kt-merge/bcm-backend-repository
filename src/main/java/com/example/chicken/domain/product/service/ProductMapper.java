@@ -1,8 +1,11 @@
 package com.example.chicken.domain.product.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import com.example.chicken.domain.auth.entity.user.User;
+import com.example.chicken.domain.product.dto.ProductBidInfoResponseDto;
 import com.example.chicken.domain.product.entity.BidStatus;
 import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.dto.ProductRequestDto;
@@ -29,6 +32,10 @@ public class ProductMapper {
 
 	public ProductResponseDto toResponseDto(Product product) {
 		return ProductResponseDto.from(product);
+	}
+
+	public ProductResponseDto toResponseDto(Product product, List<ProductBidInfoResponseDto> productBids) {
+		return ProductResponseDto.of(product, productBids);
 	}
 
 }
