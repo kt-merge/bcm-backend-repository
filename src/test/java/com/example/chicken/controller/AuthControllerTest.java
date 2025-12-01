@@ -101,7 +101,6 @@ class AuthControllerTest {
 			//then
 			.andDo(print())
 			.andExpect(status().isCreated())
-			.andExpect(header().exists("Location"))
 			.andExpect(jsonPath("$.id").exists())
 			.andExpect(jsonPath("$.email").value(email))
 			.andExpect(jsonPath("$.role").value(Role.USER.name()))

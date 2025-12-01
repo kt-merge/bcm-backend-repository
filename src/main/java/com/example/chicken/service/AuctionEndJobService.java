@@ -13,10 +13,10 @@ import com.example.chicken.domain.product.entity.HighestBidder;
 import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.entity.ProductBid;
 import com.example.chicken.domain.product.exception.ProductNotFoundException;
-import com.example.chicken.dto.mail.AuctionWonEvent;
 import com.example.chicken.domain.product.repository.HighestBidderRepository;
 import com.example.chicken.domain.product.repository.ProductBidRepository;
 import com.example.chicken.domain.product.repository.ProductRepository;
+import com.example.chicken.dto.mail.AuctionWonEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,9 +35,7 @@ public class AuctionEndJobService {
 		Product product = this.productRepository.findById(productId)
 			.orElseThrow(() -> new ProductNotFoundException(productId.toString()));
 
-		// 이미 완료된 경매인 경우 아무 작업도 수행하지 않음
-		if (product.getBidStatus().equals(BidStatus.COMPLETED))
-			return;
+		if (product.getBidStatus() == BidStatus.COMPLETED) return;
 
 		Optional<ProductBid> productBid = this.productBidRepository.findTopByProductIdOrderByPriceDesc(product.getId());
 

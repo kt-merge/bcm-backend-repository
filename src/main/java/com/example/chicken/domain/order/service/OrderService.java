@@ -47,7 +47,9 @@ public class OrderService {
 
 	@Transactional
 	public OrderResponseDto addShippingInfo(Long orderId, ShippingInfoRequestDto requestDto) {
-		Order order = this.orderRepository.findById(orderId)
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+		Order order = this.orderRepository.findByIdAndUser(orderId, email)
 			.orElseThrow(() -> new OrderNotFoundException(orderId.toString()));
 
 		ShippingInfo shippingInfo = this.orderMapper.toShippingEntity(requestDto);
@@ -59,7 +61,6 @@ public class OrderService {
 
 	@Transactional(readOnly = true)
 	public OrderResponseDto getOrder(Long orderId) {
-
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
 		Order order = this.orderRepository.findByIdAndUser(orderId, email)

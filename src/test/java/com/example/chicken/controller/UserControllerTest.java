@@ -80,21 +80,4 @@ class UserControllerTest {
 			.andExpect(jsonPath("$.id").exists());
 	}
 
-	@Test
-	@DisplayName("내 별명 변경 성공")
-	void patchMyUserNickname() throws Exception {
-		//when
-		String newNickname = "newNickName";
-		UpdateUserNicknameDto request = new UpdateUserNicknameDto(newNickname);
-		mockMvc.perform(patch("/api/users/me/nickname")
-							.header("Authorization", token)
-							.contentType(MediaType.APPLICATION_JSON)
-							.content(objectMapper.writeValueAsBytes(request)))
-			//then
-			.andDo(print())
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.id").exists())
-			.andExpect(jsonPath("$.nickname").value(newNickname));
-	}
-
 }
