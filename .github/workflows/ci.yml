@@ -58,19 +58,15 @@ jobs:
           ECR_REPOSITORY: bcm-backend-repository
           IMAGE_TAG: latest
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
       - name: Update docker-compose for ECR image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: bcm-backend-repository
-          IMAGE_TAG: ${{ github.sha }}
         run: |
-          sed -i "s|build: .|image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" docker-compose.yml
-          sed -i "/image: bcm-backend-repository-app:latest/d" docker-compose.yml
+          sed -i "s|build: .|image: $ECR_REGISTRY/$ECR_REPOSITORY:latest|g" docker-compose.yml
 
       - name: Validate Docker Compose configuration
         run: docker compose config
