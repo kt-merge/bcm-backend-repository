@@ -1,11 +1,7 @@
 package com.example.chicken.domain.product.entity;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 import com.example.chicken.common.entity.BaseTimeEntity;
 import com.example.chicken.domain.auth.entity.user.User;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,6 +13,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,94 +26,110 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product extends BaseTimeEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-	@Column(length = 500, nullable = false)
-	private String name;
+    @Column(length = 500, nullable = false)
+    private String name;
 
-	@Column(length = 1000)
-	private String description;
+    @Column(length = 1000)
+    private String description;
 
-	@Enumerated(EnumType.STRING)
-	private Category category;
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
-	private BigDecimal startPrice;
+    private BigDecimal startPrice;
 
-	private BigDecimal bidPrice;
+    private BigDecimal bidPrice;
 
-	@Enumerated(EnumType.STRING)
-	private BidStatus bidStatus;
+    @Enumerated(EnumType.STRING)
+    private BidStatus bidStatus;
 
-	private Long bidCount;
+    private Long bidCount;
 
-	private LocalDateTime bidEndDate;
+    private LocalDateTime bidEndDate;
 
-	@Enumerated(EnumType.STRING)
-	private ProductStatus productStatus;
+    @Enumerated(EnumType.STRING)
+    private ProductStatus productStatus;
 
-	@Column(length = 1000)
-	private String imageUrl;
+    @Column(length = 1000)
+    private String imageUrl;
 
-	@JoinColumn(name = "user_id")
-	@ManyToOne(fetch = FetchType.LAZY)
-	private User user;
+    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
 
-	@Builder
-	private Product(String name,
-					String description,
-					Category category,
-					BigDecimal startPrice,
-					BigDecimal bidPrice,
-					Long bidCount,
-					LocalDateTime bidEndDate,
-					BidStatus bidStatus,
-					ProductStatus productStatus,
-					String imageUrl,
-					User user) {
-		this.name = name;
-		this.description = description;
-		this.category = category;
-		this.startPrice = startPrice;
-		this.bidPrice = bidPrice;
-		this.bidCount = bidCount;
-		this.bidStatus = bidStatus;
-		this.bidEndDate = bidEndDate;
-		this.productStatus = productStatus;
-		this.imageUrl = imageUrl;
-		this.user = user;
-	}
+    @Builder
+    private Product(String name,
+                    String description,
+                    Category category,
+                    BigDecimal startPrice,
+                    BigDecimal bidPrice,
+                    Long bidCount,
+                    LocalDateTime bidEndDate,
+                    BidStatus bidStatus,
+                    ProductStatus productStatus,
+                    String imageUrl,
+                    User user) {
+        this.name = name;
+        this.description = description;
+        this.category = category;
+        this.startPrice = startPrice;
+        this.bidPrice = bidPrice;
+        this.bidCount = bidCount;
+        this.bidStatus = bidStatus;
+        this.bidEndDate = bidEndDate;
+        this.productStatus = productStatus;
+        this.imageUrl = imageUrl;
+        this.user = user;
+    }
 
-	public boolean isBidPriceLowerThan(BigDecimal price) {
-		return this.bidPrice.compareTo(price) < 0;
-	}
+    public boolean isBidPriceLowerThan(BigDecimal price) {
+        return this.bidPrice.compareTo(price) < 0;
+    }
 
-	public boolean isBidInactive() {
-		return this.bidStatus.equals(BidStatus.NOT_BIDDED);
-	}
+    public boolean isBidInactive() {
+        return this.bidStatus.equals(BidStatus.NOT_BIDDED);
+    }
 
-	public void updateBidPrice(BigDecimal price) {
-		this.bidPrice = price;
-	}
+    public void updateBidPrice(BigDecimal price) {
+        this.bidPrice = price;
+    }
 
-	public void incrementBidCount() {
-		if (this.bidCount == null) this.bidCount = 0L;
+    public void updateProduct(String name,
+                              String description,
+                              Category category,
+                              ProductStatus productStatus,
+                              LocalDateTime bidEndDate,
+                              String imageUrl) {
+        this.name = name;
+        this.description = description;
+        this.category = category;
+        this.bidEndDate = bidEndDate;
+        this.productStatus = productStatus;
+        this.imageUrl = imageUrl;
+    }
 
-		this.bidCount += 1;
-	}
+    public void incrementBidCount() {
+        if (this.bidCount == null) {
+            this.bidCount = 0L;
+        }
 
-	public void activeBid() {
-		this.bidStatus = BidStatus.BIDDED;
-	}
+        this.bidCount += 1;
+    }
 
-	public void waitPayment() {
-		this.bidStatus = BidStatus.PAYMENT_WAITING;
-	}
+    public void activeBid() {
+        this.bidStatus = BidStatus.BIDDED;
+    }
 
-	public void completeBid() {
-		this.bidStatus = BidStatus.COMPLETED;
-	}
+    public void waitPayment() {
+        this.bidStatus = BidStatus.PAYMENT_WAITING;
+    }
+
+    public void completeBid() {
+        this.bidStatus = BidStatus.COMPLETED;
+    }
 
 
 }
