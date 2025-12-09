@@ -19,7 +19,6 @@ public class SecurityConstants {
 
     protected static final String[] ADMIN_WHITELIST = {
             "/api/admin/**",
-            "/api/admin/products/**"
     };
 
     protected static final String[] USER_WHITELIST = {

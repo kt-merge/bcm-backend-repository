@@ -140,8 +140,6 @@ public class ProductService {
                 imageUrl
         );
 
-        productRepository.save(product);
-
         return this.productMapper.toResponseDto(product);
     }
 
