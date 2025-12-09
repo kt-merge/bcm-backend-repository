@@ -1,10 +1,16 @@
 package com.example.chicken.domain.auth.entity.user;
 
 import com.example.chicken.common.entity.BaseTimeEntity;
-import com.example.chicken.dto.UserRequestDto;
+import com.example.chicken.domain.admin.dto.UpdateUserInfoByAdminDto;
 import com.example.chicken.domain.auth.dto.user.UpdateUserInfoDto;
-
-import jakarta.persistence.*;
+import com.example.chicken.dto.UserRequestDto;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,50 +22,61 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-	private String nickname;
+    private String nickname;
 
-	private String email;
+    private String email;
 
-	private String password;
+    private String password;
 
-	@Enumerated(EnumType.STRING)
-	private Role role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-	private String phoneNumber;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
-	@Builder
-	private User(String nickname, String email, String password, Role role, String phoneNumber) {
-		this.nickname = nickname;
-		this.email = email;
-		this.password = password;
-		this.role = role;
-		this.phoneNumber = phoneNumber;
-	}
+    private String phoneNumber;
 
-	public void updateNickname(String nickname) {
-		this.nickname = nickname;
-	}
+    @Builder
+    private User(String nickname, String email, String password, Role role, Status status, String phoneNumber) {
+        this.nickname = nickname;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.status = status;
+        this.phoneNumber = phoneNumber;
+    }
 
-	public static User from(UserRequestDto request) {
-		return User.builder()
-			.nickname(request.nickname())
-			.email(request.email())
-			.password(request.password())
-			.role(Role.USER)
-			.phoneNumber(request.phoneNumber())
-			.build();
-	}
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 
-	public void updateUserInfo(UpdateUserInfoDto request) {
-		this.nickname = request.nickname();
-		this.phoneNumber = request.phoneNumber();
-	}
+    public static User from(UserRequestDto request) {
+        return User.builder()
+                .nickname(request.nickname())
+                .email(request.email())
+                .password(request.password())
+                .role(Role.USER)
+                .status(Status.PENDING)
+                .phoneNumber(request.phoneNumber())
+                .build();
+    }
 
-	public void updatePassword(String encodedPassword) {
-		this.password = encodedPassword;
-	}
+    public void updateUserInfo(UpdateUserInfoDto request) {
+        this.nickname = request.nickname();
+        this.phoneNumber = request.phoneNumber();
+    }
+
+    public void updateUserInfoByAdmin(UpdateUserInfoByAdminDto request) {
+        this.nickname = request.nickname();
+        this.phoneNumber = request.phoneNumber();
+        this.status = request.status();
+    }
+
+    public void updatePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
 }

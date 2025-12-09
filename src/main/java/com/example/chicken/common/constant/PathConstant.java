@@ -102,8 +102,10 @@ public class PathConstant {
 
         public static final String ADMIN_PREFIX = "/api/admin";
 
+        public static final String ADMIN_USERS_PREFIX = ADMIN_PREFIX + "/users";
         public static final String ADMIN_PRODUCTS_PREFIX = ADMIN_PREFIX + "/products";
 
+        public static final String ADMIN_USERS_ID = "/{userId}";
         public static final String ADMIN_PRODUCTS_ID = "/{productId}";
     }
 
