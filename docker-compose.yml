@@ -3,6 +3,7 @@ version: '3.8'
 services:
   app:
     build: .
+    image: bcm-backend-repository-app:latest
     environment:
       SPRING_PROFILES_ACTIVE: dev
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
