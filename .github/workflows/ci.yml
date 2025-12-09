@@ -2,9 +2,7 @@ name: CI with Gradle
 
 on:
   push:
-    branches: [ "main", "develop", "infra/docker" ]
-  pull_request:
-    branches: [ "main", "develop" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
