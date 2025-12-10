@@ -37,3 +37,11 @@ out/
 .vscode/
 src/main/resources/.env
 src/main/resources/application-dev.yaml
+
+### Env ###
+**/application*.yml
+**/application*.yaml
+**/.env*
+
+### Firebase ###
+serviceAccountKey.json
