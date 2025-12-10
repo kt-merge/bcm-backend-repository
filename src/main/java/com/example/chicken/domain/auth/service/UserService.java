@@ -74,7 +74,9 @@ public class UserService {
 
     @Transactional
     public UserResponseDto updateUserInfo(Long userId, UpdateUserInfoByAdminDto request) {
-        User user = getUser();
+        User user = this.userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException(userId.toString())
+        );
 
         user.updateUserInfoByAdmin(request);
 
