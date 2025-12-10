@@ -45,3 +45,5 @@ src/main/resources/application-dev.yaml
 
 ### Firebase ###
 serviceAccountKey.json
+
+.env

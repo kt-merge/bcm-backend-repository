@@ -1,13 +1,11 @@
 package com.example.chicken.domain.auth.service;
 
-import java.util.List;
-
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.example.chicken.domain.admin.dto.UpdateUserInfoByAdminDto;
+import com.example.chicken.domain.admin.exception.WhyDeleteMeException;
+import com.example.chicken.domain.auth.dto.user.UpdateUserInfoDto;
+import com.example.chicken.domain.auth.dto.user.WinnerResponseDto;
 import com.example.chicken.domain.auth.entity.token.ResetPasswordToken;
+import com.example.chicken.domain.auth.entity.user.Role;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.exception.ResetTokenExpiredException;
 import com.example.chicken.domain.auth.exception.UserNotFoundException;
@@ -16,86 +14,123 @@ import com.example.chicken.domain.auth.repository.UserRepository;
 import com.example.chicken.domain.order.dto.OrderResponseDto;
 import com.example.chicken.domain.order.repository.OrderRepository;
 import com.example.chicken.domain.order.service.OrderMapper;
-import com.example.chicken.domain.product.entity.ProductBid;
-import com.example.chicken.domain.product.repository.ProductRepository;
-import com.example.chicken.dto.UserResponseDto;
 import com.example.chicken.domain.product.dto.ProductBidResponseDto;
 import com.example.chicken.domain.product.dto.ProductResponseDto;
-import com.example.chicken.domain.auth.dto.user.UpdateUserInfoDto;
-import com.example.chicken.domain.auth.dto.user.WinnerResponseDto;
+import com.example.chicken.domain.product.entity.ProductBid;
 import com.example.chicken.domain.product.repository.HighestBidderRepository;
 import com.example.chicken.domain.product.repository.ProductBidRepository;
-
+import com.example.chicken.domain.product.repository.ProductRepository;
+import com.example.chicken.domain.product.service.ProductMapper;
+import com.example.chicken.dto.UserResponseDto;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-	private final UserRepository userRepository;
-	private final ProductRepository productRepository;
-	private final ProductBidRepository productBidRepository;
-	private final HighestBidderRepository highestBidderRepository;
-	private final OrderRepository orderRepository;
-	private final OrderMapper orderMapper;
-	private final ResetPasswordTokenRepository resetPasswordTokenRepository;
-	private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
+    private final ProductBidRepository productBidRepository;
+    private final HighestBidderRepository highestBidderRepository;
+    private final OrderRepository orderRepository;
+    private final UserMapper userMapper;
+    private final OrderMapper orderMapper;
+    private final ResetPasswordTokenRepository resetPasswordTokenRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final ProductMapper productMapper;
 
-	@Transactional(readOnly = true)
-	public UserResponseDto getUserInfo() {
-		User user = getUser();
+    @Transactional(readOnly = true)
+    public UserResponseDto getUserInfo() {
+        User user = getUser();
 
-		List<WinnerResponseDto> winnerResponse = this.highestBidderRepository.findByWinnerId(user.getId())
-			.stream().map(WinnerResponseDto::from)
-			.toList();
+        List<WinnerResponseDto> winnerResponse = this.highestBidderRepository.findByWinnerId(user.getId())
+                .stream().map(WinnerResponseDto::from)
+                .toList();
 
-		List<ProductBidResponseDto> productBids = this.productBidRepository.findDistinctByUserId(user.getId())
-			.stream()
-			.filter(ProductBid::isHighestBidderNotExists)
-			.map(ProductBidResponseDto::from)
-			.toList();
+        List<ProductBidResponseDto> productBids = this.productBidRepository.findDistinctByUserId(user.getId())
+                .stream()
+                .filter(ProductBid::isHighestBidderNotExists)
+                .map(ProductBidResponseDto::from)
+                .toList();
 
-		List<ProductResponseDto> productResponse = this.productRepository.findByUser(user)
-			.stream()
-			.map(ProductResponseDto::from)
-			.toList();
+        List<ProductResponseDto> productResponse = this.productRepository.findByUser(user)
+                .stream()
+                .map((product) -> productMapper.toResponseDto(product, userMapper.toResponse(user)))
+                .toList();
 
-		List<OrderResponseDto> orderResponse = this.orderRepository.findByUser(user)
-			.stream().map(orderMapper::toDto)
-			.toList();
+        List<OrderResponseDto> orderResponse = this.orderRepository.findByUser(user)
+                .stream().map(orderMapper::toDto)
+                .toList();
 
-		return UserResponseDto.of(user, winnerResponse, productBids, productResponse, orderResponse);
-	}
+        return userMapper.toResponse(user, winnerResponse, productBids, productResponse, orderResponse);
+    }
 
-	@Transactional
-	public UserResponseDto updateUserInfo(UpdateUserInfoDto request) {
-		User user = getUser();
+    @Transactional
+    public UserResponseDto updateUserInfo(Long userId, UpdateUserInfoByAdminDto request) {
+        User user = this.userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException(userId.toString())
+        );
 
-		user.updateUserInfo(request);
+        user.updateUserInfoByAdmin(request);
 
-		return UserResponseDto.from(this.userRepository.save(user));
-	}
+        return userMapper.toResponse(this.userRepository.save(user));
+    }
 
-	private User getUser() {
-		String email =
-			SecurityContextHolder.getContext().getAuthentication().getName();
+    @Transactional
+    public UserResponseDto updateMyUserInfo(UpdateUserInfoDto request) {
+        User user = getUser();
 
-		return this.userRepository.findByEmail(email)
-			.orElseThrow(() -> new UserNotFoundException(email));
-	}
+        user.updateUserInfo(request);
 
-	@Transactional
-	public void updatePassword(String password, String token) {
-		ResetPasswordToken resetPasswordToken = this.resetPasswordTokenRepository
-			.findByResetToken(token).orElseThrow(ResetTokenExpiredException::new);
+        return userMapper.toResponse(this.userRepository.save(user));
+    }
 
-		String email = resetPasswordToken.getId();
+    private User getUser() {
+        String email =
+                SecurityContextHolder.getContext().getAuthentication().getName();
 
-		User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+        return this.userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(email));
+    }
 
-		user.updatePassword(this.passwordEncoder.encode(password));
+    @Transactional(readOnly = true)
+    public Page<UserResponseDto> getUsers(Pageable pageable) {
+        Page<User> users = this.userRepository.findAll(pageable);
 
-		this.resetPasswordTokenRepository.delete(resetPasswordToken);
-	}
+        return users.map(userMapper::toResponse);
+    }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = this.userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+
+        if (user.getRole().equals(Role.ADMIN)) {
+            throw new WhyDeleteMeException();
+        }
+
+        this.userRepository.delete(user);
+    }
+
+    @Transactional
+    public void updatePassword(String password, String token) {
+        ResetPasswordToken resetPasswordToken = this.resetPasswordTokenRepository
+                .findByResetToken(token).orElseThrow(ResetTokenExpiredException::new);
+
+        String email = resetPasswordToken.getId();
+
+        User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+
+        user.updatePassword(this.passwordEncoder.encode(password));
+
+        this.resetPasswordTokenRepository.delete(resetPasswordToken);
+    }
 
 }

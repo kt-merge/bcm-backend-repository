@@ -1,6 +1,5 @@
 package com.example.chicken.domain.auth.service;
 
-import com.example.chicken.common.error.exception.user.UserAlreadyExists;
 import com.example.chicken.common.jwt.JwtTokenProvider;
 import com.example.chicken.common.jwt.JwtUtil;
 import com.example.chicken.domain.auth.dto.auth.SignInRequestDto;
@@ -13,6 +12,7 @@ import com.example.chicken.domain.auth.exception.PasswordNotMatchedException;
 import com.example.chicken.domain.auth.exception.RefreshTokenNotFoundException;
 import com.example.chicken.domain.auth.exception.ResetTokenExpiredException;
 import com.example.chicken.domain.auth.exception.TokenInvalidException;
+import com.example.chicken.domain.auth.exception.UserAlreadyExists;
 import com.example.chicken.domain.auth.exception.UserNotFoundException;
 import com.example.chicken.domain.auth.repository.RefreshTokenRepository;
 import com.example.chicken.domain.auth.repository.ResetPasswordTokenRepository;
@@ -35,6 +35,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final ResetPasswordTokenRepository resetPasswordTokenRepository;
+    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final JwtUtil jwtUtil;
@@ -54,7 +55,7 @@ public class AuthService {
 
         User result = this.userRepository.save(userEntity);
 
-        return UserResponseDto.from(result);
+        return userMapper.toResponse(result);
 
     }
 
