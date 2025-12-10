@@ -36,7 +36,8 @@ public class Product extends BaseTimeEntity {
     @Column(length = 1000)
     private String description;
 
-    @Enumerated(EnumType.STRING)
+    @JoinColumn(name = "category_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private Category category;
 
     private BigDecimal startPrice;
