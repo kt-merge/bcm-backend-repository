@@ -20,6 +20,7 @@ import com.example.chicken.domain.product.entity.ProductBid;
 import com.example.chicken.domain.product.repository.HighestBidderRepository;
 import com.example.chicken.domain.product.repository.ProductBidRepository;
 import com.example.chicken.domain.product.repository.ProductRepository;
+import com.example.chicken.domain.product.service.ProductMapper;
 import com.example.chicken.dto.UserResponseDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -39,9 +40,11 @@ public class UserService {
     private final ProductBidRepository productBidRepository;
     private final HighestBidderRepository highestBidderRepository;
     private final OrderRepository orderRepository;
+    private final UserMapper userMapper;
     private final OrderMapper orderMapper;
     private final ResetPasswordTokenRepository resetPasswordTokenRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProductMapper productMapper;
 
     @Transactional(readOnly = true)
     public UserResponseDto getUserInfo() {
@@ -59,14 +62,14 @@ public class UserService {
 
         List<ProductResponseDto> productResponse = this.productRepository.findByUser(user)
                 .stream()
-                .map(ProductResponseDto::from)
+                .map((product) -> productMapper.toResponseDto(product, userMapper.toResponse(user)))
                 .toList();
 
         List<OrderResponseDto> orderResponse = this.orderRepository.findByUser(user)
                 .stream().map(orderMapper::toDto)
                 .toList();
 
-        return UserResponseDto.of(user, winnerResponse, productBids, productResponse, orderResponse);
+        return userMapper.toResponse(user, winnerResponse, productBids, productResponse, orderResponse);
     }
 
     @Transactional
@@ -75,7 +78,7 @@ public class UserService {
 
         user.updateUserInfoByAdmin(request);
 
-        return UserResponseDto.from(this.userRepository.save(user));
+        return userMapper.toResponse(this.userRepository.save(user));
     }
 
     @Transactional
@@ -84,7 +87,7 @@ public class UserService {
 
         user.updateUserInfo(request);
 
-        return UserResponseDto.from(this.userRepository.save(user));
+        return userMapper.toResponse(this.userRepository.save(user));
     }
 
     private User getUser() {
@@ -99,7 +102,7 @@ public class UserService {
     public Page<UserResponseDto> getUsers(Pageable pageable) {
         Page<User> users = this.userRepository.findAll(pageable);
 
-        return users.map(UserResponseDto::from);
+        return users.map(userMapper::toResponse);
     }
 
     @Transactional

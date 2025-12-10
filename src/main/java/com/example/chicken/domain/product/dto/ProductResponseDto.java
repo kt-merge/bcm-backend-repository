@@ -1,62 +1,18 @@
 package com.example.chicken.domain.product.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.example.chicken.domain.product.entity.BidStatus;
 import com.example.chicken.domain.product.entity.Category;
-import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.entity.ProductStatus;
 import com.example.chicken.dto.UserResponseDto;
-
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Builder;
 
 @Builder
 public record ProductResponseDto(Long id, String name, String description, Category category, BigDecimal startPrice,
-								 BigDecimal bidPrice, Long bidCount, BidStatus bidStatus, ProductStatus productStatus,
-								 String imageUrl, UserResponseDto user, LocalDateTime createdAt,
-								 LocalDateTime modifiedAt, LocalDateTime bidEndDate,
-								 List<ProductBidInfoResponseDto> productBids) {
-
-	public static ProductResponseDto from(Product product) {
-		return ProductResponseDto.builder()
-			.id(product.getId())
-			.name(product.getName())
-			.description(product.getDescription())
-			.category(product.getCategory())
-			.startPrice(product.getStartPrice())
-			.bidPrice(product.getBidPrice())
-			.bidCount(product.getBidCount())
-			.bidStatus(product.getBidStatus())
-			.productStatus(product.getProductStatus())
-			.imageUrl(product.getImageUrl())
-			.user(UserResponseDto.from(product.getUser()))
-			.createdAt(product.getCreatedAt())
-			.modifiedAt(product.getModifiedAt())
-			.bidEndDate(product.getBidEndDate())
-			.productBids(new ArrayList<>())
-			.build();
-	}
-
-	public static ProductResponseDto of(Product product, List<ProductBidInfoResponseDto> productBids) {
-		return ProductResponseDto.builder()
-			.id(product.getId())
-			.name(product.getName())
-			.description(product.getDescription())
-			.category(product.getCategory())
-			.startPrice(product.getStartPrice())
-			.bidPrice(product.getBidPrice())
-			.bidCount(product.getBidCount())
-			.bidStatus(product.getBidStatus())
-			.productStatus(product.getProductStatus())
-			.imageUrl(product.getImageUrl())
-			.user(UserResponseDto.from(product.getUser()))
-			.createdAt(product.getCreatedAt())
-			.modifiedAt(product.getModifiedAt())
-			.bidEndDate(product.getBidEndDate())
-			.productBids(productBids)
-			.build();
-	}
+                                 BigDecimal bidPrice, Long bidCount, BidStatus bidStatus, ProductStatus productStatus,
+                                 String imageUrl, UserResponseDto user, LocalDateTime createdAt,
+                                 LocalDateTime modifiedAt, LocalDateTime bidEndDate,
+                                 List<ProductBidInfoResponseDto> productBids) {
 }

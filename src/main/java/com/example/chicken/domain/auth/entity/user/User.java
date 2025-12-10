@@ -36,12 +36,12 @@ public class User extends BaseTimeEntity {
     private Role role;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private UserStatus status;
 
     private String phoneNumber;
 
     @Builder
-    private User(String nickname, String email, String password, Role role, Status status, String phoneNumber) {
+    private User(String nickname, String email, String password, Role role, UserStatus status, String phoneNumber) {
         this.nickname = nickname;
         this.email = email;
         this.password = password;
@@ -60,7 +60,7 @@ public class User extends BaseTimeEntity {
                 .email(request.email())
                 .password(request.password())
                 .role(Role.USER)
-                .status(Status.PENDING)
+                .status(UserStatus.PENDING)
                 .phoneNumber(request.phoneNumber())
                 .build();
     }

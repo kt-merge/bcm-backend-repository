@@ -35,6 +35,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final ResetPasswordTokenRepository resetPasswordTokenRepository;
+    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final JwtUtil jwtUtil;
@@ -54,7 +55,7 @@ public class AuthService {
 
         User result = this.userRepository.save(userEntity);
 
-        return UserResponseDto.from(result);
+        return userMapper.toResponse(result);
 
     }
 

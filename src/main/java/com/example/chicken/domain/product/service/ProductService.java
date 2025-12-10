@@ -3,6 +3,7 @@ package com.example.chicken.domain.product.service;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.exception.UserNotFoundException;
 import com.example.chicken.domain.auth.repository.UserRepository;
+import com.example.chicken.domain.auth.service.UserMapper;
 import com.example.chicken.domain.product.dto.ProductBidInfoResponseDto;
 import com.example.chicken.domain.product.dto.ProductBidRequestDto;
 import com.example.chicken.domain.product.dto.ProductRequestDto;
@@ -32,6 +33,7 @@ public class ProductService {
     private String s3BucketUrl;
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final ProductMapper productMapper;
     private final ProductRepository productRepository;
     private final ProductBidRepository productBidRepository;
@@ -52,7 +54,7 @@ public class ProductService {
 
         this.bidScheduleService.register(savedProduct.getId(), savedProduct.getBidEndDate());
 
-        return this.productMapper.toResponseDto(product);
+        return this.productMapper.toResponseDto(product, userMapper.toResponse(user));
     }
 
     @Transactional(readOnly = true)
@@ -66,14 +68,15 @@ public class ProductService {
                 .stream().map(ProductBidInfoResponseDto::from)
                 .toList();
 
-        return this.productMapper.toResponseDto(product, productBidResponses);
+        return this.productMapper.toResponseDto(product, productBidResponses, userMapper.toResponse(product.getUser()));
     }
 
     @Transactional(readOnly = true)
     public Page<ProductResponseDto> getProducts(Pageable pageable) {
         Page<Product> products = this.productRepository.findAll(pageable);
 
-        return products.map(ProductResponseDto::from);
+        return products.map(
+                (product) -> productMapper.toResponseDto(product, userMapper.toResponse(product.getUser())));
     }
 
     @Transactional(readOnly = true)
@@ -84,7 +87,8 @@ public class ProductService {
                 .orElseThrow(() -> new UserNotFoundException(email));
 
         return this.productRepository.findTop10ByUserOrderByCreatedAtDesc(user)
-                .stream().map(ProductResponseDto::from)
+                .stream()
+                .map((product) -> productMapper.toResponseDto(product, userMapper.toResponse(product.getUser())))
                 .toList();
     }
 
@@ -140,7 +144,7 @@ public class ProductService {
                 imageUrl
         );
 
-        return this.productMapper.toResponseDto(product);
+        return this.productMapper.toResponseDto(product, userMapper.toResponse(product.getUser()));
     }
 
     @Transactional
