@@ -58,6 +58,7 @@ public class PathConstant {
 
         public static final String PRODUCT_ID = "/{productId}";
 
+        public static final String PRODUCT_CATEGORIES = "/categories";
     }
 
     public static class S3 {
