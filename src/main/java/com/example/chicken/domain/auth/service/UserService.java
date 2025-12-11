@@ -24,7 +24,6 @@ import com.example.chicken.domain.product.repository.ProductRepository;
 import com.example.chicken.domain.product.service.CategoryMapper;
 import com.example.chicken.domain.product.service.ProductMapper;
 import com.example.chicken.dto.UserResponseDto;
-import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,7 +34,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Service
 @RequiredArgsConstructor
@@ -116,8 +114,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<DailyUserRegistrationCountDto> getDailyUserRegistrationCounts(
-            @RequestParam(defaultValue = "7") @Positive Integer daysAgo) {
+    public List<DailyUserRegistrationCountDto> getDailyUserRegistrationCounts(Integer daysAgo) {
         LocalDateTime startDate = LocalDate.now().minusDays(daysAgo - 1).atStartOfDay();
         LocalDateTime endDate = LocalDate.now().plusDays(1).atStartOfDay();
 
