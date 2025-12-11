@@ -1,6 +1,8 @@
 package com.example.chicken.domain.product.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.chicken.domain.admin.dto.DailyProductRegistrationCountDto;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.exception.UserNotFoundException;
 import com.example.chicken.domain.auth.repository.UserRepository;
@@ -163,6 +166,14 @@ public class ProductService {
 
 		return this.productMapper.toResponseDto(product, userMapper.toResponse(product.getUser()),
 												categoryMapper.toResponseDto(product.getCategory()));
+	}
+
+	@Transactional(readOnly = true)
+	public List<DailyProductRegistrationCountDto> getDailyProductRegistrationCounts(Integer daysAgo) {
+		LocalDateTime startDate = LocalDate.now().minusDays(daysAgo - 1L).atStartOfDay();
+		LocalDateTime endDate = LocalDate.now().plusDays(1L).atStartOfDay();
+
+		return this.productRepository.countProductsByDay(startDate, endDate);
 	}
 
 	@Transactional
