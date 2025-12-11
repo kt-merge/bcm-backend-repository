@@ -62,7 +62,7 @@ public class ProductService {
 
         this.bidScheduleService.register(savedProduct.getId(), savedProduct.getBidEndDate());
 
-        return this.productMapper.toResponseDto(product, userMapper.toResponse(user),
+        return this.productMapper.toResponseDto(savedProduct, userMapper.toResponse(user),
                 categoryMapper.toResponseDto(category));
     }
 
