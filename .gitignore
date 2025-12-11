@@ -37,3 +37,10 @@ out/
 .vscode/
 src/main/resources/.env
 src/main/resources/application-dev.yaml
+
+.env
+
+### Env ###
+**/application*.yml
+**/application*.yaml
+**/.env*

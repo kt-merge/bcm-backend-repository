@@ -1,3 +1,4 @@
+# Dockerfile for a Java Spring Boot application using Gradle
 FROM eclipse-temurin:17-alpine AS builder
 
 WORKDIR /app
