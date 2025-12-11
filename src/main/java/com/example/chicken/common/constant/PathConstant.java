@@ -109,6 +109,9 @@ public class PathConstant {
         public static final String ADMIN_USERS_ID = "/{userId}";
         public static final String ADMIN_PRODUCTS_ID = "/{productId}";
         public static final String ADMIN_CATEGORIES_ID = "/{categoryId}";
+
+        public static final String ADMIN_STATISTICS_PREFIX = ADMIN_PREFIX + "/statistics";
+        public static final String ADMIN_STATISTICS_USERS_DAILY_REGISTRATIONS = "/users/daily-registrations";
     }
 
 }
