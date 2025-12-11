@@ -1,4 +1,4 @@
-package com.example.chicken.domain.auth.dto.user;
+package com.example.chicken.domain.admin.dto;
 
 import java.time.LocalDate;
 

@@ -1,5 +1,6 @@
 package com.example.chicken.domain.product.service;
 
+import com.example.chicken.domain.admin.dto.DailyProductRegistrationCountDto;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.exception.UserNotFoundException;
 import com.example.chicken.domain.auth.repository.UserRepository;
@@ -19,6 +20,8 @@ import com.example.chicken.domain.product.repository.ProductBidRepository;
 import com.example.chicken.domain.product.repository.ProductRepository;
 import com.example.chicken.service.BidScheduleService;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -102,6 +105,14 @@ public class ProductService {
                 .map((product) -> productMapper.toResponseDto(product, userMapper.toResponse(product.getUser()),
                         categoryMapper.toResponseDto(product.getCategory())))
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<DailyProductRegistrationCountDto> getDailyProductRegistrationCounts(Integer daysAgo) {
+        LocalDateTime startDate = LocalDate.now().minusDays(daysAgo - 1).atStartOfDay();
+        LocalDateTime endDate = LocalDate.now().plusDays(1).atStartOfDay();
+
+        return this.productRepository.countProductsByDay(startDate, endDate);
     }
 
     @Transactional
