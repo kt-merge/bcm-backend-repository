@@ -2,6 +2,7 @@ package com.example.chicken.domain.auth.service;
 
 import com.example.chicken.domain.admin.dto.UpdateUserInfoByAdminDto;
 import com.example.chicken.domain.admin.exception.WhyDeleteMeException;
+import com.example.chicken.domain.auth.dto.user.DailyUserRegistrationCountDto;
 import com.example.chicken.domain.auth.dto.user.UpdateUserInfoDto;
 import com.example.chicken.domain.auth.dto.user.WinnerResponseDto;
 import com.example.chicken.domain.auth.entity.token.ResetPasswordToken;
@@ -23,6 +24,8 @@ import com.example.chicken.domain.product.repository.ProductRepository;
 import com.example.chicken.domain.product.service.CategoryMapper;
 import com.example.chicken.domain.product.service.ProductMapper;
 import com.example.chicken.dto.UserResponseDto;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -108,6 +111,14 @@ public class UserService {
         Page<User> users = this.userRepository.findAll(pageable);
 
         return users.map(userMapper::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DailyUserRegistrationCountDto> getDailyUserRegistrationCounts(Integer daysAgo) {
+        LocalDateTime startDate = LocalDate.now().minusDays(daysAgo - 1).atStartOfDay();
+        LocalDateTime endDate = LocalDate.now().plusDays(1).atStartOfDay();
+
+        return this.userRepository.countUsersByDay(startDate, endDate);
     }
 
     @Transactional
