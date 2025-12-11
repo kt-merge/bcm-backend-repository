@@ -1,17 +1,9 @@
 package com.example.chicken.domain.product.controller;
 
-import static com.example.chicken.common.constant.PathConstant.Product.PRODUCT_CATEGORIES;
-import static com.example.chicken.common.constant.PathConstant.Product.PRODUCT_ID;
-import static com.example.chicken.common.constant.PathConstant.Product.PRODUCT_PREFIX;
+import static com.example.chicken.common.constant.PathConstant.Product.*;
 
-import com.example.chicken.domain.product.dto.CategoryResponseDto;
-import com.example.chicken.domain.product.dto.ProductRequestDto;
-import com.example.chicken.domain.product.dto.ProductResponseDto;
-import com.example.chicken.domain.product.service.CategoryService;
-import com.example.chicken.domain.product.service.ProductService;
-import jakarta.validation.Valid;
 import java.net.URI;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -23,44 +15,54 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.chicken.domain.product.dto.CategoryResponseDto;
+import com.example.chicken.domain.product.dto.ProductRequestDto;
+import com.example.chicken.domain.product.dto.ProductResponseDto;
+import com.example.chicken.domain.product.dto.ProductSearchCondition;
+import com.example.chicken.domain.product.service.CategoryService;
+import com.example.chicken.domain.product.service.ProductService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 @Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(PRODUCT_PREFIX)
 public class ProductController {
 
-    private final CategoryService categoryService;
-    private final ProductService productService;
+	private final CategoryService categoryService;
+	private final ProductService productService;
 
-    @PostMapping
-    public ResponseEntity<ProductResponseDto> createProduct(@RequestBody @Valid ProductRequestDto request) {
-        ProductResponseDto result = this.productService.createProduct(request);
+	@PostMapping
+	public ResponseEntity<ProductResponseDto> createProduct(@RequestBody @Valid ProductRequestDto request) {
+		ProductResponseDto result = this.productService.createProduct(request);
 
-        URI location = URI.create(result.id().toString());
+		URI location = URI.create(result.id().toString());
 
-        return ResponseEntity.created(location).body(result);
-    }
+		return ResponseEntity.created(location).body(result);
+	}
 
-    @GetMapping
-    public ResponseEntity<Page<ProductResponseDto>> getProducts(Pageable pageable) {
+	@GetMapping
+	public ResponseEntity<Page<ProductResponseDto>> getProducts(ProductSearchCondition condition, Pageable pageable) {
 
-        Page<ProductResponseDto> result = this.productService.getProducts(pageable);
+		Page<ProductResponseDto> result = this.productService.getProducts(condition, pageable);
 
-        return ResponseEntity.ok(result);
-    }
+		return ResponseEntity.ok(result);
+	}
 
-    @GetMapping(PRODUCT_ID)
-    public ResponseEntity<ProductResponseDto> getProduct(@PathVariable("productId") Long productId) {
+	@GetMapping(PRODUCT_ID)
+	public ResponseEntity<ProductResponseDto> getProduct(@PathVariable("productId") Long productId) {
 
-        ProductResponseDto result = this.productService.getProduct(productId);
+		ProductResponseDto result = this.productService.getProduct(productId);
 
-        return ResponseEntity.ok(result);
-    }
+		return ResponseEntity.ok(result);
+	}
 
-    @GetMapping(PRODUCT_CATEGORIES)
-    public ResponseEntity<Page<CategoryResponseDto>> getCategories(Pageable pageable) {
-        Page<CategoryResponseDto> result = categoryService.getCategories(pageable);
+	@GetMapping(PRODUCT_CATEGORIES)
+	public ResponseEntity<Page<CategoryResponseDto>> getCategories(Pageable pageable) {
+		Page<CategoryResponseDto> result = categoryService.getCategories(pageable);
 
-        return ResponseEntity.ok(result);
-    }
+		return ResponseEntity.ok(result);
+	}
 }
