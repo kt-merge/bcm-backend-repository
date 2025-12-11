@@ -1,5 +1,6 @@
 package com.example.chicken.domain.faq.service;
 
+import com.example.chicken.common.error.exception.EntityNotFoundException;
 import com.example.chicken.domain.faq.dto.FaqRequestDto;
 import com.example.chicken.domain.faq.dto.FaqResponseDto;
 import com.example.chicken.domain.faq.entity.Faq;
@@ -51,7 +52,7 @@ public class FaqService {
     @Transactional
     public FaqResponseDto updateFaq(Long faqId, FaqRequestDto faqRequestDto) {
         Faq faq = faqRepository.findById(faqId)
-            .orElseThrow(() -> new IllegalArgumentException("해당 FAQ를 찾을 수 없습니다."));
+            .orElseThrow(() -> new EntityNotFoundException("해당 FAQ를 찾을 수 없습니다. id=" + faqId));
         faq.updateFaq(faqRequestDto);
         return faqMapper.toDto(faq);
     }
@@ -63,6 +64,8 @@ public class FaqService {
      */
     @Transactional
     public void deleteFaq(Long faqId) {
-        faqRepository.deleteById(faqId);
+        Faq faq = faqRepository.findById(faqId)
+            .orElseThrow(() -> new EntityNotFoundException("해당 FAQ를 찾을 수 없습니다. id=" + faqId));
+        faqRepository.delete(faq);
     }
 }

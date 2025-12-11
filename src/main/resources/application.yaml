@@ -1,25 +1,12 @@
 spring:
-  profiles:
-    active: dev
   application:
     name: chicken
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ktdarius.test@gmail.com
-    password: duxs bblg xahy zyfr
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
   jpa:
     show-sql: true
 jwt:
   secret-key: and0U2VjcmV0a2V5bXVzdGJlbG9uZ2VydGhhbjMyY2hhcmFjdGVyc2JlY2FyZWZ1bHdoZW55b3VjaGFuZ2VpdA==
   expiration-time: 3000
-  refresh-expiration-time: 216000
+
 springwolf:
   docket:
     base-package: com.example.chicken
@@ -31,6 +18,7 @@ springwolf:
       stomp:
         protocol: stomp
         host: localhost:8080
+
 s3:
   bucket-name: ktproject-s3-bucket
   product-bucket-url: https://ktproject-s3-bucket.s3.ap-northeast-2.amazonaws.com/products/
