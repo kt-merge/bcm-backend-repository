@@ -3,33 +3,31 @@ package com.example.chicken.domain.faq.service;
 import com.example.chicken.domain.faq.dto.FaqRequestDto;
 import com.example.chicken.domain.faq.dto.FaqResponseDto;
 import com.example.chicken.domain.faq.entity.Faq;
+import com.example.chicken.domain.faq.mapper.FaqMapper;
 import com.example.chicken.domain.faq.repository.FaqRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class FaqService {
 
     private final FaqRepository faqRepository;
+    private final FaqMapper faqMapper;
 
     /**
      * FAQ 생성
      *
      * @param faqRequestDto FAQ 생성 요청 DTO
+     * @return 생성된 FAQ 응답 DTO
      */
     @Transactional
-    public void createFaq(FaqRequestDto faqRequestDto) {
-        Faq faq = Faq.builder()
-            .title(faqRequestDto.title())
-            .content(faqRequestDto.content())
-            .build();
-        faqRepository.save(faq);
+    public FaqResponseDto createFaq(FaqRequestDto faqRequestDto) {
+        Faq faq = faqMapper.toEntity(faqRequestDto);
+        Faq savedFaq = faqRepository.save(faq);
+        return faqMapper.toDto(savedFaq);
     }
 
     /**
@@ -37,16 +35,10 @@ public class FaqService {
      *
      * @return FAQ 목록 응답 DTO 리스트
      */
+    @Transactional(readOnly = true)
     public List<FaqResponseDto> getFaqs() {
-        return faqRepository.findAll().stream()
-            .map(faq -> FaqResponseDto.builder()
-                .faqId(faq.getFaqId())
-                .title(faq.getTitle())
-                .content(faq.getContent())
-                .createdBy(faq.getCreatedBy())
-                .createdAt(faq.getCreatedAt())
-                .build())
-            .collect(Collectors.toList());
+        List<Faq> faqs = faqRepository.findAll();
+        return faqMapper.toDtoList(faqs);
     }
 
     /**
@@ -61,13 +53,7 @@ public class FaqService {
         Faq faq = faqRepository.findById(faqId)
             .orElseThrow(() -> new IllegalArgumentException("해당 FAQ를 찾을 수 없습니다."));
         faq.updateFaq(faqRequestDto);
-        return FaqResponseDto.builder()
-            .faqId(faq.getFaqId())
-            .title(faq.getTitle())
-            .content(faq.getContent())
-            .createdBy(faq.getCreatedBy())
-            .createdAt(faq.getCreatedAt())
-            .build();
+        return faqMapper.toDto(faq);
     }
 
     /**

@@ -1,10 +1,15 @@
 package com.example.chicken.domain.admin.controller;
 
+import static com.example.chicken.common.constant.PathConstant.Admin.ADMIN_FAQ_ID;
+import static com.example.chicken.common.constant.PathConstant.Admin.ADMIN_FAQ_PREFIX;
+
 import com.example.chicken.domain.faq.dto.FaqRequestDto;
 import com.example.chicken.domain.faq.dto.FaqResponseDto;
 import com.example.chicken.domain.faq.service.FaqService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,14 +21,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 /**
  * FAQ 관련 API 컨트롤러
  */
+@Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/faq")
+@RequestMapping(ADMIN_FAQ_PREFIX)
 public class AdminFaqController {
 
     private final FaqService faqService;
@@ -32,12 +36,13 @@ public class AdminFaqController {
      * FAQ 생성
      *
      * @param faqRequestDto FAQ 생성 요청 DTO
-     * @return 생성 성공 시 201 Created
+     * @return 생성된 FAQ 정보
      */
     @PostMapping
-    public ResponseEntity<Void> createFaq(@Valid @RequestBody FaqRequestDto faqRequestDto) {
-        faqService.createFaq(faqRequestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<FaqResponseDto> createFaq(@Valid @RequestBody FaqRequestDto faqRequestDto) {
+        log.info("FAQ 생성 요청. 내용: {}", faqRequestDto);
+        FaqResponseDto createdFaq = faqService.createFaq(faqRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdFaq);
     }
 
     /**
@@ -47,6 +52,7 @@ public class AdminFaqController {
      */
     @GetMapping
     public ResponseEntity<List<FaqResponseDto>> getFaqs() {
+        log.info("FAQ 목록 조회 요청");
         return ResponseEntity.ok(faqService.getFaqs());
     }
 
@@ -57,8 +63,10 @@ public class AdminFaqController {
      * @param faqRequestDto FAQ 수정 요청 DTO
      * @return 수정된 FAQ
      */
-    @PutMapping("/{faqId}")
-    public ResponseEntity<FaqResponseDto> updateFaq(@PathVariable Long faqId, @Valid @RequestBody FaqRequestDto faqRequestDto) {
+    @PutMapping(ADMIN_FAQ_ID)
+    public ResponseEntity<FaqResponseDto> updateFaq(@PathVariable Long faqId,
+        @Valid @RequestBody FaqRequestDto faqRequestDto) {
+        log.info("FAQ 수정 요청. ID: {}, 내용: {}", faqId, faqRequestDto);
         return ResponseEntity.ok(faqService.updateFaq(faqId, faqRequestDto));
     }
 
@@ -68,8 +76,9 @@ public class AdminFaqController {
      * @param faqId 삭제할 FAQ ID
      * @return 삭제 성공 시 204 No Content
      */
-    @DeleteMapping("/{faqId}")
+    @DeleteMapping(ADMIN_FAQ_ID)
     public ResponseEntity<Void> deleteFaq(@PathVariable Long faqId) {
+        log.info("FAQ 삭제 요청. ID: {}", faqId);
         faqService.deleteFaq(faqId);
         return ResponseEntity.noContent().build();
     }
