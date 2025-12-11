@@ -7,20 +7,8 @@ jwt:
   secret-key: and0U2VjcmV0a2V5bXVzdGJlbG9uZ2VydGhhbjMyY2hhcmFjdGVyc2JlY2FyZWZ1bHdoZW55b3VjaGFuZ2VpdA==
   expiration-time: 3000
 
-springwolf:
-  docket:
-    base-package: com.example.chicken
-    info:
-      title: chicken-game-backend
-      description: chicken-game-backend Async API documentation
-      version: 0.0.1
-    servers:
-      stomp:
-        protocol: stomp
-        host: localhost:8080
-
 s3:
   bucket-name: ktproject-s3-bucket
   product-bucket-url: https://ktproject-s3-bucket.s3.ap-northeast-2.amazonaws.com/products/
-  access-key: ${AWS_ACCESS_KEY_ID}
-  secret-key: ${AWS_SECRET_ACCESS_KEY}
+  access-key: AKIA4L74ZRT2IIXTSJ2K
+  secret-key: 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
