@@ -11,6 +11,7 @@ import com.example.chicken.domain.order.exception.OrderNotFoundException;
 import com.example.chicken.domain.order.repository.OrderRepository;
 import com.example.chicken.domain.product.dto.ProductResponseDto;
 import com.example.chicken.domain.product.entity.Product;
+import com.example.chicken.domain.product.service.CategoryMapper;
 import com.example.chicken.domain.product.service.ProductMapper;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -26,6 +27,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserMapper userMapper;
     private final OrderMapper orderMapper;
+    private final CategoryMapper categoryMapper;
     private final ProductMapper productMapper;
 
     @Transactional
@@ -66,7 +68,7 @@ public class OrderService {
                 .orElseThrow(() -> new OrderNotFoundException(orderId.toString()));
 
         ProductResponseDto productResponse = productMapper.toResponseDto(order.getProduct(),
-                userMapper.toResponse(order.getUser()));
+                userMapper.toResponse(order.getUser()), categoryMapper.toResponseDto(order.getProduct().getCategory()));
 
         return this.orderMapper.toDto(order, productResponse);
     }

@@ -20,6 +20,7 @@ import com.example.chicken.domain.product.entity.ProductBid;
 import com.example.chicken.domain.product.repository.HighestBidderRepository;
 import com.example.chicken.domain.product.repository.ProductBidRepository;
 import com.example.chicken.domain.product.repository.ProductRepository;
+import com.example.chicken.domain.product.service.CategoryMapper;
 import com.example.chicken.domain.product.service.ProductMapper;
 import com.example.chicken.dto.UserResponseDto;
 import java.util.List;
@@ -42,9 +43,10 @@ public class UserService {
     private final OrderRepository orderRepository;
     private final UserMapper userMapper;
     private final OrderMapper orderMapper;
+    private final CategoryMapper categoryMapper;
+    private final ProductMapper productMapper;
     private final ResetPasswordTokenRepository resetPasswordTokenRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ProductMapper productMapper;
 
     @Transactional(readOnly = true)
     public UserResponseDto getUserInfo() {
@@ -62,7 +64,8 @@ public class UserService {
 
         List<ProductResponseDto> productResponse = this.productRepository.findByUser(user)
                 .stream()
-                .map((product) -> productMapper.toResponseDto(product, userMapper.toResponse(user)))
+                .map((product) -> productMapper.toResponseDto(product, userMapper.toResponse(user),
+                        categoryMapper.toResponseDto(product.getCategory())))
                 .toList();
 
         List<OrderResponseDto> orderResponse = this.orderRepository.findByUser(user)
