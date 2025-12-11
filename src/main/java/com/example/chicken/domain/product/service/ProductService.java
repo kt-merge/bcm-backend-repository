@@ -9,9 +9,12 @@ import com.example.chicken.domain.product.dto.ProductBidRequestDto;
 import com.example.chicken.domain.product.dto.ProductRequestDto;
 import com.example.chicken.domain.product.dto.ProductResponseDto;
 import com.example.chicken.domain.product.dto.ProductUpdateRequestDto;
+import com.example.chicken.domain.product.entity.Category;
 import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.entity.ProductBid;
+import com.example.chicken.domain.product.exception.CategoryNotFoundException;
 import com.example.chicken.domain.product.exception.ProductNotFoundException;
+import com.example.chicken.domain.product.repository.CategoryRepository;
 import com.example.chicken.domain.product.repository.ProductBidRepository;
 import com.example.chicken.domain.product.repository.ProductRepository;
 import com.example.chicken.service.BidScheduleService;
@@ -34,7 +37,9 @@ public class ProductService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final CategoryMapper categoryMapper;
     private final ProductMapper productMapper;
+    private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final ProductBidRepository productBidRepository;
     private final BidScheduleService bidScheduleService;
@@ -48,13 +53,17 @@ public class ProductService {
 
         User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
 
-        Product product = this.productMapper.toEntity(request, imageUrl, user);
+        Category category = this.categoryRepository.findById(request.categoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(request.categoryId().toString()));
+
+        Product product = this.productMapper.toEntity(request, imageUrl, user, category);
 
         Product savedProduct = this.productRepository.save(product);
 
         this.bidScheduleService.register(savedProduct.getId(), savedProduct.getBidEndDate());
 
-        return this.productMapper.toResponseDto(product, userMapper.toResponse(user));
+        return this.productMapper.toResponseDto(product, userMapper.toResponse(user),
+                categoryMapper.toResponseDto(category));
     }
 
     @Transactional(readOnly = true)
@@ -68,7 +77,8 @@ public class ProductService {
                 .stream().map(ProductBidInfoResponseDto::from)
                 .toList();
 
-        return this.productMapper.toResponseDto(product, productBidResponses, userMapper.toResponse(product.getUser()));
+        return this.productMapper.toResponseDto(product, productBidResponses, userMapper.toResponse(product.getUser()),
+                categoryMapper.toResponseDto(product.getCategory()));
     }
 
     @Transactional(readOnly = true)
@@ -76,7 +86,8 @@ public class ProductService {
         Page<Product> products = this.productRepository.findAll(pageable);
 
         return products.map(
-                (product) -> productMapper.toResponseDto(product, userMapper.toResponse(product.getUser())));
+                (product) -> productMapper.toResponseDto(product, userMapper.toResponse(product.getUser()),
+                        categoryMapper.toResponseDto(product.getCategory())));
     }
 
     @Transactional(readOnly = true)
@@ -88,7 +99,8 @@ public class ProductService {
 
         return this.productRepository.findTop10ByUserOrderByCreatedAtDesc(user)
                 .stream()
-                .map((product) -> productMapper.toResponseDto(product, userMapper.toResponse(product.getUser())))
+                .map((product) -> productMapper.toResponseDto(product, userMapper.toResponse(product.getUser()),
+                        categoryMapper.toResponseDto(product.getCategory())))
                 .toList();
     }
 
@@ -144,7 +156,8 @@ public class ProductService {
                 imageUrl
         );
 
-        return this.productMapper.toResponseDto(product, userMapper.toResponse(product.getUser()));
+        return this.productMapper.toResponseDto(product, userMapper.toResponse(product.getUser()),
+                categoryMapper.toResponseDto(product.getCategory()));
     }
 
     @Transactional

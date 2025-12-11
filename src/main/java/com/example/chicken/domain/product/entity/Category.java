@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "category")
+@Table(name = "categories")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Category extends BaseTimeEntity {
 
