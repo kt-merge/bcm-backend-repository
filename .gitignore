@@ -43,5 +43,3 @@ src/main/resources/application-dev.yaml
 ### Env ###
 **/application*.yml
 **/application*.yaml
-**/.env*
-Dockerfile
