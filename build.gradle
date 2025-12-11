@@ -67,6 +67,8 @@ dependencies {
 	implementation 'software.amazon.awssdk:s3control:2.27.3'
 	implementation 'software.amazon.awssdk:s3outposts:2.27.3'
 
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+
 	implementation 'org.postgresql:postgresql:42.7.3'
 
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
