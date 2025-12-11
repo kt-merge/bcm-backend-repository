@@ -1,8 +1,8 @@
 package com.example.chicken.domain.auth.service;
 
+import com.example.chicken.domain.admin.dto.DailyUserRegistrationCountDto;
 import com.example.chicken.domain.admin.dto.UpdateUserInfoByAdminDto;
 import com.example.chicken.domain.admin.exception.WhyDeleteMeException;
-import com.example.chicken.domain.auth.dto.user.DailyUserRegistrationCountDto;
 import com.example.chicken.domain.auth.dto.user.UpdateUserInfoDto;
 import com.example.chicken.domain.auth.dto.user.WinnerResponseDto;
 import com.example.chicken.domain.auth.entity.token.ResetPasswordToken;

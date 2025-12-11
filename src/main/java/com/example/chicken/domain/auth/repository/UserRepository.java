@@ -1,6 +1,6 @@
 package com.example.chicken.domain.auth.repository;
 
-import com.example.chicken.domain.auth.dto.user.DailyUserRegistrationCountDto;
+import com.example.chicken.domain.admin.dto.DailyUserRegistrationCountDto;
 import com.example.chicken.domain.auth.entity.user.User;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,7 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
-    @Query("SELECT new com.example.chicken.domain.auth.dto.user.DailyUserRegistrationCountDto(CAST(user.createdAt As localdate), COUNT(*)) "
+    @Query("SELECT new com.example.chicken.domain.admin.dto.DailyUserRegistrationCountDto(CAST(user.createdAt As localdate), COUNT(*)) "
             + "FROM User user "
             + "WHERE user.createdAt >= :startDate AND user.createdAt < :endDate "
             + "GROUP BY CAST(user.createdAt As localdate) "
