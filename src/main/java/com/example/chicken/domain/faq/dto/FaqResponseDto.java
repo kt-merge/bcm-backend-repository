@@ -10,5 +10,6 @@ public record FaqResponseDto(
     String title,
     String content,
     String createdBy,
-    LocalDateTime createdAt
+    LocalDateTime createdAt,
+    LocalDateTime modifiedAt
 ) {}

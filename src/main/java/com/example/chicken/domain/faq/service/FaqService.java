@@ -1,9 +1,9 @@
 package com.example.chicken.domain.faq.service;
 
-import com.example.chicken.common.error.exception.EntityNotFoundException;
 import com.example.chicken.domain.faq.dto.FaqRequestDto;
 import com.example.chicken.domain.faq.dto.FaqResponseDto;
 import com.example.chicken.domain.faq.entity.Faq;
+import com.example.chicken.domain.faq.exception.FaqNotFoundException;
 import com.example.chicken.domain.faq.mapper.FaqMapper;
 import com.example.chicken.domain.faq.repository.FaqRepository;
 import java.util.List;
@@ -52,7 +52,7 @@ public class FaqService {
     @Transactional
     public FaqResponseDto updateFaq(Long faqId, FaqRequestDto faqRequestDto) {
         Faq faq = faqRepository.findById(faqId)
-            .orElseThrow(() -> new EntityNotFoundException("해당 FAQ를 찾을 수 없습니다. id=" + faqId));
+            .orElseThrow(() -> new FaqNotFoundException("해당 FAQ를 찾을 수 없습니다. id=" + faqId));
         faq.updateFaq(faqRequestDto);
         return faqMapper.toDto(faq);
     }
@@ -65,7 +65,7 @@ public class FaqService {
     @Transactional
     public void deleteFaq(Long faqId) {
         Faq faq = faqRepository.findById(faqId)
-            .orElseThrow(() -> new EntityNotFoundException("해당 FAQ를 찾을 수 없습니다. id=" + faqId));
+            .orElseThrow(() -> new FaqNotFoundException("해당 FAQ를 찾을 수 없습니다. id=" + faqId));
         faqRepository.delete(faq);
     }
 }

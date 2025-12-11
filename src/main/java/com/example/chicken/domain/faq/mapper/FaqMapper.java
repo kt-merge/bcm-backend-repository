@@ -24,6 +24,7 @@ public class FaqMapper {
                 .content(faq.getContent())
                 .createdBy(faq.getCreatedBy())
                 .createdAt(faq.getCreatedAt())
+                .modifiedAt(faq.getModifiedAt())
                 .build();
     }
 
