@@ -18,6 +18,7 @@ import com.example.chicken.domain.product.dto.ProductBidInfoResponseDto;
 import com.example.chicken.domain.product.dto.ProductBidRequestDto;
 import com.example.chicken.domain.product.dto.ProductRequestDto;
 import com.example.chicken.domain.product.dto.ProductResponseDto;
+import com.example.chicken.domain.product.dto.ProductSearchCondition;
 import com.example.chicken.domain.product.dto.ProductUpdateRequestDto;
 import com.example.chicken.domain.product.entity.Category;
 import com.example.chicken.domain.product.entity.Product;
@@ -85,8 +86,8 @@ public class ProductService {
 	}
 
 	@Transactional(readOnly = true)
-	public Page<ProductResponseDto> getProducts(Pageable pageable) {
-		Page<Product> result = this.productRepository.searchProducts(pageable);
+	public Page<ProductResponseDto> getProducts(ProductSearchCondition condition, Pageable pageable) {
+		Page<Product> result = this.productRepository.searchProducts(condition, pageable);
 
 		return result.map(product ->
 							  productMapper.toResponseDto(product,

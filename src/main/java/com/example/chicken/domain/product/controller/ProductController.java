@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.chicken.domain.product.dto.CategoryResponseDto;
 import com.example.chicken.domain.product.dto.ProductRequestDto;
 import com.example.chicken.domain.product.dto.ProductResponseDto;
+import com.example.chicken.domain.product.dto.ProductSearchCondition;
 import com.example.chicken.domain.product.service.CategoryService;
 import com.example.chicken.domain.product.service.ProductService;
 
@@ -43,9 +44,9 @@ public class ProductController {
 	}
 
 	@GetMapping
-	public ResponseEntity<Page<ProductResponseDto>> getProducts(Pageable pageable) {
+	public ResponseEntity<Page<ProductResponseDto>> getProducts(ProductSearchCondition condition, Pageable pageable) {
 
-		Page<ProductResponseDto> result = this.productService.getProducts(pageable);
+		Page<ProductResponseDto> result = this.productService.getProducts(condition, pageable);
 
 		return ResponseEntity.ok(result);
 	}
