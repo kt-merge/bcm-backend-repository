@@ -25,20 +25,17 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 	@Override
 	public Page<Product> searchProducts(ProductSearchCondition condition, Pageable pageable) {
 
-		Long id = condition.id();
-		String name = condition.name();
-		Long categoryId = condition.categoryId();
-		BidStatus bidStatus = condition.bidStatus();
+		Predicate[] searchConditions = {
+			equalsId(condition.id()),
+			hasNameContaining(condition.name()),
+			equalsCategoryId(condition.categoryId()),
+			equalsBidStatus(condition.bidStatus())
+		};
 
 		List<Product> result = queryFactory
 			.select(product)
 			.from(product)
-			.where(
-				equalsId(id),
-				hasNameContaining(name),
-				equalsCategoryId(categoryId),
-				equalsBidStatus(bidStatus)
-			)
+			.where(searchConditions)
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize() + 1L)
 			.fetch();
@@ -46,29 +43,24 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 		JPAQuery<Long> countQuery = queryFactory
 			.select(product.count())
 			.from(product)
-			.where(
-				equalsId(id),
-				hasNameContaining(name),
-				equalsCategoryId(categoryId),
-				equalsBidStatus(bidStatus)
-			);
+			.where(searchConditions);
 
 		return PageableExecutionUtils.getPage(result, pageable, countQuery::fetchOne);
 	}
 
-	private Predicate equalsId(Long id) {
+	private static Predicate equalsId(Long id) {
 		return id != null ? product.id.eq(id) : null;
 	}
 
-	private Predicate hasNameContaining(String name) {
+	private static Predicate hasNameContaining(String name) {
 		return name != null ? product.name.contains(name) : null;
 	}
 
-	private Predicate equalsCategoryId(Long categoryId) {
+	private static Predicate equalsCategoryId(Long categoryId) {
 		return categoryId != null ? product.category.id.eq(categoryId) : null;
 	}
 
-	private Predicate equalsBidStatus(BidStatus bidStatus) {
+	private static Predicate equalsBidStatus(BidStatus bidStatus) {
 		return bidStatus != null ? product.bidStatus.eq(bidStatus) : null;
 	}
 
