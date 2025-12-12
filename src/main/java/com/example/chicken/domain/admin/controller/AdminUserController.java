@@ -4,6 +4,7 @@ import static com.example.chicken.common.constant.PathConstant.Admin.ADMIN_USERS
 import static com.example.chicken.common.constant.PathConstant.Admin.ADMIN_USERS_PREFIX;
 
 import com.example.chicken.domain.admin.dto.UpdateUserInfoByAdminDto;
+import com.example.chicken.domain.admin.dto.UserSearchCondition;
 import com.example.chicken.domain.auth.service.UserService;
 import com.example.chicken.dto.UserResponseDto;
 import jakarta.validation.Valid;
@@ -29,9 +30,9 @@ public class AdminUserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<Page<UserResponseDto>> getUsers(Pageable pageable) {
+    public ResponseEntity<Page<UserResponseDto>> getUsers(UserSearchCondition condition, Pageable pageable) {
 
-        Page<UserResponseDto> result = this.userService.getUsers(pageable);
+        Page<UserResponseDto> result = this.userService.getUsers(condition, pageable);
 
         return ResponseEntity.ok(result);
     }
