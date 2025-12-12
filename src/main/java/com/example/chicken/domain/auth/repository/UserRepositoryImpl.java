@@ -39,7 +39,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                         hasUserStatusContaining(userStatus)
                 )
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize() + 1L)
+                .limit(pageable.getPageSize())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
