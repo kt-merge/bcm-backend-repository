@@ -6,8 +6,9 @@ import com.example.chicken.domain.faq.entity.Faq;
 import com.example.chicken.domain.faq.exception.FaqNotFoundException;
 import com.example.chicken.domain.faq.mapper.FaqMapper;
 import com.example.chicken.domain.faq.repository.FaqRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,12 +35,13 @@ public class FaqService {
     /**
      * FAQ 목록 조회
      *
-     * @return FAQ 목록 응답 DTO 리스트
+     * @param pageable 페이징 정보
+     * @return FAQ 페이지 응답 DTO
      */
     @Transactional(readOnly = true)
-    public List<FaqResponseDto> getFaqs() {
-        List<Faq> faqs = faqRepository.findAll();
-        return faqMapper.toDtoList(faqs);
+    public Page<FaqResponseDto> getFaqs(Pageable pageable) {
+        Page<Faq> faqs = faqRepository.findAll(pageable);
+        return faqs.map(faqMapper::toDto);
     }
 
     /**
