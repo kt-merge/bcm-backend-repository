@@ -2,6 +2,7 @@ package com.example.chicken.domain.auth.service;
 
 import com.example.chicken.domain.admin.dto.DailyUserRegistrationCountDto;
 import com.example.chicken.domain.admin.dto.UpdateUserInfoByAdminDto;
+import com.example.chicken.domain.admin.dto.UserSearchCondition;
 import com.example.chicken.domain.admin.exception.WhyDeleteMeException;
 import com.example.chicken.domain.auth.dto.user.UpdateUserInfoDto;
 import com.example.chicken.domain.auth.dto.user.WinnerResponseDto;
@@ -107,8 +108,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserResponseDto> getUsers(Pageable pageable) {
-        Page<User> users = this.userRepository.findAll(pageable);
+    public Page<UserResponseDto> getUsers(UserSearchCondition condition, Pageable pageable) {
+        Page<User> users = this.userRepository.searchUsers(condition, pageable);
 
         return users.map(userMapper::toResponse);
     }
