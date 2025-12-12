@@ -1,5 +1,4 @@
 FROM eclipse-temurin:17-jdk AS builder
-# FROM eclipse-temurin:17-jdk-jammy AS builder
 
 WORKDIR /app
 
@@ -13,7 +12,6 @@ RUN chmod +x gradlew
 RUN ./gradlew bootJar --no-daemon -x test
 
 FROM eclipse-temurin:17-jdk
-# FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=builder /app/build/libs/*-SNAPSHOT.jar app.jar
 
