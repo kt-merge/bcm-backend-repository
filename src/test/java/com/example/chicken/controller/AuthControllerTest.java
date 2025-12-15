@@ -71,7 +71,7 @@ class AuthControllerTest {
 
 		user = this.userRepository.save(userValue);
 
-		this.refreshToken = this.tokenProvider.createTokens(user.getEmail(), user.getNickname()).refreshToken();
+		this.refreshToken = this.tokenProvider.createTokens(user).refreshToken();
 
 		RefreshToken refreshToken = RefreshToken.builder()
 			.email(user.getEmail())
@@ -132,7 +132,7 @@ class AuthControllerTest {
 	@Test
 	@DisplayName("[Integration Test] 로그인 성공")
 	void signIn() throws Exception {
-		SignInRequestDto request = new SignInRequestDto(user.getEmail(), "1q2w3e4r!");
+		SignInRequestDto request = new SignInRequestDto(user.getEmail(), "1q2w3e4r!", Boolean.TRUE);
 
 		//when
 		mockMvc.perform(post("/api/auth/sign-in")
@@ -150,8 +150,7 @@ class AuthControllerTest {
 	@DisplayName("토큰 재발급 성공")
 	void reissue() throws Exception {
 		//given
-		String refreshToken = this.refreshToken;
-		Cookie cookie = new Cookie("refresh-token", refreshToken);
+		Cookie cookie = new Cookie("refresh-token", this.refreshToken);
 
 		//when
 		mockMvc.perform(post("/api/auth/reissue")

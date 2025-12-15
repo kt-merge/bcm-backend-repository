@@ -7,9 +7,10 @@ import com.example.chicken.domain.faq.dto.FaqRequestDto;
 import com.example.chicken.domain.faq.dto.FaqResponseDto;
 import com.example.chicken.domain.faq.service.FaqService;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,12 +49,13 @@ public class AdminFaqController {
     /**
      * FAQ 목록 조회
      *
+     * @param pageable 페이징 정보
      * @return FAQ 목록
      */
     @GetMapping
-    public ResponseEntity<List<FaqResponseDto>> getFaqs() {
+    public ResponseEntity<Page<FaqResponseDto>> getFaqs(Pageable pageable) {
         log.info("FAQ 목록 조회 요청");
-        return ResponseEntity.ok(faqService.getFaqs());
+        return ResponseEntity.ok(faqService.getFaqs(pageable));
     }
 
     /**

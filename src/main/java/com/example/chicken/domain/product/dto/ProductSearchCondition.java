@@ -1,4 +1,6 @@
 package com.example.chicken.domain.product.dto;
 
-public record ProductSearchCondition(String name) {
+import com.example.chicken.domain.product.entity.BidStatus;
+
+public record ProductSearchCondition(Long id, String name, Long categoryId, BidStatus bidStatus) {
 }
