@@ -46,17 +46,13 @@ public class AuthService {
 	@Transactional
 	public UserResponseDto signUp(UserRequestDto request) {
 
-		boolean isUserExists = this.userRepository.existsByEmail(request.email());
+		if (this.userRepository.existsByEmail(request.email())) throw new UserAlreadyExists();
 
-		if (isUserExists) {
-			throw new UserAlreadyExists();
-		}
+		User user = User.from(request);
 
-		User userEntity = User.from(request);
+		user.updatePassword(passwordEncoder.encode(request.password()));
 
-		userEntity.updatePassword(passwordEncoder.encode(request.password()));
-
-		User result = this.userRepository.save(userEntity);
+		User result = this.userRepository.save(user);
 
 		return userMapper.toResponse(result);
 
@@ -66,14 +62,12 @@ public class AuthService {
 	public SignInResponseDto signIn(SignInRequestDto request) {
 		String email = request.email();
 
-		User user = this.userRepository.findByEmail(email)
-			.orElseThrow(() -> new UserNotFoundException(email));
+		User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
 
 		if (!this.passwordEncoder.matches(request.password(), user.getPassword()))
 			throw new PasswordNotMatchedException();
 
 		String refreshToken = this.tokenProvider.createRefreshJWT(email);
-
 		this.refreshTokenRepository.save(RefreshToken.of(email, refreshToken));
 
 		String accessToken = this.tokenProvider.createAccessToken(user);
@@ -83,7 +77,8 @@ public class AuthService {
 
 	@Transactional
 	public TokenResponseDto reissue(String refreshToken) {
-		if (!jwtUtil.validate(refreshToken)) throw new TokenInvalidException();
+		if (!jwtUtil.validate(refreshToken))
+			throw new TokenInvalidException();
 
 		String email = jwtUtil.parseClaims(refreshToken).getSubject();
 
@@ -92,9 +87,7 @@ public class AuthService {
 
 		if (!storedToken.getRefreshJwt().equals(refreshToken)) throw new TokenInvalidException();
 
-
-		User user = this.userRepository.findByEmail(email)
-			.orElseThrow(() -> new UserNotFoundException(email));
+		User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
 
 		String newAccessToken = this.tokenProvider.createAccessToken(user);
 		String newRefreshToken = this.tokenProvider.createRefreshJWT(email);

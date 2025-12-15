@@ -57,9 +57,12 @@ public class AuthController {
 
 		SignInResponseDto tokens = this.authService.signIn(request);
 
+		Duration cookieDuration = Boolean.TRUE.equals(request.rememberMe()) ?
+			Duration.ofDays(15) : Duration.ofSeconds(-1);
+
 		ResponseCookie cookie = CookieUtil.generateCookieResponse(CookieConstant.REFRESH_TOKEN_NAME,
 																  tokens.refreshToken(),
-																  Duration.ofDays(15));
+																  cookieDuration);
 
 		AccessTokenResponseDto result = AccessTokenResponseDto.from(tokens.accessToken());
 
