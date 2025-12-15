@@ -9,15 +9,13 @@ import com.example.chicken.domain.order.entity.OrderStatus;
 import com.example.chicken.domain.order.entity.ShippingInfo;
 import com.example.chicken.domain.order.exception.OrderNotFoundException;
 import com.example.chicken.domain.order.repository.OrderRepository;
-import com.example.chicken.domain.product.dto.ProductImageResponseDto;
-import com.example.chicken.domain.product.dto.ProductResponseDto;
 import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.service.CategoryMapper;
 import com.example.chicken.domain.product.service.ProductImageMapper;
 import com.example.chicken.domain.product.service.ProductMapper;
+import com.example.chicken.domain.product.service.ProductService;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -33,6 +31,7 @@ public class OrderService {
     private final CategoryMapper categoryMapper;
     private final ProductMapper productMapper;
     private final ProductImageMapper productImageMapper;
+    private final ProductService productService;
 
     @Transactional
     public Order createOrder(User user, Product product) {
@@ -71,16 +70,7 @@ public class OrderService {
         Order order = this.orderRepository.findByIdAndUser(orderId, email)
                 .orElseThrow(() -> new OrderNotFoundException(orderId.toString()));
 
-        List<ProductImageResponseDto> productImageResponseDtoList = order.getProduct().getImages()
-                .stream()
-                .map(this.productImageMapper::toResponseDto)
-                .toList();
-
-        ProductResponseDto productResponse = productMapper.toResponseDto(order.getProduct(),
-                userMapper.toResponse(order.getUser()), categoryMapper.toResponseDto(order.getProduct().getCategory()),
-                productImageResponseDtoList);
-
-        return this.orderMapper.toDto(order, productResponse);
+        return this.orderMapper.toDto(order, this.productService.convertToDto(order.getProduct()));
     }
 
 }

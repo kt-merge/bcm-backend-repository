@@ -193,7 +193,7 @@ public class ProductService {
         this.productRepository.delete(product);
     }
 
-    private ProductResponseDto convertToDto(Product product) {
+    public ProductResponseDto convertToDto(Product product) {
         List<ProductImageResponseDto> productImageResponseDtoList = product.getImages()
                 .stream()
                 .map(this.productImageMapper::toResponseDto)
@@ -205,7 +205,7 @@ public class ProductService {
                 productImageResponseDtoList);
     }
 
-    private ProductResponseDto convertToDto(Product product, List<ProductBidInfoResponseDto> productBids) {
+    public ProductResponseDto convertToDto(Product product, List<ProductBidInfoResponseDto> productBids) {
         List<ProductImageResponseDto> productImageResponseDtoList = product.getImages()
                 .stream()
                 .map(this.productImageMapper::toResponseDto)

@@ -17,7 +17,6 @@ import com.example.chicken.domain.order.dto.OrderResponseDto;
 import com.example.chicken.domain.order.repository.OrderRepository;
 import com.example.chicken.domain.order.service.OrderMapper;
 import com.example.chicken.domain.product.dto.ProductBidResponseDto;
-import com.example.chicken.domain.product.dto.ProductImageResponseDto;
 import com.example.chicken.domain.product.dto.ProductResponseDto;
 import com.example.chicken.domain.product.entity.ProductBid;
 import com.example.chicken.domain.product.repository.HighestBidderRepository;
@@ -26,6 +25,7 @@ import com.example.chicken.domain.product.repository.ProductRepository;
 import com.example.chicken.domain.product.service.CategoryMapper;
 import com.example.chicken.domain.product.service.ProductImageMapper;
 import com.example.chicken.domain.product.service.ProductMapper;
+import com.example.chicken.domain.product.service.ProductService;
 import com.example.chicken.dto.UserResponseDto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -54,6 +54,7 @@ public class UserService {
     private final ProductImageMapper productImageMapper;
     private final ResetPasswordTokenRepository resetPasswordTokenRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProductService productService;
 
     @Transactional(readOnly = true)
     public UserResponseDto getUserInfo() {
@@ -71,15 +72,7 @@ public class UserService {
 
         List<ProductResponseDto> productResponse = this.productRepository.findByUser(user)
                 .stream()
-                .map((product) -> {
-                    List<ProductImageResponseDto> productImageResponseDtoList = product.getImages()
-                            .stream()
-                            .map(this.productImageMapper::toResponseDto)
-                            .toList();
-
-                    return productMapper.toResponseDto(product, userMapper.toResponse(user),
-                            categoryMapper.toResponseDto(product.getCategory()), productImageResponseDtoList);
-                })
+                .map(this.productService::convertToDto)
                 .toList();
 
         List<OrderResponseDto> orderResponse = this.orderRepository.findByUser(user)
