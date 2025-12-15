@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -69,7 +68,7 @@ public class ProductService {
         List<ProductImage> productImages = request.imageUrls()
                 .stream()
                 .map(url -> productImageMapper.toEntity(product, this.s3BucketUrl + url))
-                .collect((Collectors.toList()));
+                .toList();
 
         product.updateImages(productImages);
 
@@ -77,19 +76,13 @@ public class ProductService {
 
         this.bidScheduleService.register(savedProduct.getId(), savedProduct.getBidEndDate());
 
-        List<ProductImageResponseDto> productImageResponseDtoList = productImages
-                .stream()
-                .map(this.productImageMapper::toResponseDto)
-                .toList();
-
-        return this.productMapper.toResponseDto(savedProduct, userMapper.toResponse(user),
-                categoryMapper.toResponseDto(category), productImageResponseDtoList);
+        return this.convertToDto(savedProduct);
     }
 
     @Transactional(readOnly = true)
     public ProductResponseDto getProduct(Long productId) {
 
-        Product product = this.productRepository.findById(productId)
+        Product product = this.productRepository.findByIdWithDetails(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId.toString()));
 
         List<ProductBidInfoResponseDto> productBidResponses = this.productBidRepository
@@ -97,32 +90,14 @@ public class ProductService {
                 .stream().map(ProductBidInfoResponseDto::from)
                 .toList();
 
-        List<ProductImageResponseDto> productImageResponseDtoList = product.getImages()
-                .stream()
-                .map(this.productImageMapper::toResponseDto)
-                .toList();
-
-        return this.productMapper.toResponseDto(product, productBidResponses, userMapper.toResponse(product.getUser()),
-                categoryMapper.toResponseDto(product.getCategory()), productImageResponseDtoList);
+        return this.convertToDto(product, productBidResponses);
     }
 
     @Transactional(readOnly = true)
     public Page<ProductResponseDto> getProducts(ProductSearchCondition condition, Pageable pageable) {
         Page<Product> result = this.productRepository.searchProducts(condition, pageable);
 
-        return result.map(product -> {
-
-                    List<ProductImageResponseDto> productImageResponseDtoList = product.getImages()
-                            .stream()
-                            .map(this.productImageMapper::toResponseDto)
-                            .toList();
-
-                    return productMapper.toResponseDto(product,
-                            userMapper.toResponse(product.getUser()),
-                            categoryMapper.toResponseDto(product.getCategory()),
-                            productImageResponseDtoList);
-                }
-        );
+        return result.map(this::convertToDto);
     }
 
     @Transactional(readOnly = true)
@@ -132,17 +107,9 @@ public class ProductService {
         User user = this.userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
 
-        return this.productRepository.findTop10ByUserOrderByCreatedAtDesc(user)
-                .stream()
-                .map(product -> {
-                    List<ProductImageResponseDto> productImageResponseDtoList = product.getImages()
-                            .stream()
-                            .map(this.productImageMapper::toResponseDto)
-                            .toList();
-                    return productMapper.toResponseDto(product, userMapper.toResponse(product.getUser()),
-                            categoryMapper.toResponseDto(product.getCategory()), productImageResponseDtoList);
-                })
-                .toList();
+        List<Product> result = this.productRepository.findTop10ByUserWithDetails(user);
+
+        return result.stream().map(this::convertToDto).toList();
     }
 
     @Transactional
@@ -195,7 +162,7 @@ public class ProductService {
                         return productImageMapper.toEntity(product, s3BucketUrl + url);
                     }
                 })
-                .collect((Collectors.toList()));
+                .toList();
 
         product.updateProduct(request.name(),
                 request.description(),
@@ -205,13 +172,9 @@ public class ProductService {
                 productImages
         );
 
-        List<ProductImageResponseDto> productImageResponseDtoList = productImages
-                .stream()
-                .map(this.productImageMapper::toResponseDto)
-                .toList();
+        Product savedProduct = this.productRepository.save(product);
 
-        return this.productMapper.toResponseDto(product, userMapper.toResponse(product.getUser()),
-                categoryMapper.toResponseDto(product.getCategory()), productImageResponseDtoList);
+        return this.convertToDto(savedProduct);
     }
 
     @Transactional(readOnly = true)
@@ -228,6 +191,31 @@ public class ProductService {
                 .orElseThrow(() -> new ProductNotFoundException(productId.toString()));
 
         this.productRepository.delete(product);
+    }
+
+    private ProductResponseDto convertToDto(Product product) {
+        List<ProductImageResponseDto> productImageResponseDtoList = product.getImages()
+                .stream()
+                .map(this.productImageMapper::toResponseDto)
+                .toList();
+
+        return this.productMapper.toResponseDto(product,
+                userMapper.toResponse(product.getUser()),
+                categoryMapper.toResponseDto(product.getCategory()),
+                productImageResponseDtoList);
+    }
+
+    private ProductResponseDto convertToDto(Product product, List<ProductBidInfoResponseDto> productBids) {
+        List<ProductImageResponseDto> productImageResponseDtoList = product.getImages()
+                .stream()
+                .map(this.productImageMapper::toResponseDto)
+                .toList();
+
+        return this.productMapper.toResponseDto(product,
+                productBids,
+                userMapper.toResponse(product.getUser()),
+                categoryMapper.toResponseDto(product.getCategory()),
+                productImageResponseDtoList);
     }
 
 }

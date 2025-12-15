@@ -116,8 +116,7 @@ public class Product extends BaseTimeEntity {
         this.category = category;
         this.bidEndDate = bidEndDate;
         this.productStatus = productStatus;
-        this.images.clear();
-        this.images.addAll(productImages);
+        this.updateImages(productImages);
     }
 
     public void incrementBidCount() {
