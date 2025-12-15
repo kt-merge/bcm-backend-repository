@@ -69,7 +69,7 @@ public class PathConstant {
 
         public static final String S3_PREFIX = "/api/s3";
 
-        public static final String UPLOAD_URL = "/upload-url";
+        public static final String UPLOAD_URLS = "/upload-url";
 
     }
 

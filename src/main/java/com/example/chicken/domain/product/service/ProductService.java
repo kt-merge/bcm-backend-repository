@@ -1,17 +1,5 @@
 package com.example.chicken.domain.product.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.example.chicken.domain.admin.dto.DailyProductRegistrationCountDto;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.exception.UserNotFoundException;
@@ -19,6 +7,7 @@ import com.example.chicken.domain.auth.repository.UserRepository;
 import com.example.chicken.domain.auth.service.UserMapper;
 import com.example.chicken.domain.product.dto.ProductBidInfoResponseDto;
 import com.example.chicken.domain.product.dto.ProductBidRequestDto;
+import com.example.chicken.domain.product.dto.ProductImageResponseDto;
 import com.example.chicken.domain.product.dto.ProductRequestDto;
 import com.example.chicken.domain.product.dto.ProductResponseDto;
 import com.example.chicken.domain.product.dto.ProductSearchCondition;
@@ -26,162 +15,219 @@ import com.example.chicken.domain.product.dto.ProductUpdateRequestDto;
 import com.example.chicken.domain.product.entity.Category;
 import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.entity.ProductBid;
+import com.example.chicken.domain.product.entity.ProductImage;
 import com.example.chicken.domain.product.exception.CategoryNotFoundException;
 import com.example.chicken.domain.product.exception.ProductNotFoundException;
 import com.example.chicken.domain.product.repository.CategoryRepository;
 import com.example.chicken.domain.product.repository.ProductBidRepository;
 import com.example.chicken.domain.product.repository.ProductRepository;
 import com.example.chicken.service.BidScheduleService;
-
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class ProductService {
 
-	@Value("${s3.product-bucket-url}")
-	private String s3BucketUrl;
+    @Value("${s3.product-bucket-url}")
+    private String s3BucketUrl;
 
-	private final UserRepository userRepository;
-	private final UserMapper userMapper;
-	private final CategoryMapper categoryMapper;
-	private final ProductMapper productMapper;
-	private final CategoryRepository categoryRepository;
-	private final ProductRepository productRepository;
-	private final ProductBidRepository productBidRepository;
-	private final BidScheduleService bidScheduleService;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
+    private final ProductBidRepository productBidRepository;
+    private final CategoryRepository categoryRepository;
 
-	@Transactional
-	public ProductResponseDto createProduct(ProductRequestDto request) {
+    private final UserMapper userMapper;
+    private final ProductMapper productMapper;
+    private final CategoryMapper categoryMapper;
+    private final ProductImageMapper productImageMapper;
 
-		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+    private final BidScheduleService bidScheduleService;
 
-		String imageUrl = this.s3BucketUrl + request.imageUrl();
+    @Transactional
+    public ProductResponseDto createProduct(ProductRequestDto request) {
 
-		User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-		Category category = this.categoryRepository.findById(request.categoryId())
-			.orElseThrow(() -> new CategoryNotFoundException(request.categoryId().toString()));
+        User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
 
-		Product product = this.productMapper.toEntity(request, imageUrl, user, category);
+        Category category = this.categoryRepository.findById(request.categoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(request.categoryId().toString()));
 
-		Product savedProduct = this.productRepository.save(product);
+        Product product = this.productMapper.toEntity(request, user, category);
 
-		this.bidScheduleService.register(savedProduct.getId(), savedProduct.getBidEndDate());
+        List<ProductImage> productImages = request.imageUrls()
+                .stream()
+                .map(url -> productImageMapper.toEntity(product, this.s3BucketUrl + url))
+                .collect((Collectors.toList()));
 
-		return this.productMapper.toResponseDto(savedProduct, userMapper.toResponse(user),
-												categoryMapper.toResponseDto(category));
-	}
+        product.updateImages(productImages);
 
-	@Transactional(readOnly = true)
-	public ProductResponseDto getProduct(Long productId) {
+        Product savedProduct = this.productRepository.save(product);
 
-		Product product = this.productRepository.findById(productId)
-			.orElseThrow(() -> new ProductNotFoundException(productId.toString()));
+        this.bidScheduleService.register(savedProduct.getId(), savedProduct.getBidEndDate());
 
-		List<ProductBidInfoResponseDto> productBidResponses = this.productBidRepository
-			.findTop5ByProductIdOrderByCreatedAtDesc(productId)
-			.stream().map(ProductBidInfoResponseDto::from)
-			.toList();
+        List<ProductImageResponseDto> productImageResponseDtoList = productImages
+                .stream()
+                .map(this.productImageMapper::toResponseDto)
+                .toList();
 
-		return this.productMapper.toResponseDto(product, productBidResponses, userMapper.toResponse(product.getUser()),
-												categoryMapper.toResponseDto(product.getCategory()));
-	}
+        return this.productMapper.toResponseDto(savedProduct, userMapper.toResponse(user),
+                categoryMapper.toResponseDto(category), productImageResponseDtoList);
+    }
 
-	@Transactional(readOnly = true)
-	public Page<ProductResponseDto> getProducts(ProductSearchCondition condition, Pageable pageable) {
-		Page<Product> result = this.productRepository.searchProducts(condition, pageable);
+    @Transactional(readOnly = true)
+    public ProductResponseDto getProduct(Long productId) {
 
-		return result.map(product ->
-							  productMapper.toResponseDto(product,
-														  userMapper.toResponse(product.getUser()),
-														  categoryMapper.toResponseDto(product.getCategory())));
-	}
+        Product product = this.productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(productId.toString()));
 
-	@Transactional(readOnly = true)
-	public List<ProductResponseDto> getMyProducts() {
-		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<ProductBidInfoResponseDto> productBidResponses = this.productBidRepository
+                .findTop5ByProductIdOrderByCreatedAtDesc(productId)
+                .stream().map(ProductBidInfoResponseDto::from)
+                .toList();
 
-		User user = this.userRepository.findByEmail(email)
-			.orElseThrow(() -> new UserNotFoundException(email));
+        List<ProductImageResponseDto> productImageResponseDtoList = product.getImages()
+                .stream()
+                .map(this.productImageMapper::toResponseDto)
+                .toList();
 
-		return this.productRepository.findTop10ByUserOrderByCreatedAtDesc(user)
-			.stream()
-			.map(product -> productMapper.toResponseDto(product, userMapper.toResponse(product.getUser()),
-														categoryMapper.toResponseDto(product.getCategory())))
-			.toList();
-	}
+        return this.productMapper.toResponseDto(product, productBidResponses, userMapper.toResponse(product.getUser()),
+                categoryMapper.toResponseDto(product.getCategory()), productImageResponseDtoList);
+    }
 
-	@Transactional
-	public boolean updateProductBid(Long productId, ProductBidRequestDto request) {
-		String email = request.email();
-		BigDecimal price = request.price();
+    @Transactional(readOnly = true)
+    public Page<ProductResponseDto> getProducts(ProductSearchCondition condition, Pageable pageable) {
+        Page<Product> result = this.productRepository.searchProducts(condition, pageable);
 
-		User user = this.userRepository.findByEmail(email)
-			.orElseThrow(() -> new UserNotFoundException(email));
+        return result.map(product -> {
 
-		Product product = this.productRepository.findById(productId)
-			.orElseThrow(() -> new ProductNotFoundException(productId.toString()));
+                    List<ProductImageResponseDto> productImageResponseDtoList = product.getImages()
+                            .stream()
+                            .map(this.productImageMapper::toResponseDto)
+                            .toList();
 
-		if (product.isBidInactive()) {
-			product.activeBid();
-		}
+                    return productMapper.toResponseDto(product,
+                            userMapper.toResponse(product.getUser()),
+                            categoryMapper.toResponseDto(product.getCategory()),
+                            productImageResponseDtoList);
+                }
+        );
+    }
 
-		if (product.isBidPriceLowerThan(price)) {
-			product.updateBidPrice(price);
-			product.incrementBidCount();
+    @Transactional(readOnly = true)
+    public List<ProductResponseDto> getMyProducts() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-			ProductBid productBid = ProductBid.builder()
-				.price(price)
-				.user(user)
-				.product(product)
-				.build();
+        User user = this.userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(email));
 
-			this.productBidRepository.save(productBid);
+        return this.productRepository.findTop10ByUserOrderByCreatedAtDesc(user)
+                .stream()
+                .map(product -> {
+                    List<ProductImageResponseDto> productImageResponseDtoList = product.getImages()
+                            .stream()
+                            .map(this.productImageMapper::toResponseDto)
+                            .toList();
+                    return productMapper.toResponseDto(product, userMapper.toResponse(product.getUser()),
+                            categoryMapper.toResponseDto(product.getCategory()), productImageResponseDtoList);
+                })
+                .toList();
+    }
 
-			return true;
-		}
+    @Transactional
+    public boolean updateProductBid(Long productId, ProductBidRequestDto request) {
+        String email = request.email();
+        BigDecimal price = request.price();
 
-		return false;
-	}
+        User user = this.userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(email));
 
-	@Transactional
-	public ProductResponseDto updateProduct(Long productId, ProductUpdateRequestDto request) {
-		Product product = productRepository.findById(productId)
-			.orElseThrow(() -> new ProductNotFoundException(productId.toString()));
+        Product product = this.productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(productId.toString()));
 
-		String imageUrl = product.getImageUrl();
+        if (product.isBidInactive()) {
+            product.activeBid();
+        }
 
-		if (!request.imageUrl().equals(product.getImageUrl())) {
-			imageUrl = this.s3BucketUrl + request.imageUrl();
-		}
+        if (product.isBidPriceLowerThan(price)) {
+            product.updateBidPrice(price);
+            product.incrementBidCount();
 
-		product.updateProduct(request.name(),
-							  request.description(),
-							  request.category(),
-							  request.productStatus(),
-							  request.bidEndDate(),
-							  imageUrl
-		);
+            ProductBid productBid = ProductBid.builder()
+                    .price(price)
+                    .user(user)
+                    .product(product)
+                    .build();
 
-		return this.productMapper.toResponseDto(product, userMapper.toResponse(product.getUser()),
-												categoryMapper.toResponseDto(product.getCategory()));
-	}
+            this.productBidRepository.save(productBid);
 
-	@Transactional(readOnly = true)
-	public List<DailyProductRegistrationCountDto> getDailyProductRegistrationCounts(Integer daysAgo) {
-		LocalDateTime startDate = LocalDate.now().minusDays(daysAgo - 1L).atStartOfDay();
-		LocalDateTime endDate = LocalDate.now().plusDays(1L).atStartOfDay();
+            return true;
+        }
 
-		return this.productRepository.countProductsByDay(startDate, endDate);
-	}
+        return false;
+    }
 
-	@Transactional
-	public void deleteProduct(Long productId) {
-		Product product = this.productRepository.findById(productId)
-			.orElseThrow(() -> new ProductNotFoundException(productId.toString()));
+    @Transactional
+    public ProductResponseDto updateProduct(Long productId, ProductUpdateRequestDto request) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(productId.toString()));
 
-		this.productRepository.delete(product);
-	}
+        Category category = categoryRepository.findById(request.categoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(request.categoryId().toString()));
+
+        List<ProductImage> productImages = request.imageUrls()
+                .stream()
+                .map(url -> {
+                    if (url.startsWith("http")) {
+                        return productImageMapper.toEntity(product, url);
+                    } else {
+                        return productImageMapper.toEntity(product, s3BucketUrl + url);
+                    }
+                })
+                .collect((Collectors.toList()));
+
+        product.updateProduct(request.name(),
+                request.description(),
+                category,
+                request.productStatus(),
+                request.bidEndDate(),
+                productImages
+        );
+
+        List<ProductImageResponseDto> productImageResponseDtoList = productImages
+                .stream()
+                .map(this.productImageMapper::toResponseDto)
+                .toList();
+
+        return this.productMapper.toResponseDto(product, userMapper.toResponse(product.getUser()),
+                categoryMapper.toResponseDto(product.getCategory()), productImageResponseDtoList);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DailyProductRegistrationCountDto> getDailyProductRegistrationCounts(Integer daysAgo) {
+        LocalDateTime startDate = LocalDate.now().minusDays(daysAgo - 1L).atStartOfDay();
+        LocalDateTime endDate = LocalDate.now().plusDays(1L).atStartOfDay();
+
+        return this.productRepository.countProductsByDay(startDate, endDate);
+    }
+
+    @Transactional
+    public void deleteProduct(Long productId) {
+        Product product = this.productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(productId.toString()));
+
+        this.productRepository.delete(product);
+    }
 
 }

@@ -1,43 +1,33 @@
 package com.example.chicken.domain.s3.controller;
 
-import static com.example.chicken.common.constant.PathConstant.S3.*;
+import static com.example.chicken.common.constant.PathConstant.S3.S3_PREFIX;
+import static com.example.chicken.common.constant.PathConstant.S3.UPLOAD_URLS;
 
-import java.util.Map;
-
+import com.example.chicken.domain.s3.dto.UploadUrlsRequestDto;
+import com.example.chicken.domain.s3.service.S3Provider;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.chicken.domain.s3.service.S3Provider;
-import com.example.chicken.dto.S3FileNameDto;
-
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(S3_PREFIX)
 public class S3Controller {
 
-	private final S3Provider s3Provider;
+    private final S3Provider s3Provider;
 
-	@PostMapping(UPLOAD_URL)
-	public ResponseEntity<Map<String, String>> putUploadUrl(@RequestBody @Valid S3FileNameDto request) {
-		String presignedUrl = this.s3Provider.generateUploadUrl(request.fileName());
+    @PostMapping(UPLOAD_URLS)
+    public ResponseEntity<List<String>> putUploadUrls(@RequestBody UploadUrlsRequestDto uploadUrls) {
 
-		Map<String, String> result = Map.of("url", presignedUrl);
+        List<String> result = this.s3Provider.generateUploadUrls(uploadUrls);
 
-		return ResponseEntity.ok(result);
-	}
+        return ResponseEntity.ok(result);
+    }
 
-	@PostMapping("/download-url")
-	public ResponseEntity<Map<String, String>> getUploadUrl(@RequestBody S3FileNameDto request) {
-		String presignedUrl = this.s3Provider.generateDownloadUrl(request.fileName());
-
-		Map<String, String> result = Map.of("url", presignedUrl);
-
-		return ResponseEntity.ok(result);
-	}
 }

@@ -3,6 +3,7 @@ package com.example.chicken.domain.product.service;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.product.dto.CategoryResponseDto;
 import com.example.chicken.domain.product.dto.ProductBidInfoResponseDto;
+import com.example.chicken.domain.product.dto.ProductImageResponseDto;
 import com.example.chicken.domain.product.dto.ProductRequestDto;
 import com.example.chicken.domain.product.dto.ProductResponseDto;
 import com.example.chicken.domain.product.entity.BidStatus;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProductMapper {
 
-    public Product toEntity(ProductRequestDto request, String imageUrl, User user, Category category) {
+    public Product toEntity(ProductRequestDto request, User user, Category category) {
         return Product.builder()
                 .name(request.name())
                 .description(request.description())
@@ -27,12 +28,12 @@ public class ProductMapper {
                 .bidStatus(BidStatus.NOT_BIDDED)
                 .productStatus(request.productStatus())
                 .bidEndDate(request.bidEndDate())
-                .imageUrl(imageUrl)
                 .user(user)
                 .build();
     }
 
-    public ProductResponseDto toResponseDto(Product product, UserResponseDto user, CategoryResponseDto category) {
+    public ProductResponseDto toResponseDto(Product product, UserResponseDto user, CategoryResponseDto category,
+                                            List<ProductImageResponseDto> productImageResponseDtoList) {
         return ProductResponseDto.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -43,8 +44,8 @@ public class ProductMapper {
                 .bidCount(product.getBidCount())
                 .bidStatus(product.getBidStatus())
                 .productStatus(product.getProductStatus())
-                .imageUrl(product.getImageUrl())
                 .user(user)
+                .imageUrls(productImageResponseDtoList)
                 .createdAt(product.getCreatedAt())
                 .modifiedAt(product.getModifiedAt())
                 .bidEndDate(product.getBidEndDate())
@@ -53,7 +54,8 @@ public class ProductMapper {
     }
 
     public ProductResponseDto toResponseDto(Product product, List<ProductBidInfoResponseDto> productBids,
-                                            UserResponseDto user, CategoryResponseDto category) {
+                                            UserResponseDto user, CategoryResponseDto category,
+                                            List<ProductImageResponseDto> productImageResponseDtoList) {
         return ProductResponseDto.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -64,8 +66,8 @@ public class ProductMapper {
                 .bidCount(product.getBidCount())
                 .bidStatus(product.getBidStatus())
                 .productStatus(product.getProductStatus())
-                .imageUrl(product.getImageUrl())
                 .user(user)
+                .imageUrls(productImageResponseDtoList)
                 .createdAt(product.getCreatedAt())
                 .modifiedAt(product.getModifiedAt())
                 .bidEndDate(product.getBidEndDate())
