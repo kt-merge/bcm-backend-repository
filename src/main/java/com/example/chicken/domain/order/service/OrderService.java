@@ -9,10 +9,11 @@ import com.example.chicken.domain.order.entity.OrderStatus;
 import com.example.chicken.domain.order.entity.ShippingInfo;
 import com.example.chicken.domain.order.exception.OrderNotFoundException;
 import com.example.chicken.domain.order.repository.OrderRepository;
-import com.example.chicken.domain.product.dto.ProductResponseDto;
 import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.service.CategoryMapper;
+import com.example.chicken.domain.product.service.ProductImageMapper;
 import com.example.chicken.domain.product.service.ProductMapper;
+import com.example.chicken.domain.product.service.ProductService;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,8 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private final CategoryMapper categoryMapper;
     private final ProductMapper productMapper;
+    private final ProductImageMapper productImageMapper;
+    private final ProductService productService;
 
     @Transactional
     public Order createOrder(User user, Product product) {
@@ -67,10 +70,7 @@ public class OrderService {
         Order order = this.orderRepository.findByIdAndUser(orderId, email)
                 .orElseThrow(() -> new OrderNotFoundException(orderId.toString()));
 
-        ProductResponseDto productResponse = productMapper.toResponseDto(order.getProduct(),
-                userMapper.toResponse(order.getUser()), categoryMapper.toResponseDto(order.getProduct().getCategory()));
-
-        return this.orderMapper.toDto(order, productResponse);
+        return this.orderMapper.toDto(order, this.productService.convertToDto(order.getProduct()));
     }
 
 }

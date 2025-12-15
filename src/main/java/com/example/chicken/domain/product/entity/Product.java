@@ -2,6 +2,7 @@ package com.example.chicken.domain.product.entity;
 
 import com.example.chicken.common.entity.BaseTimeEntity;
 import com.example.chicken.domain.auth.entity.user.User;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,9 +13,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,8 +58,8 @@ public class Product extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private ProductStatus productStatus;
 
-    @Column(length = 1000)
-    private String imageUrl;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    final private List<ProductImage> images = new ArrayList<>();
 
     @JoinColumn(name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -71,7 +75,6 @@ public class Product extends BaseTimeEntity {
                     LocalDateTime bidEndDate,
                     BidStatus bidStatus,
                     ProductStatus productStatus,
-                    String imageUrl,
                     User user) {
         this.name = name;
         this.description = description;
@@ -82,7 +85,6 @@ public class Product extends BaseTimeEntity {
         this.bidStatus = bidStatus;
         this.bidEndDate = bidEndDate;
         this.productStatus = productStatus;
-        this.imageUrl = imageUrl;
         this.user = user;
     }
 
@@ -98,18 +100,23 @@ public class Product extends BaseTimeEntity {
         this.bidPrice = price;
     }
 
+    public void updateImages(List<ProductImage> images) {
+        this.images.clear();
+        this.images.addAll(images);
+    }
+
     public void updateProduct(String name,
                               String description,
                               Category category,
                               ProductStatus productStatus,
                               LocalDateTime bidEndDate,
-                              String imageUrl) {
+                              List<ProductImage> productImages) {
         this.name = name;
         this.description = description;
         this.category = category;
         this.bidEndDate = bidEndDate;
         this.productStatus = productStatus;
-        this.imageUrl = imageUrl;
+        this.updateImages(productImages);
     }
 
     public void incrementBidCount() {
@@ -131,6 +138,5 @@ public class Product extends BaseTimeEntity {
     public void completeBid() {
         this.bidStatus = BidStatus.COMPLETED;
     }
-
 
 }
