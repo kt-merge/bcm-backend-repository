@@ -20,8 +20,10 @@ import com.example.chicken.domain.auth.repository.UserRepository;
 import com.example.chicken.dto.UserRequestDto;
 import com.example.chicken.dto.UserResponseDto;
 import com.example.chicken.service.EmailService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,120 +33,115 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final EmailService emailService;
-    private final UserRepository userRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final ResetPasswordTokenRepository resetPasswordTokenRepository;
-    private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider tokenProvider;
-    private final JwtUtil jwtUtil;
+	private final EmailService emailService;
+	private final UserRepository userRepository;
+	private final RefreshTokenRepository refreshTokenRepository;
+	private final ResetPasswordTokenRepository resetPasswordTokenRepository;
+	private final UserMapper userMapper;
+	private final PasswordEncoder passwordEncoder;
+	private final JwtTokenProvider tokenProvider;
+	private final JwtUtil jwtUtil;
+	private final TokenMapper tokenMapper;
 
-    @Transactional
-    public UserResponseDto signUp(UserRequestDto request) {
+	@Transactional
+	public UserResponseDto signUp(UserRequestDto request) {
 
-        boolean isUserExists = this.userRepository.existsByEmail(request.email());
+		boolean isUserExists = this.userRepository.existsByEmail(request.email());
 
-        if (isUserExists) {
-            throw new UserAlreadyExists();
-        }
+		if (isUserExists) {
+			throw new UserAlreadyExists();
+		}
 
-        User userEntity = User.from(request);
+		User userEntity = User.from(request);
 
-        userEntity.updatePassword(passwordEncoder.encode(request.password()));
+		userEntity.updatePassword(passwordEncoder.encode(request.password()));
 
-        User result = this.userRepository.save(userEntity);
+		User result = this.userRepository.save(userEntity);
 
-        return userMapper.toResponse(result);
+		return userMapper.toResponse(result);
 
-    }
+	}
 
-    @Transactional
-    public SignInResponseDto signIn(SignInRequestDto request) {
-        String email = request.email();
+	@Transactional
+	public SignInResponseDto signIn(SignInRequestDto request) {
+		String email = request.email();
 
-        User user = this.userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(email));
+		User user = this.userRepository.findByEmail(email)
+			.orElseThrow(() -> new UserNotFoundException(email));
 
-        if (!this.passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new PasswordNotMatchedException();
-        }
+		if (!this.passwordEncoder.matches(request.password(), user.getPassword()))
+			throw new PasswordNotMatchedException();
 
-        String refreshToken = this.tokenProvider.createRefreshJWT(email);
+		String refreshToken = this.tokenProvider.createRefreshJWT(email);
 
-        RefreshToken tokenEntity = RefreshToken.of(email, refreshToken);
+		this.refreshTokenRepository.save(RefreshToken.of(email, refreshToken));
 
-        this.refreshTokenRepository.save(tokenEntity);
+		String accessToken = this.tokenProvider.createAccessToken(user);
 
-        String accessToken = this.tokenProvider.createJWT(user.getEmail(), user.getNickname(), user.getRole());
+		return new SignInResponseDto(accessToken, refreshToken);
+	}
 
-        return new SignInResponseDto(accessToken, refreshToken);
-    }
+	@Transactional
+	public TokenResponseDto reissue(String refreshToken) {
+		if (!jwtUtil.validate(refreshToken)) throw new TokenInvalidException();
 
-    @Transactional
-    public TokenResponseDto reissue(String refreshToken) {
+		String email = jwtUtil.parseClaims(refreshToken).getSubject();
 
-        if (!jwtUtil.validate(refreshToken)) {
-            throw new TokenInvalidException();
-        }
+		RefreshToken storedToken = this.refreshTokenRepository.findById(email)
+			.orElseThrow(() -> new RefreshTokenNotFoundException(email));
 
-        String email = jwtUtil.parseClaims(refreshToken).getSubject();
+		if (!storedToken.getRefreshJwt().equals(refreshToken)) throw new TokenInvalidException();
 
-        User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
 
-        RefreshToken savedToken = this.refreshTokenRepository.findById(email)
-                .orElseThrow(() -> new RefreshTokenNotFoundException(email));
+		User user = this.userRepository.findByEmail(email)
+			.orElseThrow(() -> new UserNotFoundException(email));
 
-        if (!savedToken.getRefreshJwt().equals(refreshToken)) {
-            throw new TokenInvalidException();
-        }
+		String newAccessToken = this.tokenProvider.createAccessToken(user);
+		String newRefreshToken = this.tokenProvider.createRefreshJWT(email);
 
-        String refreshJWT = this.tokenProvider.createRefreshJWT(email);
+		storedToken.renewalToken(newRefreshToken);
+		this.refreshTokenRepository.save(storedToken);
 
-        savedToken.renewalToken(refreshJWT);
+		return this.tokenMapper.toDto(newAccessToken, newRefreshToken);
+	}
 
-        this.refreshTokenRepository.save(savedToken);
+	@Transactional
+	public void logout(String refreshToken) {
 
-        return this.tokenProvider.createTokens(user.getEmail(), user.getPassword());
-    }
+		String email = jwtUtil.parseClaims(refreshToken).getSubject();
 
-    @Transactional
-    public void logout(String refreshToken) {
+		this.refreshTokenRepository.findById(email).ifPresent(this.refreshTokenRepository::delete);
+	}
 
-        String email = jwtUtil.parseClaims(refreshToken).getSubject();
+	@Transactional
+	public void requestPasswordReset(String email) {
+		boolean isUserExists = this.userRepository.existsByEmail(email);
 
-        this.refreshTokenRepository.findById(email).ifPresent(this.refreshTokenRepository::delete);
-    }
+		if (!isUserExists) {
+			throw new UserNotFoundException(email);
+		}
 
-    @Transactional
-    public void requestPasswordReset(String email) {
-        boolean isUserExists = this.userRepository.existsByEmail(email);
+		String token = this.tokenProvider.createRefreshJWT(email);
 
-        if (!isUserExists) {
-            throw new UserNotFoundException(email);
-        }
+		ResetPasswordToken resetPasswordToken = ResetPasswordToken.builder()
+			.email(email)
+			.resetToken(token)
+			.build();
 
-        String token = this.tokenProvider.createRefreshJWT(email);
+		this.resetPasswordTokenRepository.save(resetPasswordToken);
 
-        ResetPasswordToken resetPasswordToken = ResetPasswordToken.builder()
-                .email(email)
-                .resetToken(token)
-                .build();
+		this.emailService.sendPasswordChangeEmail(email, token);
+	}
 
-        this.resetPasswordTokenRepository.save(resetPasswordToken);
+	public void verifyResetToken(String token) {
+		String email = jwtUtil.parseClaims(token).getSubject();
 
-        this.emailService.sendPasswordChangeEmail(email, token);
-    }
+		ResetPasswordToken resetPasswordToken = this.resetPasswordTokenRepository.findById(email)
+			.orElseThrow(ResetTokenExpiredException::new);
 
-    public void verifyResetToken(String token) {
-        String email = jwtUtil.parseClaims(token).getSubject();
-
-        ResetPasswordToken resetPasswordToken = this.resetPasswordTokenRepository.findById(email)
-                .orElseThrow(ResetTokenExpiredException::new);
-
-        if (!resetPasswordToken.getResetToken().equals(token)) {
-            throw new TokenInvalidException();
-        }
-    }
+		if (!resetPasswordToken.getResetToken().equals(token)) {
+			throw new TokenInvalidException();
+		}
+	}
 
 }
