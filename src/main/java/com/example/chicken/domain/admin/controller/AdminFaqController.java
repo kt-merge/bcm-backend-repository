@@ -22,9 +22,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * FAQ 관련 API 컨트롤러
- */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
