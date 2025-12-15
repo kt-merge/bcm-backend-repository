@@ -18,7 +18,6 @@ import com.example.chicken.ChickenApplication;
 import com.example.chicken.common.jwt.JwtTokenProvider;
 import com.example.chicken.domain.auth.entity.user.Role;
 import com.example.chicken.domain.auth.entity.user.User;
-import com.example.chicken.dto.UpdateUserNicknameDto;
 import com.example.chicken.domain.auth.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -63,7 +62,7 @@ class UserControllerTest {
 
 		this.userRepository.save(user);
 
-		token = "Bearer " + tokenProvider.createJWT(email, nickname, role);
+		token = "Bearer " + tokenProvider.createAccessToken(user);
 	}
 
 	@Test

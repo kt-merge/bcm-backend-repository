@@ -8,8 +8,8 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.example.chicken.domain.auth.entity.user.Role;
 import com.example.chicken.domain.auth.dto.user.TokenResponseDto;
+import com.example.chicken.domain.auth.entity.user.User;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -40,10 +40,10 @@ public class JwtTokenProvider {
 							  SignatureAlgorithm.HS512.getJcaName());
 	}
 
-	public TokenResponseDto createTokens(String email, String nickname) {
+	public TokenResponseDto createTokens(User user) {
 		return TokenResponseDto.of(
-			createJWT(email, nickname, Role.USER),
-			createRefreshJWT(email));
+			createAccessToken(user),
+			createRefreshJWT(user.getEmail()));
 	}
 
 	public String createRefreshJWT(String email) {
@@ -60,12 +60,12 @@ public class JwtTokenProvider {
 			.compact();
 	}
 
-	public String createJWT(String email, String nickname, Role role) {
-		Claims claims = Jwts.claims().setSubject(email);
+	public String createAccessToken(User user) {
+		Claims claims = Jwts.claims().setSubject(user.getEmail());
 
-		String userRole = "ROLE_" + role.name();
+		String userRole = "ROLE_" + user.getRole();
 		claims.put("role", userRole);
-		claims.put("nickname", nickname);
+		claims.put("nickname", user.getNickname());
 		claims.put("type", "access_token");
 
 		Date now = new Date();
