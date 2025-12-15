@@ -1,7 +1,7 @@
 package com.example.chicken.domain.s3.controller;
 
 import static com.example.chicken.common.constant.PathConstant.S3.S3_PREFIX;
-import static com.example.chicken.common.constant.PathConstant.S3.UPLOAD_URLS;
+import static com.example.chicken.common.constant.PathConstant.S3.UPLOAD_URL;
 
 import com.example.chicken.domain.s3.dto.UploadUrlsRequestDto;
 import com.example.chicken.domain.s3.service.S3Provider;
@@ -22,7 +22,7 @@ public class S3Controller {
 
     private final S3Provider s3Provider;
 
-    @PostMapping(UPLOAD_URLS)
+    @PostMapping(UPLOAD_URL)
     public ResponseEntity<List<String>> putUploadUrls(@RequestBody UploadUrlsRequestDto uploadUrls) {
 
         List<String> result = this.s3Provider.generateUploadUrls(uploadUrls);
