@@ -1,6 +1,7 @@
 package com.example.chicken.domain.product.entity;
 
 import com.example.chicken.common.entity.BaseTimeEntity;
+import com.example.chicken.common.entity.DeleteStatus;
 import com.example.chicken.domain.auth.entity.user.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -23,11 +24,16 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 
 @Getter
 @Entity
 @Table(name = "products")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE products SET delete_status = 'DELETED' WHERE id = ?")
+@SQLRestriction("delete_status = 'ACTIVATED'")
 public class Product extends BaseTimeEntity {
 
     @Id
@@ -58,8 +64,11 @@ public class Product extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private ProductStatus productStatus;
 
+    @Enumerated(EnumType.STRING)
+    private final DeleteStatus deleteStatus = DeleteStatus.ACTIVATED;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    final private List<ProductImage> images = new ArrayList<>();
+    private final List<ProductImage> images = new ArrayList<>();
 
     @JoinColumn(name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY)

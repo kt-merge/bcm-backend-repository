@@ -1,6 +1,7 @@
 package com.example.chicken.domain.auth.entity.user;
 
 import com.example.chicken.common.entity.BaseTimeEntity;
+import com.example.chicken.common.entity.DeleteStatus;
 import com.example.chicken.domain.admin.dto.UpdateUserInfoByAdminDto;
 import com.example.chicken.domain.auth.dto.user.UpdateUserInfoDto;
 import com.example.chicken.dto.UserRequestDto;
@@ -15,11 +16,15 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Entity
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE users SET delete_status = 'DELETED' WHERE id = ?")
+@SQLRestriction("delete_status = 'ACTIVATED'")
 public class User extends BaseTimeEntity {
 
     @Id
@@ -38,10 +43,14 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
+    @Enumerated(EnumType.STRING)
+    private final DeleteStatus deleteStatus = DeleteStatus.ACTIVATED;
+
     private String phoneNumber;
 
     @Builder
-    private User(String nickname, String email, String password, Role role, UserStatus status, String phoneNumber) {
+    private User(String nickname, String email, String password, Role role, UserStatus status,
+                 String phoneNumber) {
         this.nickname = nickname;
         this.email = email;
         this.password = password;
