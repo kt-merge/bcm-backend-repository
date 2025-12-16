@@ -30,12 +30,6 @@ public class AdminFaqController {
 
     private final FaqService faqService;
 
-    /**
-     * FAQ 생성
-     *
-     * @param faqRequestDto FAQ 생성 요청 DTO
-     * @return 생성된 FAQ 정보
-     */
     @PostMapping
     public ResponseEntity<FaqResponseDto> createFaq(@Valid @RequestBody FaqRequestDto faqRequestDto) {
         log.info("FAQ 생성 요청. 내용: {}", faqRequestDto);
@@ -43,25 +37,12 @@ public class AdminFaqController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdFaq);
     }
 
-    /**
-     * FAQ 목록 조회
-     *
-     * @param pageable 페이징 정보
-     * @return FAQ 목록
-     */
     @GetMapping
     public ResponseEntity<Page<FaqResponseDto>> getFaqs(Pageable pageable) {
         log.info("FAQ 목록 조회 요청");
         return ResponseEntity.ok(faqService.getFaqs(pageable));
     }
 
-    /**
-     * FAQ 수정
-     *
-     * @param faqId         수정할 FAQ ID
-     * @param faqRequestDto FAQ 수정 요청 DTO
-     * @return 수정된 FAQ
-     */
     @PutMapping(ADMIN_FAQ_ID)
     public ResponseEntity<FaqResponseDto> updateFaq(@PathVariable Long faqId,
         @Valid @RequestBody FaqRequestDto faqRequestDto) {
@@ -69,12 +50,6 @@ public class AdminFaqController {
         return ResponseEntity.ok(faqService.updateFaq(faqId, faqRequestDto));
     }
 
-    /**
-     * FAQ 삭제
-     *
-     * @param faqId 삭제할 FAQ ID
-     * @return 삭제 성공 시 204 No Content
-     */
     @DeleteMapping(ADMIN_FAQ_ID)
     public ResponseEntity<Void> deleteFaq(@PathVariable Long faqId) {
         log.info("FAQ 삭제 요청. ID: {}", faqId);

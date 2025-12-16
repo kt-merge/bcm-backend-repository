@@ -3,8 +3,8 @@ package com.example.chicken.domain.qna.controller;
 import static com.example.chicken.common.constant.PathConstant.Qna.QNA_ID;
 import static com.example.chicken.common.constant.PathConstant.Qna.QNA_PREFIX;
 
-import com.example.chicken.domain.qna.dto.QnaRequestDto;
 import com.example.chicken.domain.qna.dto.QnaResponseDto;
+import com.example.chicken.domain.qna.dto.QuestionRequestDto;
 import com.example.chicken.domain.qna.service.QnaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,51 +30,32 @@ public class QnaController {
 
     private final QnaService qnaService;
 
-    /**
-     * QNA 생성
-     *
-     * @param qnaRequestDto QNA 생성 요청 DTO
-     * @return 생성된 QNA 정보
-     */
     @PostMapping
-    public ResponseEntity<QnaResponseDto> createQna(@Valid @RequestBody QnaRequestDto qnaRequestDto) {
-        log.info("QNA 생성 요청. 내용: {}", qnaRequestDto);
-        QnaResponseDto createdQna = qnaService.createQna(qnaRequestDto);
+    public ResponseEntity<QnaResponseDto> createQuestion(@Valid @RequestBody QuestionRequestDto questionRequestDto) {
+        log.info("질문 생성 요청. 내용: {}", questionRequestDto);
+        QnaResponseDto createdQna = qnaService.createQuestion(questionRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdQna);
     }
 
-    /**
-     * QNA 목록 조회
-     *
-     * @param pageable 페이징 정보
-     * @return QNA 목록
-     */
     @GetMapping
     public ResponseEntity<Page<QnaResponseDto>> getQnas(Pageable pageable) {
         log.info("QNA 목록 조회 요청");
         return ResponseEntity.ok(qnaService.getQnas(pageable));
     }
 
-    /**
-     * QNA 수정
-     *
-     * @param qnaId         수정할 QNA ID
-     * @param qnaRequestDto QNA 수정 요청 DTO
-     * @return 수정된 QNA
-     */
-    @PutMapping(QNA_ID)
-    public ResponseEntity<QnaResponseDto> updateQna(@PathVariable Long qnaId,
-                                                    @Valid @RequestBody QnaRequestDto qnaRequestDto) {
-        log.info("QNA 수정 요청. ID: {}, 내용: {}", qnaId, qnaRequestDto);
-        return ResponseEntity.ok(qnaService.updateQna(qnaId, qnaRequestDto));
+    @GetMapping(QNA_ID)
+    public ResponseEntity<QnaResponseDto> getQna(@PathVariable Long qnaId) {
+        log.info("QNA 단일 조회 요청. ID: {}", qnaId);
+        return ResponseEntity.ok(qnaService.getQna(qnaId));
     }
 
-    /**
-     * QNA 삭제
-     *
-     * @param qnaId 삭제할 QNA ID
-     * @return 삭제 성공 시 204 No Content
-     */
+    @PutMapping(QNA_ID)
+    public ResponseEntity<QnaResponseDto> updateQuestion(@PathVariable Long qnaId,
+                                                    @Valid @RequestBody QuestionRequestDto questionRequestDto) {
+        log.info("질문 수정 요청. ID: {}, 내용: {}", qnaId, questionRequestDto);
+        return ResponseEntity.ok(qnaService.updateQuestion(qnaId, questionRequestDto));
+    }
+
     @DeleteMapping(QNA_ID)
     public ResponseEntity<Void> deleteQna(@PathVariable Long qnaId) {
         log.info("QNA 삭제 요청. ID: {}", qnaId);

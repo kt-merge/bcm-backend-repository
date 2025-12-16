@@ -1,7 +1,8 @@
 package com.example.chicken.domain.qna.service;
 
-import com.example.chicken.domain.qna.dto.QnaRequestDto;
+import com.example.chicken.domain.qna.dto.AnswerRequestDto;
 import com.example.chicken.domain.qna.dto.QnaResponseDto;
+import com.example.chicken.domain.qna.dto.QuestionRequestDto;
 import com.example.chicken.domain.qna.entity.Qna;
 import com.example.chicken.domain.qna.exception.QnaNotFoundException;
 import com.example.chicken.domain.qna.mapper.QnaMapper;
@@ -19,51 +20,53 @@ public class QnaService {
     private final QnaRepository qnaRepository;
     private final QnaMapper qnaMapper;
 
-    /**
-     * QNA 생성
-     *
-     * @param qnaRequestDto QNA 생성 요청 DTO
-     * @return 생성된 QNA 응답 DTO
-     */
+    // 사용자용 (질문)
     @Transactional
-    public QnaResponseDto createQna(QnaRequestDto qnaRequestDto) {
-        Qna qna = qnaMapper.toEntity(qnaRequestDto);
+    public QnaResponseDto createQuestion(QuestionRequestDto questionRequestDto) {
+        Qna qna = qnaMapper.toEntity(questionRequestDto);
         Qna savedQna = qnaRepository.save(qna);
         return qnaMapper.toDto(savedQna);
     }
 
-    /**
-     * QNA 목록 조회
-     *
-     * @param pageable 페이징 정보
-     * @return QNA 페이지 응답 DTO
-     */
+    @Transactional
+    public QnaResponseDto updateQuestion(Long qnaId, QuestionRequestDto questionRequestDto) {
+        Qna qna = qnaRepository.findById(qnaId)
+            .orElseThrow(() -> new QnaNotFoundException("해당 QNA를 찾을 수 없습니다. id=" + qnaId));
+        qna.updateQuestion(questionRequestDto);
+        return qnaMapper.toDto(qna);
+    }
+
+    // 관리자용 (답변)
+    @Transactional
+    public QnaResponseDto createAnswer(Long qnaId, AnswerRequestDto answerRequestDto) {
+        Qna qna = qnaRepository.findById(qnaId)
+                .orElseThrow(() -> new QnaNotFoundException("해당 QNA를 찾을 수 없습니다. id=" + qnaId));
+        qna.updateAnswer(answerRequestDto);
+        return qnaMapper.toDto(qna);
+    }
+
+    @Transactional
+    public QnaResponseDto updateAnswer(Long qnaId, AnswerRequestDto answerRequestDto) {
+        Qna qna = qnaRepository.findById(qnaId)
+                .orElseThrow(() -> new QnaNotFoundException("해당 QNA를 찾을 수 없습니다. id=" + qnaId));
+        qna.updateAnswer(answerRequestDto);
+        return qnaMapper.toDto(qna);
+    }
+
+    // 공용 (조회, 삭제)
+    @Transactional(readOnly = true)
+    public QnaResponseDto getQna(Long qnaId) {
+        Qna qna = qnaRepository.findById(qnaId)
+            .orElseThrow(() -> new QnaNotFoundException("해당 QNA를 찾을 수 없습니다. id=" + qnaId));
+        return qnaMapper.toDto(qna);
+    }
+
     @Transactional(readOnly = true)
     public Page<QnaResponseDto> getQnas(Pageable pageable) {
         Page<Qna> qnas = qnaRepository.findAll(pageable);
         return qnas.map(qnaMapper::toDto);
     }
 
-    /**
-     * QNA 수정
-     *
-     * @param qnaId         수정할 QNA ID
-     * @param qnaRequestDto QNA 수정 요청 DTO
-     * @return 수정된 QNA 응답 DTO
-     */
-    @Transactional
-    public QnaResponseDto updateQna(Long qnaId, QnaRequestDto qnaRequestDto) {
-        Qna qna = qnaRepository.findById(qnaId)
-            .orElseThrow(() -> new QnaNotFoundException("해당 QNA를 찾을 수 없습니다. id=" + qnaId));
-        qna.updateQna(qnaRequestDto);
-        return qnaMapper.toDto(qna);
-    }
-
-    /**
-     * QNA 삭제
-     *
-     * @param qnaId 삭제할 QNA ID
-     */
     @Transactional
     public void deleteQna(Long qnaId) {
         Qna qna = qnaRepository.findById(qnaId)

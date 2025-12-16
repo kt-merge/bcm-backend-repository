@@ -125,6 +125,7 @@ public class PathConstant {
         public static final String ADMIN_PRODUCTS_ID = "/{productId}";
         public static final String ADMIN_FAQ_ID = "/{faqId}";
         public static final String ADMIN_QNA_ID = "/{qnaId}";
+        public static final String ADMIN_QNA_ANSWER = ADMIN_QNA_ID + "/answer";
         public static final String ADMIN_CATEGORIES_ID = "/{categoryId}";
 
         public static final String ADMIN_STATISTICS_PREFIX = ADMIN_PREFIX + "/statistics";

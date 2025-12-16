@@ -1,7 +1,8 @@
 package com.example.chicken.domain.qna.entity;
 
 import com.example.chicken.common.entity.BaseTimeEntity;
-import com.example.chicken.domain.qna.dto.QnaRequestDto;
+import com.example.chicken.domain.qna.dto.AnswerRequestDto;
+import com.example.chicken.domain.qna.dto.QuestionRequestDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,8 +34,11 @@ public class Qna extends BaseTimeEntity {
         this.answer = answer;
     }
 
-    public void updateQna(QnaRequestDto qnaRequestDto) {
+    public void updateQuestion(QuestionRequestDto qnaRequestDto) {
         this.question = qnaRequestDto.question();
-        this.answer = qnaRequestDto.answer();
+    }
+
+    public void updateAnswer(AnswerRequestDto answerRequestDto) {
+        this.answer = answerRequestDto.answer();
     }
 }

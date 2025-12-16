@@ -1,6 +1,6 @@
 package com.example.chicken.domain.qna.mapper;
 
-import com.example.chicken.domain.qna.dto.QnaRequestDto;
+import com.example.chicken.domain.qna.dto.QuestionRequestDto;
 import com.example.chicken.domain.qna.dto.QnaResponseDto;
 import com.example.chicken.domain.qna.entity.Qna;
 import org.springframework.stereotype.Component;
@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class QnaMapper {
 
-    public Qna toEntity(QnaRequestDto dto) {
+    public Qna toEntity(QuestionRequestDto dto) {
         return Qna.builder()
                 .question(dto.question())
-                .answer(dto.answer())
+                .answer(null)
                 .build();
     }
 
