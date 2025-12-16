@@ -65,10 +65,10 @@ public class Product extends BaseTimeEntity {
     private ProductStatus productStatus;
 
     @Enumerated(EnumType.STRING)
-    private DeleteStatus deleteStatus;
+    private final DeleteStatus deleteStatus = DeleteStatus.ACTIVATED;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    final private List<ProductImage> images = new ArrayList<>();
+    private final List<ProductImage> images = new ArrayList<>();
 
     @JoinColumn(name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -84,7 +84,6 @@ public class Product extends BaseTimeEntity {
                     LocalDateTime bidEndDate,
                     BidStatus bidStatus,
                     ProductStatus productStatus,
-                    DeleteStatus deleteStatus,
                     User user) {
         this.name = name;
         this.description = description;
@@ -95,7 +94,6 @@ public class Product extends BaseTimeEntity {
         this.bidStatus = bidStatus;
         this.bidEndDate = bidEndDate;
         this.productStatus = productStatus;
-        this.deleteStatus = deleteStatus;
         this.user = user;
     }
 

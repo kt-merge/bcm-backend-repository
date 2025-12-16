@@ -44,19 +44,18 @@ public class User extends BaseTimeEntity {
     private UserStatus status;
 
     @Enumerated(EnumType.STRING)
-    private DeleteStatus deleteStatus;
+    private final DeleteStatus deleteStatus = DeleteStatus.ACTIVATED;
 
     private String phoneNumber;
 
     @Builder
     private User(String nickname, String email, String password, Role role, UserStatus status,
-                 DeleteStatus deleteStatus, String phoneNumber) {
+                 String phoneNumber) {
         this.nickname = nickname;
         this.email = email;
         this.password = password;
         this.role = role;
         this.status = status;
-        this.deleteStatus = deleteStatus;
         this.phoneNumber = phoneNumber;
     }
 

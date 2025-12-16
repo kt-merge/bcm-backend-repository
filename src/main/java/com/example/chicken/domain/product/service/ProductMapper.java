@@ -1,6 +1,5 @@
 package com.example.chicken.domain.product.service;
 
-import com.example.chicken.common.entity.DeleteStatus;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.product.dto.CategoryResponseDto;
 import com.example.chicken.domain.product.dto.ProductBidInfoResponseDto;
@@ -26,7 +25,6 @@ public class ProductMapper {
                 .startPrice(request.price())
                 .bidPrice(request.price())
                 .bidCount(0L)
-                .deleteStatus(DeleteStatus.ACTIVATED)
                 .bidStatus(BidStatus.NOT_BIDDED)
                 .productStatus(request.productStatus())
                 .bidEndDate(request.bidEndDate())
