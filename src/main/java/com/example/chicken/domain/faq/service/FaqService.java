@@ -19,12 +19,6 @@ public class FaqService {
     private final FaqRepository faqRepository;
     private final FaqMapper faqMapper;
 
-    /**
-     * FAQ 생성
-     *
-     * @param faqRequestDto FAQ 생성 요청 DTO
-     * @return 생성된 FAQ 응답 DTO
-     */
     @Transactional
     public FaqResponseDto createFaq(FaqRequestDto faqRequestDto) {
         Faq faq = faqMapper.toEntity(faqRequestDto);
@@ -32,25 +26,12 @@ public class FaqService {
         return faqMapper.toDto(savedFaq);
     }
 
-    /**
-     * FAQ 목록 조회
-     *
-     * @param pageable 페이징 정보
-     * @return FAQ 페이지 응답 DTO
-     */
     @Transactional(readOnly = true)
     public Page<FaqResponseDto> getFaqs(Pageable pageable) {
         Page<Faq> faqs = faqRepository.findAll(pageable);
         return faqs.map(faqMapper::toDto);
     }
 
-    /**
-     * FAQ 수정
-     *
-     * @param faqId         수정할 FAQ ID
-     * @param faqRequestDto FAQ 수정 요청 DTO
-     * @return 수정된 FAQ 응답 DTO
-     */
     @Transactional
     public FaqResponseDto updateFaq(Long faqId, FaqRequestDto faqRequestDto) {
         Faq faq = faqRepository.findById(faqId)
@@ -59,11 +40,6 @@ public class FaqService {
         return faqMapper.toDto(faq);
     }
 
-    /**
-     * FAQ 삭제
-     *
-     * @param faqId 삭제할 FAQ ID
-     */
     @Transactional
     public void deleteFaq(Long faqId) {
         Faq faq = faqRepository.findById(faqId)
