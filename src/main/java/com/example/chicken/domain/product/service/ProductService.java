@@ -58,12 +58,14 @@ public class ProductService {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
+        String thumbnailUrl = this.s3BucketUrl + request.thumbnail();
+
         User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
 
         Category category = this.categoryRepository.findById(request.categoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(request.categoryId().toString()));
 
-        Product product = this.productMapper.toEntity(request, user, category);
+        Product product = this.productMapper.toEntity(request, thumbnailUrl, user, category);
 
         List<ProductImage> productImages = request.imageUrls()
                 .stream()
@@ -153,6 +155,9 @@ public class ProductService {
         Category category = categoryRepository.findById(request.categoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(request.categoryId().toString()));
 
+        String thumbnail =
+                request.thumbnail().startsWith("http") ? request.thumbnail() : s3BucketUrl + request.thumbnail();
+
         List<ProductImage> productImages = request.imageUrls()
                 .stream()
                 .map(url -> {
@@ -169,6 +174,7 @@ public class ProductService {
                 category,
                 request.productStatus(),
                 request.bidEndDate(),
+                thumbnail,
                 productImages
         );
 

@@ -17,12 +17,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProductMapper {
 
-    public Product toEntity(ProductRequestDto request, User user, Category category) {
+    public Product toEntity(ProductRequestDto request, String thumbnail, User user, Category category) {
         return Product.builder()
                 .name(request.name())
                 .description(request.description())
                 .category(category)
                 .startPrice(request.price())
+                .thumbnail(thumbnail)
                 .bidPrice(request.price())
                 .bidCount(0L)
                 .bidStatus(BidStatus.NOT_BIDDED)
@@ -50,6 +51,7 @@ public class ProductMapper {
                 .modifiedAt(product.getModifiedAt())
                 .bidEndDate(product.getBidEndDate())
                 .productBids(new ArrayList<>())
+                .thumbnail(product.getThumbnail())
                 .build();
     }
 
@@ -72,6 +74,7 @@ public class ProductMapper {
                 .modifiedAt(product.getModifiedAt())
                 .bidEndDate(product.getBidEndDate())
                 .productBids(productBids)
+                .thumbnail(product.getThumbnail())
                 .build();
     }
 

@@ -12,6 +12,8 @@ public record ProductUpdateRequestDto(@NotBlank String name,
                                       Long categoryId,
                                       ProductStatus productStatus,
                                       LocalDateTime bidEndDate,
+                                      @NotBlank
+                                      String thumbnail,
                                       @NotNull
                                       @Size(min = 1, max = 100)
                                       List<String> imageUrls) {

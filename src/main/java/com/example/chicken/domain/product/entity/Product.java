@@ -67,6 +67,9 @@ public class Product extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private final DeleteStatus deleteStatus = DeleteStatus.ACTIVATED;
 
+    @Column(length = 1000)
+    private String thumbnail;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ProductImage> images = new ArrayList<>();
 
@@ -84,6 +87,7 @@ public class Product extends BaseTimeEntity {
                     LocalDateTime bidEndDate,
                     BidStatus bidStatus,
                     ProductStatus productStatus,
+                    String thumbnail,
                     User user) {
         this.name = name;
         this.description = description;
@@ -94,6 +98,7 @@ public class Product extends BaseTimeEntity {
         this.bidStatus = bidStatus;
         this.bidEndDate = bidEndDate;
         this.productStatus = productStatus;
+        this.thumbnail = thumbnail;
         this.user = user;
     }
 
@@ -119,12 +124,14 @@ public class Product extends BaseTimeEntity {
                               Category category,
                               ProductStatus productStatus,
                               LocalDateTime bidEndDate,
+                              String thumbnail,
                               List<ProductImage> productImages) {
         this.name = name;
         this.description = description;
         this.category = category;
         this.bidEndDate = bidEndDate;
         this.productStatus = productStatus;
+        this.thumbnail = thumbnail;
         this.updateImages(productImages);
     }
 
