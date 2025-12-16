@@ -14,6 +14,7 @@ public record ProductRequestDto(@NotBlank String name,
                                 BigDecimal price,
                                 ProductStatus productStatus,
                                 LocalDateTime bidEndDate,
+                                @NotBlank String thumbnail,
                                 @NotNull
                                 @Size(min = 1, max = 100)
                                 List<String> imageUrls) {

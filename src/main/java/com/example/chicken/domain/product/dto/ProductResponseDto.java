@@ -12,6 +12,7 @@ import lombok.Builder;
 public record ProductResponseDto(Long id, String name, String description, CategoryResponseDto category,
                                  BigDecimal startPrice,
                                  BigDecimal bidPrice, Long bidCount, BidStatus bidStatus, ProductStatus productStatus,
+                                 String thumbnail,
                                  List<ProductImageResponseDto> imageUrls, UserResponseDto user, LocalDateTime createdAt,
                                  LocalDateTime modifiedAt, LocalDateTime bidEndDate,
                                  List<ProductBidInfoResponseDto> productBids) {
