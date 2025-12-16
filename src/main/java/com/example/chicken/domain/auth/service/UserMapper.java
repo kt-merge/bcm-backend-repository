@@ -1,5 +1,6 @@
 package com.example.chicken.domain.auth.service;
 
+import com.example.chicken.common.entity.DeleteStatus;
 import com.example.chicken.domain.auth.dto.user.WinnerResponseDto;
 import com.example.chicken.domain.auth.entity.user.Role;
 import com.example.chicken.domain.auth.entity.user.User;
@@ -22,6 +23,7 @@ public class UserMapper {
                 .password(request.password())
                 .role(Role.USER)
                 .status(UserStatus.PENDING)
+                .deleteStatus(DeleteStatus.ACTIVATED)
                 .phoneNumber(request.phoneNumber())
                 .build();
     }
