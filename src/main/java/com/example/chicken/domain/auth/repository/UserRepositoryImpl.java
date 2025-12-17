@@ -3,6 +3,7 @@ package com.example.chicken.domain.auth.repository;
 import static com.example.chicken.domain.auth.entity.user.QUser.user;
 
 import com.example.chicken.domain.admin.dto.UserSearchCondition;
+import com.example.chicken.domain.auth.entity.user.Role;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.entity.user.UserStatus;
 import com.querydsl.core.types.Predicate;
@@ -22,22 +23,19 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     @Override
     public Page<User> searchUsers(UserSearchCondition condition, Pageable pageable) {
 
-        Long userId = condition.userId();
-        String nickname = condition.nickname();
-        String email = condition.email();
-        String phoneNumber = condition.phoneNumber();
-        UserStatus userStatus = condition.userStatus();
+        Predicate[] searchConditions = {
+                hasUserIdContaining(condition.userId()),
+                hasNameContaining(condition.nickname()),
+                hasEmailContaining(condition.email()),
+                hasPhoneNumberContaining(condition.phoneNumber()),
+                equalsUserStatus(condition.userStatus()),
+                equalsRole(condition.role())
+        };
 
         List<User> result = queryFactory
                 .select(user)
                 .from(user)
-                .where(
-                        hasUserIdContaining(userId),
-                        hasNameContaining(nickname),
-                        hasEmailContaining(email),
-                        hasPhoneNumberContaining(phoneNumber),
-                        hasUserStatusContaining(userStatus)
-                )
+                .where(searchConditions)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -45,13 +43,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
         JPAQuery<Long> countQuery = queryFactory
                 .select(user.count())
                 .from(user)
-                .where(
-                        hasUserIdContaining(userId),
-                        hasNameContaining(nickname),
-                        hasEmailContaining(email),
-                        hasPhoneNumberContaining(phoneNumber),
-                        hasUserStatusContaining(userStatus)
-                );
+                .where(searchConditions);
 
         return PageableExecutionUtils.getPage(result, pageable, countQuery::fetchOne);
     }
@@ -72,8 +64,13 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
         return phoneNumber != null ? user.phoneNumber.contains(phoneNumber) : null;
     }
 
-    private static Predicate hasUserStatusContaining(UserStatus userStatus) {
+    private static Predicate equalsUserStatus(UserStatus userStatus) {
         return userStatus != null ? user.status.eq(userStatus) : null;
     }
+
+    private static Predicate equalsRole(Role role) {
+        return role != null ? user.role.eq(role) : null;
+    }
+
 
 }
