@@ -131,6 +131,7 @@ public class PathConstant {
         public static final String ADMIN_STATISTICS_PREFIX = ADMIN_PREFIX + "/statistics";
         public static final String ADMIN_STATISTICS_USERS_DAILY_REGISTRATIONS = "/users/daily-registrations";
         public static final String ADMIN_STATISTICS_PRODUCTS_DAILY_REGISTRATIONS = "/products/daily-registrations";
+        public static final String ADMIN_STATISTICS_BIDS_DAILY_REGISTRATIONS = "/bids/daily-registrations";
     }
 
 }
