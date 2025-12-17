@@ -13,8 +13,6 @@ import com.example.chicken.domain.auth.entity.token.RefreshToken;
 import com.example.chicken.domain.auth.entity.user.Role;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.repository.RefreshTokenRepository;
-import com.example.chicken.domain.auth.repository.UserRepository;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +31,7 @@ class AuthServiceTest {
     private JwtTokenProvider tokenProvider;
 
     @Mock
-    private UserRepository userRepository;
+    private UserQueryService userQueryService;
 
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
@@ -58,7 +56,7 @@ class AuthServiceTest {
                 .role(Role.ADMIN)
                 .build();
 
-        given(this.userRepository.findByEmail(email)).willReturn(Optional.of(adminUser));
+        given(this.userQueryService.getUserByEmail(email)).willReturn(adminUser);
         given(this.passwordEncoder.matches(password, encodedPassword)).willReturn(true);
 
         String accessToken = "access-token";
@@ -92,7 +90,7 @@ class AuthServiceTest {
                 .role(Role.USER)
                 .build();
 
-        given(this.userRepository.findByEmail(email)).willReturn(Optional.of(normalUser));
+        given(this.userQueryService.getUserByEmail(email)).willReturn(normalUser);
 
         assertThrows(RoleNotAllowedException.class, () -> this.authService.signInAdmin(requestDto));
     }

@@ -14,7 +14,6 @@ import com.example.chicken.domain.auth.exception.PasswordNotMatchedException;
 import com.example.chicken.domain.auth.exception.RefreshTokenNotFoundException;
 import com.example.chicken.domain.auth.exception.ResetTokenExpiredException;
 import com.example.chicken.domain.auth.exception.TokenInvalidException;
-import com.example.chicken.domain.auth.exception.UserAlreadyExists;
 import com.example.chicken.domain.auth.exception.UserNotFoundException;
 import com.example.chicken.domain.auth.repository.RefreshTokenRepository;
 import com.example.chicken.domain.auth.repository.ResetPasswordTokenRepository;
@@ -37,20 +36,19 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final ResetPasswordTokenRepository resetPasswordTokenRepository;
-    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final JwtUtil jwtUtil;
+    private final UserMapper userMapper;
     private final TokenMapper tokenMapper;
+    private final UserQueryService userQueryService;
 
     @Transactional
     public UserResponseDto signUp(UserRequestDto request) {
 
-        if (this.userRepository.existsByEmail(request.email())) {
-            throw new UserAlreadyExists();
-        }
+        this.userQueryService.checkUserExistsByEmail(request.email());
 
-        User user = User.from(request);
+        User user = userMapper.toEntity(request);
 
         user.updatePassword(passwordEncoder.encode(request.password()));
 
@@ -62,33 +60,31 @@ public class AuthService {
 
     @Transactional
     public SignInResponseDto signInAdmin(SignInRequestDto request) {
-        String email = request.email();
+        User user = this.userQueryService.getUserByEmail(request.email());
 
-        User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+        validateSignInRequest(request, user, Role.ADMIN);
 
-        if (user.getRole() != Role.ADMIN) {
+        return createTokens(user);
+
+    }
+
+    @Transactional
+    public SignInResponseDto signIn(SignInRequestDto request) {
+        User user = this.userQueryService.getUserByEmail(request.email());
+
+        validateSignInRequest(request, user, Role.USER);
+
+        return createTokens(user);
+    }
+
+    private void validateSignInRequest(SignInRequestDto request, User user, Role role) {
+        if (user.getRole() != role) {
             throw new RoleNotAllowedException();
         }
 
         if (!this.passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new PasswordNotMatchedException();
         }
-
-        return createTokens(user);
-    }
-
-    @Transactional
-    public SignInResponseDto signIn(SignInRequestDto request) {
-        String email = request.email();
-
-        User user = this.userRepository.findByEmail(email).orElseThrow(() ->
-                new UserNotFoundException(email));
-
-        if (!this.passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new PasswordNotMatchedException();
-        }
-
-        return createTokens(user);
     }
 
     private SignInResponseDto createTokens(User user) {
@@ -115,7 +111,7 @@ public class AuthService {
             throw new TokenInvalidException();
         }
 
-        User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+        User user = this.userQueryService.getUserByEmail(email);
 
         String newAccessToken = this.tokenProvider.createAccessToken(user);
         String newRefreshToken = this.tokenProvider.createRefreshJWT(email);
@@ -136,9 +132,8 @@ public class AuthService {
 
     @Transactional
     public void requestPasswordReset(String email) {
-        boolean isUserExists = this.userRepository.existsByEmail(email);
 
-        if (!isUserExists) {
+        if (!this.userQueryService.isUserExistsByEmail(email)) {
             throw new UserNotFoundException(email);
         }
 
