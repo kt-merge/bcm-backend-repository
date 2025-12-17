@@ -29,4 +29,7 @@ public class UserQueryService {
         return this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
     }
 
+    public User getUserById(Long id) {
+        return this.userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id.toString()));
+    }
 }
