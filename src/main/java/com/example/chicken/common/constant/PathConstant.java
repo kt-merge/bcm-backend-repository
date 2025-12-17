@@ -96,13 +96,19 @@ public class PathConstant {
     }
 
     public static class Faq {
-        private Faq() { throw new IllegalStateException(ERROR_MESSAGE); }
+        private Faq() {
+            throw new IllegalStateException(ERROR_MESSAGE);
+        }
+
         public static final String FAQ_PREFIX = "/api/faq";
         public static final String FAQ_ID = "/{faqId}";
     }
 
     public static class Qna {
-        private Qna() { throw new IllegalStateException(ERROR_MESSAGE); }
+        private Qna() {
+            throw new IllegalStateException(ERROR_MESSAGE);
+        }
+
         public static final String QNA_PREFIX = "/api/qna";
         public static final String QNA_ID = "/{qnaId}";
     }
@@ -115,6 +121,7 @@ public class PathConstant {
 
         public static final String ADMIN_PREFIX = "/api/admin";
 
+        public static final String ADMIN_AUTH_PREFIX = ADMIN_PREFIX + "/auth";
         public static final String ADMIN_USERS_PREFIX = ADMIN_PREFIX + "/users";
         public static final String ADMIN_PRODUCTS_PREFIX = ADMIN_PREFIX + "/products";
         public static final String ADMIN_FAQ_PREFIX = ADMIN_PREFIX + "/faq";
