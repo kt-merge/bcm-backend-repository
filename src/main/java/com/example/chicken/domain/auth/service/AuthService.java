@@ -59,30 +59,22 @@ public class AuthService {
     }
 
     @Transactional
-    public SignInResponseDto signInAdmin(SignInRequestDto request) {
-        User user = this.userQueryService.getUserByEmail(request.email());
-
-        validateSignInRequest(request, user, Role.ADMIN);
-
-        return createTokens(user);
-
-    }
-
-    @Transactional
     public SignInResponseDto signIn(SignInRequestDto request) {
-        User user = this.userQueryService.getUserByEmail(request.email());
+        User storedUser = userQueryService.getUserByEmail(request.email());
 
-        validateSignInRequest(request, user, Role.USER);
+        Role expectedRole = request.userType() == Role.ADMIN ? Role.ADMIN : Role.USER;
 
-        return createTokens(user);
+        ensureSignInAllowed(request, storedUser, expectedRole);
+
+        return createTokens(storedUser);
     }
 
-    private void validateSignInRequest(SignInRequestDto request, User user, Role role) {
-        if (user.getRole() != role) {
+    private void ensureSignInAllowed(SignInRequestDto signInRequest, User storedUser, Role expectedRole) {
+        if (storedUser.getRole() != expectedRole) {
             throw new RoleNotAllowedException();
         }
 
-        if (!this.passwordEncoder.matches(request.password(), user.getPassword())) {
+        if (!this.passwordEncoder.matches(signInRequest.password(), storedUser.getPassword())) {
             throw new PasswordNotMatchedException();
         }
     }

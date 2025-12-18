@@ -47,7 +47,7 @@ class AuthServiceTest {
         String password = "password1234";
         Boolean rememberMe = true;
 
-        SignInRequestDto requestDto = new SignInRequestDto(email, password, rememberMe);
+        SignInRequestDto requestDto = new SignInRequestDto(email, password, rememberMe, Role.ADMIN);
 
         String encodedPassword = "encodedPassword";
         User adminUser = User.builder()
@@ -67,7 +67,7 @@ class AuthServiceTest {
         given(this.refreshTokenRepository.save(any(RefreshToken.class)))
                 .willReturn(RefreshToken.of(email, refreshToken));
         //when
-        SignInResponseDto responseDto = this.authService.signInAdmin(requestDto);
+        SignInResponseDto responseDto = this.authService.signIn(requestDto);
 
         //then
         assertThat(responseDto).isNotNull();
@@ -82,7 +82,7 @@ class AuthServiceTest {
         String password = "password1234";
         Boolean rememberMe = true;
 
-        SignInRequestDto requestDto = new SignInRequestDto(email, password, rememberMe);
+        SignInRequestDto requestDto = new SignInRequestDto(email, password, rememberMe, Role.ADMIN);
 
         User normalUser = User.builder()
                 .email(email)
@@ -92,7 +92,7 @@ class AuthServiceTest {
 
         given(this.userQueryService.getUserByEmail(email)).willReturn(normalUser);
 
-        assertThrows(RoleNotAllowedException.class, () -> this.authService.signInAdmin(requestDto));
+        assertThrows(RoleNotAllowedException.class, () -> this.authService.signIn(requestDto));
     }
 
 }
