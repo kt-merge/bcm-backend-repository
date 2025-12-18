@@ -7,5 +7,5 @@ public record CategoryCountResponseDto(Long id,
                                        String name,
                                        LocalDateTime createdAt,
                                        LocalDateTime modifiedAt,
-                                       Integer productCount) {
+                                       Long productCount) {
 }

@@ -43,8 +43,8 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
-                .select(product.count())
-                .from(product);
+                .select(category.count())
+                .from(category);
 
         return PageableExecutionUtils.getPage(result, pageable, countQuery::fetchOne);
     }
