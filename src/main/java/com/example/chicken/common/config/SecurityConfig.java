@@ -3,6 +3,7 @@ package com.example.chicken.common.config;
 import static com.example.chicken.common.config.SecurityConstants.ADMIN_WHITELIST;
 import static com.example.chicken.common.config.SecurityConstants.ALLOWED_METHODS;
 import static com.example.chicken.common.config.SecurityConstants.AUTH_WHITELIST;
+import static com.example.chicken.common.config.SecurityConstants.COMMON_WHITELIST;
 import static com.example.chicken.common.config.SecurityConstants.USER_WHITELIST;
 
 import com.example.chicken.domain.auth.entity.user.Role;
@@ -41,6 +42,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .requestMatchers(COMMON_WHITELIST).hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                         .requestMatchers(ADMIN_WHITELIST).hasRole(Role.ADMIN.name())
                         .requestMatchers(USER_WHITELIST).hasAnyRole(Role.USER.name())
                         .anyRequest().authenticated())
