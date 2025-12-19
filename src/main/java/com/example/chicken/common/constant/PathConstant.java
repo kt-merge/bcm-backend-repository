@@ -112,6 +112,7 @@ public class PathConstant {
     public static class Admin {
 
         public static final String ADMIN_PREFIX = "/api/admin";
+        public static final String ADMIN_AUTH_PREFIX = ADMIN_PREFIX + "/auth";
         public static final String ADMIN_USERS_PREFIX = ADMIN_PREFIX + "/users";
         public static final String ADMIN_PRODUCTS_PREFIX = ADMIN_PREFIX + "/products";
         public static final String ADMIN_ANNOUNCEMENT_PREFIX = ADMIN_PREFIX + "/announcements";
@@ -128,9 +129,12 @@ public class PathConstant {
         public static final String ADMIN_STATISTICS_PREFIX = ADMIN_PREFIX + "/statistics";
         public static final String ADMIN_STATISTICS_USERS_DAILY_REGISTRATIONS = "/users/daily-registrations";
         public static final String ADMIN_STATISTICS_PRODUCTS_DAILY_REGISTRATIONS = "/products/daily-registrations";
+        public static final String ADMIN_STATISTICS_BIDS_DAILY_REGISTRATIONS = "/bids/daily-registrations";
+      
         private Admin() {
             throw new IllegalStateException(ERROR_MESSAGE);
         }
+     
     }
 
 }

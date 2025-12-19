@@ -3,8 +3,10 @@ package com.example.chicken.domain.admin.controller;
 import static com.example.chicken.common.constant.PathConstant.Admin.ADMIN_CATEGORIES_ID;
 import static com.example.chicken.common.constant.PathConstant.Admin.ADMIN_CATEGORIES_PREFIX;
 
+import com.example.chicken.domain.product.dto.CategoryCountResponseDto;
 import com.example.chicken.domain.product.dto.CategoryRequestDto;
 import com.example.chicken.domain.product.dto.CategoryResponseDto;
+import com.example.chicken.domain.product.service.CategoryQueryService;
 import com.example.chicken.domain.product.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(ADMIN_CATEGORIES_PREFIX)
 public class AdminCategoryController {
 
+    private final CategoryQueryService categoryQueryService;
     private final CategoryService categoryService;
 
     @PostMapping
@@ -35,10 +38,8 @@ public class AdminCategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<CategoryResponseDto>> getCategories(Pageable pageable) {
-        Page<CategoryResponseDto> result = categoryService.getCategories(pageable);
-
-        return ResponseEntity.ok(result);
+    public ResponseEntity<Page<CategoryCountResponseDto>> getCategories(Pageable pageable) {
+        return ResponseEntity.ok(categoryQueryService.getCategories(pageable));
     }
 
     @PatchMapping(ADMIN_CATEGORIES_ID)
