@@ -2,6 +2,7 @@ package com.example.chicken.common.service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +31,7 @@ public class S3UrlProvider {
 
         return filenames.stream()
                 .map(this::generateUrl)
+                .filter(Objects::nonNull)
                 .toList();
     }
 
