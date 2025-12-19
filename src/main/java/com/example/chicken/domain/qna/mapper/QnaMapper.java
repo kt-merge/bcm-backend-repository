@@ -1,7 +1,7 @@
 package com.example.chicken.domain.qna.mapper;
 
-import com.example.chicken.domain.qna.dto.QuestionRequestDto;
 import com.example.chicken.domain.qna.dto.QnaResponseDto;
+import com.example.chicken.domain.qna.dto.QuestionRequestDto;
 import com.example.chicken.domain.qna.entity.Qna;
 import org.springframework.stereotype.Component;
 
