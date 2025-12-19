@@ -102,6 +102,23 @@ public class Product extends BaseTimeEntity {
         this.user = user;
     }
 
+    public void addImageUrls(List<String> imageUrls) {
+        if (imageUrls == null || imageUrls.isEmpty()) {
+            return;
+        }
+
+        imageUrls.stream()
+                .map(url -> ProductImage.builder()
+                        .imageUrl(url)
+                        .build())
+                .forEach(this::addProductImage);
+    }
+
+    private void addProductImage(ProductImage productImage) {
+        this.images.add(productImage);
+        productImage.assignProduct(this);
+    }
+
     public boolean isBidPriceLowerThan(BigDecimal price) {
         return this.bidPrice.compareTo(price) < 0;
     }
@@ -112,11 +129,6 @@ public class Product extends BaseTimeEntity {
 
     public void updateBidPrice(BigDecimal price) {
         this.bidPrice = price;
-    }
-
-    public void updateImages(List<ProductImage> images) {
-        this.images.clear();
-        this.images.addAll(images);
     }
 
     public void updateProduct(String name,
@@ -133,6 +145,11 @@ public class Product extends BaseTimeEntity {
         this.productStatus = productStatus;
         this.thumbnail = thumbnail;
         this.updateImages(productImages);
+    }
+
+    private void updateImages(List<ProductImage> images) {
+        this.images.clear();
+        this.images.addAll(images);
     }
 
     public void incrementBidCount() {
