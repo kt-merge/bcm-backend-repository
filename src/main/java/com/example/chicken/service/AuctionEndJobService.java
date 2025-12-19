@@ -1,11 +1,5 @@
 package com.example.chicken.service;
 
-import java.util.Optional;
-
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.order.entity.Order;
 import com.example.chicken.domain.order.repository.OrderRepository;
@@ -15,48 +9,61 @@ import com.example.chicken.domain.product.entity.BidStatus;
 import com.example.chicken.domain.product.entity.HighestBidder;
 import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.entity.ProductBid;
-import com.example.chicken.domain.product.exception.ProductNotFoundException;
 import com.example.chicken.domain.product.repository.HighestBidderRepository;
 import com.example.chicken.domain.product.repository.ProductBidRepository;
 import com.example.chicken.domain.product.repository.ProductRepository;
 import com.example.chicken.dto.mail.AuctionWonEvent;
-
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuctionEndJobService {
 
-	private final ProductRepository productRepository;
-	private final ProductBidRepository productBidRepository;
-	private final HighestBidderRepository highestBidderRepository;
-	private final OrderRepository orderRepository;
-	private final PaymentRepository paymentRepository;
-	private final ApplicationEventPublisher eventPublisher;
-	@Transactional
-	public void endProductAuction(Long productId) {
+    private final ProductRepository productRepository;
+    private final ProductBidRepository productBidRepository;
+    private final HighestBidderRepository highestBidderRepository;
+    private final OrderRepository orderRepository;
+    private final PaymentRepository paymentRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
-		Product product = this.productRepository.findById(productId)
-			.orElseThrow(() -> new ProductNotFoundException(productId.toString()));
+    @Transactional
+    public void endProductAuction(Long productId) {
 
-		if (product.getBidStatus() == BidStatus.COMPLETED) return;
+        Product product = this.productRepository.findById(productId)
+                .orElseGet(() -> {
+                    log.warn("프로덕트 ID {}번 존재하지 않음", productId);
+                    return null;
+                });
 
-		Optional<ProductBid> productBid = this.productBidRepository.findTopByProductIdOrderByPriceDesc(product.getId());
+        if (product == null || product.getBidStatus() == BidStatus.COMPLETED) {
+            return;
+        }
 
-		if (productBid.isPresent()) {
-			User user = productBid.get().getUser();
+        Optional<ProductBid> productBid = this.productBidRepository.findTopByProductIdOrderByPriceDesc(product.getId());
 
-			this.highestBidderRepository.save(HighestBidder.of(productBid.get(), product));
-			Order savedOrder = this.orderRepository.save(Order.pendingOrder(user, product));
-			this.paymentRepository.save(Payment.ready(user, savedOrder));
+        if (productBid.isPresent()) {
+            User user = productBid.get().getUser();
 
-			this.eventPublisher.publishEvent(new AuctionWonEvent(product.getName(), user.getEmail()));
-		}
+            this.highestBidderRepository.save(HighestBidder.of(productBid.get(), product));
+            Order savedOrder = this.orderRepository.save(Order.pendingOrder(user, product));
+            this.paymentRepository.save(Payment.ready(user, savedOrder));
 
-		if (product.getBidStatus().equals(BidStatus.NOT_BIDDED)) product.completeBid();
-		else product.waitPayment();
+            this.eventPublisher.publishEvent(new AuctionWonEvent(product.getName(), user.getEmail()));
+        }
 
-		this.productRepository.save(product);
-	}
+        if (product.getBidStatus().equals(BidStatus.NOT_BIDDED)) {
+            product.completeBid();
+        } else {
+            product.waitPayment();
+        }
+
+        this.productRepository.save(product);
+    }
 
 }
