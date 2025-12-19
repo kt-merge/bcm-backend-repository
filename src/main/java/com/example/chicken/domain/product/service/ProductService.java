@@ -1,11 +1,15 @@
 package com.example.chicken.domain.product.service;
 
+import static com.example.chicken.common.util.SecurityUtil.getCurrentUserEmail;
+
+import com.example.chicken.common.service.S3UrlProvider;
 import com.example.chicken.domain.admin.dto.DailyBidRegistrationCountDto;
 import com.example.chicken.domain.admin.dto.DailyProductRegistrationCountDto;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.exception.UserNotFoundException;
 import com.example.chicken.domain.auth.repository.UserRepository;
 import com.example.chicken.domain.auth.service.UserMapper;
+import com.example.chicken.domain.auth.service.UserQueryService;
 import com.example.chicken.domain.product.dto.ProductBidInfoResponseDto;
 import com.example.chicken.domain.product.dto.ProductBidRequestDto;
 import com.example.chicken.domain.product.dto.ProductImageResponseDto;
@@ -31,7 +35,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +45,9 @@ public class ProductService {
     @Value("${s3.product-bucket-url}")
     private String s3BucketUrl;
 
+    private final S3UrlProvider s3UrlProvider;
+    private final UserQueryService userQueryService;
+    private final CategoryQueryService categoryQueryService;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ProductBidRepository productBidRepository;
@@ -57,29 +63,19 @@ public class ProductService {
     @Transactional
     public ProductResponseDto createProduct(ProductRequestDto request) {
 
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userQueryService.getUserByEmail(getCurrentUserEmail());
+        Category category = categoryQueryService.getCategoryById(request.categoryId());
+        String thumbnailUrl = s3UrlProvider.generateUrl(request.thumbnail());
 
-        String thumbnailUrl = this.s3BucketUrl + request.thumbnail();
+        Product productEntity = productMapper.toEntity(request, thumbnailUrl, user, category);
 
-        User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+        productEntity.addImagesFromUrls(s3UrlProvider.generateUrls(request.imageUrls()));
 
-        Category category = this.categoryRepository.findById(request.categoryId())
-                .orElseThrow(() -> new CategoryNotFoundException(request.categoryId().toString()));
+        Product product = productRepository.save(productEntity);
 
-        Product product = this.productMapper.toEntity(request, thumbnailUrl, user, category);
+        this.bidScheduleService.register(product.getId(), product.getBidEndDate());
 
-        List<ProductImage> productImages = request.imageUrls()
-                .stream()
-                .map(url -> productImageMapper.toEntity(product, this.s3BucketUrl + url))
-                .toList();
-
-        product.updateImages(productImages);
-
-        Product savedProduct = this.productRepository.save(product);
-
-        this.bidScheduleService.register(savedProduct.getId(), savedProduct.getBidEndDate());
-
-        return this.convertToDto(savedProduct);
+        return this.convertToDto(product);
     }
 
     @Transactional(readOnly = true)
@@ -105,10 +101,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public List<ProductResponseDto> getMyProducts() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        User user = this.userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(email));
+        User user = userQueryService.getUserByEmail(getCurrentUserEmail());
 
         List<Product> result = this.productRepository.findTop10ByUserWithDetails(user);
 
@@ -155,7 +148,7 @@ public class ProductService {
 
         Category category = categoryRepository.findById(request.categoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(request.categoryId().toString()));
-
+        
         String thumbnail =
                 request.thumbnail().startsWith("http") ? request.thumbnail() : s3BucketUrl + request.thumbnail();
 
