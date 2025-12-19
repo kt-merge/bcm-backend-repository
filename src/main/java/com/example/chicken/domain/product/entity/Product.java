@@ -102,7 +102,7 @@ public class Product extends BaseTimeEntity {
         this.user = user;
     }
 
-    public void addImagesFromUrls(List<String> imageUrls) {
+    public void addImageUrls(List<String> imageUrls) {
         if (imageUrls == null || imageUrls.isEmpty()) {
             return;
         }

@@ -69,7 +69,7 @@ public class ProductService {
 
         Product productEntity = productMapper.toEntity(request, thumbnailUrl, user, category);
 
-        productEntity.addImagesFromUrls(s3UrlProvider.generateUrls(request.imageUrls()));
+        productEntity.addImageUrls(s3UrlProvider.generateUrls(request.imageUrls()));
 
         Product product = productRepository.save(productEntity);
 
@@ -148,7 +148,7 @@ public class ProductService {
 
         Category category = categoryRepository.findById(request.categoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(request.categoryId().toString()));
-        
+
         String thumbnail =
                 request.thumbnail().startsWith("http") ? request.thumbnail() : s3BucketUrl + request.thumbnail();
 
