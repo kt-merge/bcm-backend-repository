@@ -3,15 +3,18 @@ package com.example.chicken.domain.admin.controller;
 import static com.example.chicken.common.constant.PathConstant.Admin.ADMIN_PRODUCTS_ID;
 import static com.example.chicken.common.constant.PathConstant.Admin.ADMIN_PRODUCTS_PREFIX;
 
+import com.example.chicken.domain.product.dto.ProductRequestDto;
 import com.example.chicken.domain.product.dto.ProductResponseDto;
 import com.example.chicken.domain.product.dto.ProductUpdateRequestDto;
 import com.example.chicken.domain.product.service.ProductService;
 import jakarta.validation.Valid;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +25,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminProductController {
 
     private final ProductService productService;
+
+    @PostMapping
+    public ResponseEntity<ProductResponseDto> createProduct(@RequestBody @Valid ProductRequestDto request) {
+        ProductResponseDto result = this.productService.createProduct(request);
+
+        URI location = URI.create(result.id().toString());
+
+        return ResponseEntity.created(location).body(result);
+    }
 
     @PatchMapping(ADMIN_PRODUCTS_ID)
     public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable Long productId,

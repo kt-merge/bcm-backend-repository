@@ -5,11 +5,13 @@ import static com.example.chicken.domain.product.entity.QCategory.category;
 import static com.example.chicken.domain.product.entity.QProduct.product;
 import static com.example.chicken.domain.product.entity.QProductImage.productImage;
 
+import com.example.chicken.common.util.QueryDslUtil;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.product.dto.ProductSearchCondition;
 import com.example.chicken.domain.product.entity.BidStatus;
 import com.example.chicken.domain.product.entity.Product;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -27,6 +29,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     @Override
     public Page<Product> searchProducts(ProductSearchCondition condition, Pageable pageable) {
 
+        PathBuilder<Product> pathBuilder = new PathBuilder<>(product.getType(), product.getMetadata());
+
         Predicate[] searchConditions = {
                 equalsId(condition.id()),
                 hasNameContaining(condition.name()),
@@ -43,6 +47,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 .where(searchConditions)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(QueryDslUtil.getOrderSpecifiers(pageable, pathBuilder))
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory

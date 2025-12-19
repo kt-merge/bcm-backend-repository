@@ -1,5 +1,6 @@
 package com.example.chicken.domain.product.service;
 
+import com.example.chicken.domain.admin.dto.DailyBidRegistrationCountDto;
 import com.example.chicken.domain.admin.dto.DailyProductRegistrationCountDto;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.exception.UserNotFoundException;
@@ -189,6 +190,13 @@ public class ProductService {
         LocalDateTime endDate = LocalDate.now().plusDays(1L).atStartOfDay();
 
         return this.productRepository.countProductsByDay(startDate, endDate);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DailyBidRegistrationCountDto> getDailyBidCounts(Integer daysAgo) {
+        LocalDateTime startDate = LocalDate.now().minusDays(daysAgo - 1L).atStartOfDay();
+
+        return this.productBidRepository.countBidsByDay(startDate);
     }
 
     @Transactional

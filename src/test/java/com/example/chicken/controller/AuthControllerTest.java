@@ -1,10 +1,24 @@
 package com.example.chicken.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.chicken.ChickenApplication;
+import com.example.chicken.common.jwt.JwtTokenProvider;
+import com.example.chicken.domain.auth.dto.auth.SignInRequestDto;
+import com.example.chicken.domain.auth.entity.token.RefreshToken;
+import com.example.chicken.domain.auth.entity.user.Role;
+import com.example.chicken.domain.auth.entity.user.User;
+import com.example.chicken.domain.auth.repository.RefreshTokenRepository;
+import com.example.chicken.domain.auth.repository.UserRepository;
+import com.example.chicken.dto.UserRequestDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,167 +30,153 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.example.chicken.ChickenApplication;
-import com.example.chicken.common.jwt.JwtTokenProvider;
-import com.example.chicken.domain.auth.entity.user.Role;
-import com.example.chicken.domain.auth.entity.user.User;
-import com.example.chicken.domain.auth.entity.token.RefreshToken;
-import com.example.chicken.domain.auth.dto.auth.SignInRequestDto;
-import com.example.chicken.dto.UserRequestDto;
-import com.example.chicken.domain.auth.repository.RefreshTokenRepository;
-import com.example.chicken.domain.auth.repository.UserRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.servlet.http.Cookie;
-import jakarta.transaction.Transactional;
-
 @Transactional
 @AutoConfigureMockMvc
 @SpringBootTest(classes = ChickenApplication.class)
 class AuthControllerTest {
 
-	@Autowired
-	MockMvc mockMvc;
-	@Autowired
-	ObjectMapper objectMapper;
+    @Autowired
+    MockMvc mockMvc;
+    @Autowired
+    ObjectMapper objectMapper;
 
-	@Autowired
-	UserRepository userRepository;
-	@Autowired
-	PasswordEncoder passwordEncoder;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
-	@Autowired
-	JwtTokenProvider tokenProvider;
+    @Autowired
+    JwtTokenProvider tokenProvider;
 
-	@Autowired
-	RefreshTokenRepository tokenRepository;
+    @Autowired
+    RefreshTokenRepository tokenRepository;
 
-	User user;
+    User user;
 
-	String refreshToken;
+    String refreshToken;
 
-	@BeforeEach
-	void setUp() {
-		String email = "yoojinlee.dev@gmail.com";
-		String password = "1q2w3e4r!";
-		String nickname = "yoojinLee";
-		Role role = Role.USER;
+    @BeforeEach
+    void setUp() {
+        String email = "yoojinlee.dev@gmail.com";
+        String password = "1q2w3e4r!";
+        String nickname = "yoojinLee";
+        Role role = Role.USER;
 
-		User userValue = User.builder()
-			.email(email)
-			.password(this.passwordEncoder.encode(password))
-			.nickname(nickname)
-			.role(role)
-			.build();
+        User userValue = User.builder()
+                .email(email)
+                .password(this.passwordEncoder.encode(password))
+                .nickname(nickname)
+                .role(role)
+                .build();
 
-		user = this.userRepository.save(userValue);
+        user = this.userRepository.save(userValue);
 
-		this.refreshToken = this.tokenProvider.createTokens(user).refreshToken();
+        this.refreshToken = this.tokenProvider.createTokens(user).refreshToken();
 
-		RefreshToken refreshToken = RefreshToken.builder()
-			.email(user.getEmail())
-			.refreshToken(this.refreshToken)
-			.build();
+        RefreshToken refreshToken = RefreshToken.builder()
+                .email(user.getEmail())
+                .refreshToken(this.refreshToken)
+                .build();
 
-		this.tokenRepository.save(refreshToken);
+        this.tokenRepository.save(refreshToken);
 
-	}
+    }
 
-	@Test
-	@DisplayName("[Integration Test] 회원가입 성공")
-	void signUp() throws Exception {
-		//given
-		String email = "test@test.com";
-		String password = "1q2w3e4r!";
-		String nickname = "testnick";
-		String phoneNumber = "01012345678";
+    @Test
+    @DisplayName("[Integration Test] 회원가입 성공")
+    void signUp() throws Exception {
+        //given
+        String email = "test@test.com";
+        String password = "1q2w3e4r!";
+        String nickname = "testnick";
+        String phoneNumber = "01012345678";
 
-		UserRequestDto request =
-			new UserRequestDto(email, password, nickname, phoneNumber);
+        UserRequestDto request =
+                new UserRequestDto(email, password, nickname, phoneNumber);
 
-		//when
-		mockMvc.perform(post("/api/auth/sign-up")
-							.contentType(MediaType.APPLICATION_JSON)
-							.content(objectMapper.writeValueAsString(request)))
-			//then
-			.andDo(print())
-			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.id").exists())
-			.andExpect(jsonPath("$.email").value(email))
-			.andExpect(jsonPath("$.role").value(Role.USER.name()))
-			.andExpect(jsonPath("$.nickname").value(nickname))
-			.andExpect(jsonPath("$.phoneNumber").value(phoneNumber))
-			.andExpect(jsonPath("$.createdAt").exists())
-			.andExpect(jsonPath("$.modifiedAt").exists());
+        //when
+        mockMvc.perform(post("/api/auth/sign-up")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                //then
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.email").value(email))
+                .andExpect(jsonPath("$.role").value(Role.USER.name()))
+                .andExpect(jsonPath("$.nickname").value(nickname))
+                .andExpect(jsonPath("$.phoneNumber").value(phoneNumber))
+                .andExpect(jsonPath("$.createdAt").exists())
+                .andExpect(jsonPath("$.modifiedAt").exists());
 
-	}
+    }
 
-	@Test
-	@DisplayName("[Integration Test] 회원가입 시 유효성 검증 실패")
-	void signUp_validation() throws Exception {
-		//given
-		UserRequestDto request = UserRequestDto.newInstance();
+    @Test
+    @DisplayName("[Integration Test] 회원가입 시 유효성 검증 실패")
+    void signUp_validation() throws Exception {
+        //given
+        UserRequestDto request = UserRequestDto.newInstance();
 
-		//when
-		mockMvc.perform(post("/api/auth/sign-up")
-							.contentType(MediaType.APPLICATION_JSON)
-							.content(objectMapper.writeValueAsString(request)))
-			//then
-			.andDo(print())
-			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
-			.andExpect(jsonPath("$.message").value("Field validation fail"))
-			.andExpect(jsonPath("$.errors").isArray());
-	}
+        //when
+        mockMvc.perform(post("/api/auth/sign-up")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                //then
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.message").value("Field validation fail"))
+                .andExpect(jsonPath("$.errors").isArray());
+    }
 
-	@Test
-	@DisplayName("[Integration Test] 로그인 성공")
-	void signIn() throws Exception {
-		SignInRequestDto request = new SignInRequestDto(user.getEmail(), "1q2w3e4r!", Boolean.TRUE);
+    @Test
+    @DisplayName("[Integration Test] 로그인 성공")
+    void signIn() throws Exception {
+        SignInRequestDto request = new SignInRequestDto(user.getEmail(), "1q2w3e4r!", Boolean.TRUE, Role.USER);
 
-		//when
-		mockMvc.perform(post("/api/auth/sign-in")
-							.contentType(MediaType.APPLICATION_JSON)
-							.content(objectMapper.writeValueAsString(request)))
-			//then
-			.andDo(print())
-			.andExpect(status().isOk())
-			.andExpect(cookie().exists("refresh-token"))
-			.andExpect(cookie().value("refresh-token", notNullValue()))
-			.andExpect(jsonPath("$.accessToken").exists());
-	}
+        //when
+        mockMvc.perform(post("/api/auth/sign-in")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                //then
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(cookie().exists("refresh-token"))
+                .andExpect(cookie().value("refresh-token", notNullValue()))
+                .andExpect(jsonPath("$.accessToken").exists());
+    }
 
-	@Test
-	@DisplayName("토큰 재발급 성공")
-	void reissue() throws Exception {
-		//given
-		Cookie cookie = new Cookie("refresh-token", this.refreshToken);
+    @Test
+    @DisplayName("토큰 재발급 성공")
+    void reissue() throws Exception {
+        //given
+        Cookie cookie = new Cookie("refresh-token", this.refreshToken);
 
-		//when
-		mockMvc.perform(post("/api/auth/reissue")
-							.cookie(cookie)
-							.contentType(MediaType.APPLICATION_JSON))
-			//then
-			.andDo(print())
-			.andExpect(status().isOk())
-			.andExpect(cookie().exists("refresh-token"))
-			.andExpect(jsonPath("$.accessToken").exists());
-	}
+        //when
+        mockMvc.perform(post("/api/auth/reissue")
+                        .cookie(cookie)
+                        .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(cookie().exists("refresh-token"))
+                .andExpect(jsonPath("$.accessToken").exists());
+    }
 
-	@Test
-	@DisplayName("토큰 재발급 시 유효성 검증 실패")
-	void reissue_validate() throws Exception {
-		//given
-		String authValue = "";
-		Cookie cookie = new Cookie("refresh-token", authValue);
+    @Test
+    @DisplayName("토큰 재발급 시 유효성 검증 실패")
+    void reissue_validate() throws Exception {
+        //given
+        String authValue = "";
+        Cookie cookie = new Cookie("refresh-token", authValue);
 
-		//when
-		mockMvc.perform(post("/api/auth/reissue")
-							.cookie(cookie)
-							.contentType(MediaType.APPLICATION_JSON))
-			//then
-			.andDo(print())
-			.andExpect(status().isBadRequest());
-	}
+        //when
+        mockMvc.perform(post("/api/auth/reissue")
+                        .cookie(cookie)
+                        .contentType(MediaType.APPLICATION_JSON))
+                //then
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.example.chicken.domain.auth.service;
 
+import com.example.chicken.common.util.SecurityUtil;
 import com.example.chicken.domain.admin.dto.DailyUserRegistrationCountDto;
 import com.example.chicken.domain.admin.dto.UpdateUserInfoByAdminDto;
 import com.example.chicken.domain.admin.dto.UserSearchCondition;
@@ -10,7 +11,6 @@ import com.example.chicken.domain.auth.entity.token.ResetPasswordToken;
 import com.example.chicken.domain.auth.entity.user.Role;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.exception.ResetTokenExpiredException;
-import com.example.chicken.domain.auth.exception.UserNotFoundException;
 import com.example.chicken.domain.auth.repository.ResetPasswordTokenRepository;
 import com.example.chicken.domain.auth.repository.UserRepository;
 import com.example.chicken.domain.order.dto.OrderResponseDto;
@@ -33,7 +33,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,10 +54,11 @@ public class UserService {
     private final ResetPasswordTokenRepository resetPasswordTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final ProductService productService;
+    private final UserQueryService userQueryService;
 
     @Transactional(readOnly = true)
     public UserResponseDto getUserInfo() {
-        User user = getUser();
+        User user = this.userQueryService.getUserByEmail(SecurityUtil.getCurrentUserEmail());
 
         List<WinnerResponseDto> winnerResponse = this.highestBidderRepository.findByWinnerId(user.getId())
                 .stream().map(WinnerResponseDto::from)
@@ -84,9 +84,7 @@ public class UserService {
 
     @Transactional
     public UserResponseDto updateUserInfo(Long userId, UpdateUserInfoByAdminDto request) {
-        User user = this.userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException(userId.toString())
-        );
+        User user = this.userQueryService.getUserById(userId);
 
         user.updateUserInfoByAdmin(request);
 
@@ -95,19 +93,11 @@ public class UserService {
 
     @Transactional
     public UserResponseDto updateMyUserInfo(UpdateUserInfoDto request) {
-        User user = getUser();
+        User user = this.userQueryService.getUserByEmail(SecurityUtil.getCurrentUserEmail());
 
         user.updateUserInfo(request);
 
         return userMapper.toResponse(this.userRepository.save(user));
-    }
-
-    private User getUser() {
-        String email =
-                SecurityContextHolder.getContext().getAuthentication().getName();
-
-        return this.userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(email));
     }
 
     @Transactional(readOnly = true)
@@ -127,13 +117,12 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long userId) {
-        User user = this.userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+        User user = this.userQueryService.getUserById(userId);
 
-        if (user.getRole().equals(Role.ADMIN)) {
+        if (user.getRole() == Role.ADMIN) {
             throw new WhyDeleteMeException();
         }
-
+        
         this.userRepository.delete(user);
     }
 
@@ -144,7 +133,7 @@ public class UserService {
 
         String email = resetPasswordToken.getId();
 
-        User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+        User user = this.userQueryService.getUserByEmail(email);
 
         user.updatePassword(this.passwordEncoder.encode(password));
 

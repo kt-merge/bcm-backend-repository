@@ -2,17 +2,18 @@ package com.example.chicken.domain.auth.service;
 
 import com.example.chicken.common.jwt.JwtTokenProvider;
 import com.example.chicken.common.jwt.JwtUtil;
+import com.example.chicken.domain.admin.exception.RoleNotAllowedException;
 import com.example.chicken.domain.auth.dto.auth.SignInRequestDto;
 import com.example.chicken.domain.auth.dto.auth.SignInResponseDto;
 import com.example.chicken.domain.auth.dto.user.TokenResponseDto;
 import com.example.chicken.domain.auth.entity.token.RefreshToken;
 import com.example.chicken.domain.auth.entity.token.ResetPasswordToken;
+import com.example.chicken.domain.auth.entity.user.Role;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.exception.PasswordNotMatchedException;
 import com.example.chicken.domain.auth.exception.RefreshTokenNotFoundException;
 import com.example.chicken.domain.auth.exception.ResetTokenExpiredException;
 import com.example.chicken.domain.auth.exception.TokenInvalidException;
-import com.example.chicken.domain.auth.exception.UserAlreadyExists;
 import com.example.chicken.domain.auth.exception.UserNotFoundException;
 import com.example.chicken.domain.auth.repository.RefreshTokenRepository;
 import com.example.chicken.domain.auth.repository.ResetPasswordTokenRepository;
@@ -20,10 +21,8 @@ import com.example.chicken.domain.auth.repository.UserRepository;
 import com.example.chicken.dto.UserRequestDto;
 import com.example.chicken.dto.UserResponseDto;
 import com.example.chicken.service.EmailService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,108 +32,124 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService {
 
-	private final EmailService emailService;
-	private final UserRepository userRepository;
-	private final RefreshTokenRepository refreshTokenRepository;
-	private final ResetPasswordTokenRepository resetPasswordTokenRepository;
-	private final UserMapper userMapper;
-	private final PasswordEncoder passwordEncoder;
-	private final JwtTokenProvider tokenProvider;
-	private final JwtUtil jwtUtil;
-	private final TokenMapper tokenMapper;
+    private final EmailService emailService;
+    private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final ResetPasswordTokenRepository resetPasswordTokenRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider tokenProvider;
+    private final JwtUtil jwtUtil;
+    private final UserMapper userMapper;
+    private final TokenMapper tokenMapper;
+    private final UserQueryService userQueryService;
 
-	@Transactional
-	public UserResponseDto signUp(UserRequestDto request) {
+    @Transactional
+    public UserResponseDto signUp(UserRequestDto request) {
 
-		if (this.userRepository.existsByEmail(request.email())) throw new UserAlreadyExists();
+        this.userQueryService.checkUserExistsByEmail(request.email());
 
-		User user = User.from(request);
+        User user = userMapper.toEntity(request);
 
-		user.updatePassword(passwordEncoder.encode(request.password()));
+        user.updatePassword(passwordEncoder.encode(request.password()));
 
-		User result = this.userRepository.save(user);
+        User result = this.userRepository.save(user);
 
-		return userMapper.toResponse(result);
+        return userMapper.toResponse(result);
 
-	}
+    }
 
-	@Transactional
-	public SignInResponseDto signIn(SignInRequestDto request) {
-		String email = request.email();
+    @Transactional
+    public SignInResponseDto signIn(SignInRequestDto request) {
+        User storedUser = userQueryService.getUserByEmail(request.email());
 
-		User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+        Role expectedRole = request.userType() == Role.ADMIN ? Role.ADMIN : Role.USER;
 
-		if (!this.passwordEncoder.matches(request.password(), user.getPassword()))
-			throw new PasswordNotMatchedException();
+        ensureSignInAllowed(request, storedUser, expectedRole);
 
-		String refreshToken = this.tokenProvider.createRefreshJWT(email);
-		this.refreshTokenRepository.save(RefreshToken.of(email, refreshToken));
+        return createTokens(storedUser);
+    }
 
-		String accessToken = this.tokenProvider.createAccessToken(user);
+    private void ensureSignInAllowed(SignInRequestDto signInRequest, User storedUser, Role expectedRole) {
+        if (storedUser.getRole() != expectedRole) {
+            throw new RoleNotAllowedException();
+        }
 
-		return new SignInResponseDto(accessToken, refreshToken);
-	}
+        if (!this.passwordEncoder.matches(signInRequest.password(), storedUser.getPassword())) {
+            throw new PasswordNotMatchedException();
+        }
+    }
 
-	@Transactional
-	public TokenResponseDto reissue(String refreshToken) {
-		if (!jwtUtil.validate(refreshToken))
-			throw new TokenInvalidException();
+    private SignInResponseDto createTokens(User user) {
+        String refreshToken = this.tokenProvider.createRefreshJWT(user.getEmail());
+        this.refreshTokenRepository.save(RefreshToken.of(user.getEmail(), refreshToken));
 
-		String email = jwtUtil.parseClaims(refreshToken).getSubject();
+        String accessToken = this.tokenProvider.createAccessToken(user);
 
-		RefreshToken storedToken = this.refreshTokenRepository.findById(email)
-			.orElseThrow(() -> new RefreshTokenNotFoundException(email));
+        return new SignInResponseDto(accessToken, refreshToken);
+    }
 
-		if (!storedToken.getRefreshJwt().equals(refreshToken)) throw new TokenInvalidException();
+    @Transactional
+    public TokenResponseDto reissue(String refreshToken) {
+        if (!jwtUtil.validate(refreshToken)) {
+            throw new TokenInvalidException();
+        }
 
-		User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+        String email = jwtUtil.parseClaims(refreshToken).getSubject();
 
-		String newAccessToken = this.tokenProvider.createAccessToken(user);
-		String newRefreshToken = this.tokenProvider.createRefreshJWT(email);
+        RefreshToken storedToken = this.refreshTokenRepository.findById(email)
+                .orElseThrow(() -> new RefreshTokenNotFoundException(email));
 
-		storedToken.renewalToken(newRefreshToken);
-		this.refreshTokenRepository.save(storedToken);
+        if (!storedToken.getRefreshJwt().equals(refreshToken)) {
+            throw new TokenInvalidException();
+        }
 
-		return this.tokenMapper.toDto(newAccessToken, newRefreshToken);
-	}
+        User user = this.userQueryService.getUserByEmail(email);
 
-	@Transactional
-	public void logout(String refreshToken) {
+        String newAccessToken = this.tokenProvider.createAccessToken(user);
+        String newRefreshToken = this.tokenProvider.createRefreshJWT(email);
 
-		String email = jwtUtil.parseClaims(refreshToken).getSubject();
+        storedToken.renewalToken(newRefreshToken);
+        this.refreshTokenRepository.save(storedToken);
 
-		this.refreshTokenRepository.findById(email).ifPresent(this.refreshTokenRepository::delete);
-	}
+        return this.tokenMapper.toDto(newAccessToken, newRefreshToken);
+    }
 
-	@Transactional
-	public void requestPasswordReset(String email) {
-		boolean isUserExists = this.userRepository.existsByEmail(email);
+    @Transactional
+    public void logout(String refreshToken) {
 
-		if (!isUserExists) {
-			throw new UserNotFoundException(email);
-		}
+        String email = jwtUtil.parseClaims(refreshToken).getSubject();
 
-		String token = this.tokenProvider.createRefreshJWT(email);
+        this.refreshTokenRepository.findById(email).ifPresent(this.refreshTokenRepository::delete);
+    }
 
-		ResetPasswordToken resetPasswordToken = ResetPasswordToken.builder()
-			.email(email)
-			.resetToken(token)
-			.build();
+    @Transactional
+    public void requestPasswordReset(String email) {
 
-		this.resetPasswordTokenRepository.save(resetPasswordToken);
+        if (!this.userQueryService.isUserExistsByEmail(email)) {
+            throw new UserNotFoundException(email);
+        }
 
-		this.emailService.sendPasswordChangeEmail(email, token);
-	}
+        String token = this.tokenProvider.createRefreshJWT(email);
 
-	public void verifyResetToken(String token) {
-		String email = jwtUtil.parseClaims(token).getSubject();
+        ResetPasswordToken resetPasswordToken = ResetPasswordToken.builder()
+                .email(email)
+                .resetToken(token)
+                .build();
 
-		ResetPasswordToken resetPasswordToken = this.resetPasswordTokenRepository.findById(email)
-			.orElseThrow(ResetTokenExpiredException::new);
+        this.resetPasswordTokenRepository.save(resetPasswordToken);
 
-		if (!resetPasswordToken.getResetToken().equals(token)) {
-			throw new TokenInvalidException();
-		}
-	}
+        this.emailService.sendPasswordChangeEmail(email, token);
+    }
+
+    public void verifyResetToken(String token) {
+        String email = jwtUtil.parseClaims(token).getSubject();
+
+        ResetPasswordToken resetPasswordToken = this.resetPasswordTokenRepository.findById(email)
+                .orElseThrow(ResetTokenExpiredException::new);
+
+        if (!resetPasswordToken.getResetToken().equals(token)) {
+            throw new TokenInvalidException();
+        }
+    }
 
 }

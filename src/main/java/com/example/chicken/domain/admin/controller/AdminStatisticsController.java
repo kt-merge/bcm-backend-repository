@@ -1,9 +1,11 @@
 package com.example.chicken.domain.admin.controller;
 
+import static com.example.chicken.common.constant.PathConstant.Admin.ADMIN_STATISTICS_BIDS_DAILY_REGISTRATIONS;
 import static com.example.chicken.common.constant.PathConstant.Admin.ADMIN_STATISTICS_PREFIX;
 import static com.example.chicken.common.constant.PathConstant.Admin.ADMIN_STATISTICS_PRODUCTS_DAILY_REGISTRATIONS;
 import static com.example.chicken.common.constant.PathConstant.Admin.ADMIN_STATISTICS_USERS_DAILY_REGISTRATIONS;
 
+import com.example.chicken.domain.admin.dto.DailyBidRegistrationCountDto;
 import com.example.chicken.domain.admin.dto.DailyProductRegistrationCountDto;
 import com.example.chicken.domain.admin.dto.DailyUserRegistrationCountDto;
 import com.example.chicken.domain.admin.service.StatisticsService;
@@ -39,6 +41,14 @@ public class AdminStatisticsController {
             @RequestParam(defaultValue = "7") @Positive Integer daysAgo) {
         List<DailyProductRegistrationCountDto> result = this.statisticsService.getDailyProductRegistrationCounts(
                 daysAgo);
+
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping(ADMIN_STATISTICS_BIDS_DAILY_REGISTRATIONS)
+    public ResponseEntity<List<DailyBidRegistrationCountDto>> getDailyBidRegistrationCounts(
+            @RequestParam(defaultValue = "7") @Positive Integer daysAgo) {
+        List<DailyBidRegistrationCountDto> result = this.statisticsService.getDailyBidCounts(daysAgo);
 
         return ResponseEntity.ok(result);
     }

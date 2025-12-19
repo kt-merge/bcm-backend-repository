@@ -1,5 +1,6 @@
 package com.example.chicken.domain.admin.service;
 
+import com.example.chicken.domain.admin.dto.DailyBidRegistrationCountDto;
 import com.example.chicken.domain.admin.dto.DailyProductRegistrationCountDto;
 import com.example.chicken.domain.admin.dto.DailyUserRegistrationCountDto;
 import com.example.chicken.domain.auth.service.UserService;
@@ -24,5 +25,10 @@ public class StatisticsService {
     @Transactional(readOnly = true)
     public List<DailyProductRegistrationCountDto> getDailyProductRegistrationCounts(Integer daysAgo) {
         return this.productService.getDailyProductRegistrationCounts(daysAgo);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DailyBidRegistrationCountDto> getDailyBidCounts(Integer daysAgo) {
+        return this.productService.getDailyBidCounts(daysAgo);
     }
 }
