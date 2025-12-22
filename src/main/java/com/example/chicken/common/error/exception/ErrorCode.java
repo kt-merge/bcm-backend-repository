@@ -20,7 +20,7 @@ public enum ErrorCode {
     EXISTS_CATEGORY_IN_PRODUCT("CATE002", HttpStatus.CONFLICT.value(), "카테고리에 속한 상품이 있어 삭제할 수 없습니다."),
 
     PAYMENT_AMOUNT_MISMATCH_EXCEPTION("PAYM001", HttpStatus.BAD_REQUEST.value(), "결제 금액이 일치하지 않습니다."),
-    PAYMENT_ALREADY_PAID_EXCEIPTION("PAYM002", HttpStatus.BAD_REQUEST.value(), "이미 결제 완료된 주문입니다."),
+    PAYMENT_ALREADY_PAID_EXCEPTION("PAYM002", HttpStatus.BAD_REQUEST.value(), "이미 결제 완료된 주문입니다."),
     PAYMENT_CONFIRM_FAILED("PAYM003", HttpStatus.BAD_REQUEST.value(), "결제 승인에 실패했습니다."),
     PAYMENT_REQUEST_SERIALIZATION_FAILED("PAYM004", HttpStatus.INTERNAL_SERVER_ERROR.value(),
             "결제 요청 데이터 처리 중 오류가 발생했습니다."),

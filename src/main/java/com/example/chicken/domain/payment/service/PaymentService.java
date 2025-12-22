@@ -26,6 +26,7 @@ public class PaymentService {
 
     @Transactional
     public void confirmPayment(PaymentRequestDto requestDto, PgProvider pgProvider) {
+
         Long orderId = requestDto.orderId();
 
         Order order = this.orderRepository.findById(requestDto.orderId())
@@ -36,7 +37,7 @@ public class PaymentService {
         }
 
         if (order.isPaid()) {
-            throw new PaymentConfirmException(ErrorCode.PAYMENT_ALREADY_PAID_EXCEIPTION);
+            throw new PaymentConfirmException(ErrorCode.PAYMENT_ALREADY_PAID_EXCEPTION);
         }
 
         Payment payment = this.paymentRepository.findByOrder(order)

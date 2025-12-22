@@ -24,6 +24,7 @@ public class TossPaymentGateway implements PaymentGateway {
     private String secretKey;
 
     private final ObjectMapper objectMapper;
+    private final HttpClient httpClient;
 
     @Override
     public PgProvider getPgProvider() {
@@ -49,7 +50,7 @@ public class TossPaymentGateway implements PaymentGateway {
                             this.objectMapper.writeValueAsString(request)))
                     .build();
 
-            HttpResponse<String> response = HttpClient.newHttpClient()
+            HttpResponse<String> response = this.httpClient
                     .send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
