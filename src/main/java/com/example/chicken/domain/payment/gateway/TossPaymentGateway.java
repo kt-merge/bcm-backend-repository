@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TossPaymentGateway implements PaymentGateway {
 
-    @Value("${payment.toss.secret_key}")
+    @Value("${payment.toss.secret-key}")
     private String secretKey;
 
     private final ObjectMapper objectMapper;
