@@ -24,20 +24,27 @@ public class InitialDataLoader implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		String adminNickname = "Admin";
-		String adminEmail = "admin@admin.com";
+		String[] adminNicknames = {"관리자1","관리자2","관리자3"};
+		String[] adminEmails = {"admin@admin.com","admin1@admin.com","admin2@admin.com"};
+
 		String adminPassword = "1q2w3e4r!";
 
-		if (!this.userRepository.existsByEmail(adminEmail)) {
-			User admin = User.builder()
-				.nickname(adminNickname)
-				.email(adminEmail)
-				.password(passwordEncoder.encode(adminPassword))
-				.role(Role.ADMIN)
-				.status(UserStatus.ACTIVE)
-				.build();
+		int count = Math.min(adminEmails.length, adminNicknames.length);
+		for (int i = 0; i < count; i++) {
+			String adminEmail = adminEmails[i];
+			String adminNickname = adminNicknames[i];
 
-			this.userRepository.save(admin);
+			if (!this.userRepository.existsByEmail(adminEmail)) {
+				User admin = User.builder()
+					.nickname(adminNickname)
+					.email(adminEmail)
+					.password(passwordEncoder.encode(adminPassword))
+					.role(Role.ADMIN)
+					.status(UserStatus.ACTIVE)
+					.build();
+
+				this.userRepository.save(admin);
+			}
 		}
 
 		String code = "ETC";
