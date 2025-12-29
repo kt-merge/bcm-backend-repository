@@ -28,7 +28,7 @@ public class AnnouncementService {
 
     @Transactional(readOnly = true)
     public Page<AnnouncementResponseDto> getAnnouncements(Pageable pageable) {
-        return announcementRepository.findAll(pageable).map(announcementMapper::toDto);
+        return announcementRepository.searchAnnouncements(pageable);
     }
 
     @Transactional(readOnly = true)
