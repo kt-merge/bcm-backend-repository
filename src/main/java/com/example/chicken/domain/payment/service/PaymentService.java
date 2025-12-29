@@ -27,10 +27,8 @@ public class PaymentService {
     @Transactional
     public void confirmPayment(PaymentRequestDto requestDto, PgProvider pgProvider) {
 
-        Long orderId = requestDto.orderId();
-
-        Order order = this.orderRepository.findById(requestDto.orderId())
-                .orElseThrow(() -> new OrderNotFoundException(orderId.toString()));
+        Order order = this.orderRepository.findByOrderNumber(requestDto.orderId())
+                .orElseThrow(() -> new OrderNotFoundException(requestDto.orderId()));
 
         if (order.getFinalPrice().compareTo(requestDto.amount()) != 0) {
             throw new PaymentConfirmException(ErrorCode.PAYMENT_AMOUNT_MISMATCH_EXCEPTION);
@@ -41,7 +39,7 @@ public class PaymentService {
         }
 
         Payment payment = this.paymentRepository.findByOrder(order)
-                .orElseThrow(() -> new PaymentNotFoundException(orderId.toString()));
+                .orElseThrow(() -> new PaymentNotFoundException(requestDto.orderId()));
 
         PaymentGateway paymentGateway = this.paymentGatewayFactory.getPaymentGateway(pgProvider);
 

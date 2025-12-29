@@ -3,6 +3,7 @@ package com.example.chicken.domain.order.entity;
 import com.example.chicken.common.entity.BaseTimeEntity;
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.product.entity.Product;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,10 +14,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,6 +36,9 @@ public class Order extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @Column(unique = true, nullable = false)
+    private String orderNumber;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
@@ -63,6 +71,21 @@ public class Order extends BaseTimeEntity {
         this.shippingInfo = shippingInfo;
         this.user = user;
         this.product = product;
+    }
+
+    @PrePersist
+    public void generateOrderNumber() {
+        if (this.orderNumber == null) {
+            String PREFIX = "ORD";
+            DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+            int RANDOM_PART_LENGTH = 8;
+
+            String datePart = LocalDate.now().format(DATE_FORMATTER);
+            String randomPart = UUID.randomUUID().toString().replace("-", "").substring(0, RANDOM_PART_LENGTH)
+                    .toUpperCase();
+
+            this.orderNumber = String.format("%s-%s-%s", PREFIX, datePart, randomPart);
+        }
     }
 
     public static Order pendingOrder(User user, Product product) {
