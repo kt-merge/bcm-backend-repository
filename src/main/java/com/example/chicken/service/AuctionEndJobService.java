@@ -25,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuctionEndJobService {
 
+    private static final String MESSAGE = "프로덕트 존재하지 않음: id = {}";
+
     private final ProductRepository productRepository;
     private final ProductBidRepository productBidRepository;
     private final HighestBidderRepository highestBidderRepository;
@@ -35,9 +37,9 @@ public class AuctionEndJobService {
     @Transactional
     public void endProductAuction(Long productId) {
 
-        Product product = this.productRepository.findById(productId)
-                .orElseGet(() -> {
-                    log.warn("프로덕트 ID {}번 존재하지 않음", productId);
+        Product product =
+                productRepository.findById(productId).orElseGet(() -> {
+                    log.warn(MESSAGE, productId);
                     return null;
                 });
 
@@ -45,16 +47,18 @@ public class AuctionEndJobService {
             return;
         }
 
-        Optional<ProductBid> productBid = this.productBidRepository.findTopByProductIdOrderByPriceDesc(product.getId());
+        Optional<ProductBid> productBid = productBidRepository.findTopByProductIdOrderByPriceDesc(product.getId());
 
         if (productBid.isPresent()) {
             User user = productBid.get().getUser();
 
-            this.highestBidderRepository.save(HighestBidder.of(productBid.get(), product));
-            Order savedOrder = this.orderRepository.save(Order.pendingOrder(user, product));
-            this.paymentRepository.save(Payment.ready(user, savedOrder));
+            highestBidderRepository.save(HighestBidder.of(productBid.get(), product));
 
-            this.eventPublisher.publishEvent(new AuctionWonEvent(product.getName(), user.getEmail()));
+            Order savedOrder = orderRepository.save(Order.pendingOrder(user, product));
+
+            paymentRepository.save(Payment.ready(user, savedOrder));
+
+            eventPublisher.publishEvent(new AuctionWonEvent(product.getName(), user.getEmail()));
         }
 
         if (product.getBidStatus().equals(BidStatus.NOT_BIDDED)) {
@@ -63,7 +67,7 @@ public class AuctionEndJobService {
             product.waitPayment();
         }
 
-        this.productRepository.save(product);
+        productRepository.save(product);
     }
 
 }

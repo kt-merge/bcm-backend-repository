@@ -68,11 +68,19 @@ public class Order extends BaseTimeEntity {
     public static Order pendingOrder(User user, Product product) {
         return Order.builder()
                 .status(OrderStatus.PAYMENT_PENDING)
-                .finalPrice(product.getBidPrice())
+                .finalPrice(calculateFinalPrice(product.getBidPrice()))
                 .expiredAt(LocalDateTime.now(ZoneOffset.UTC).plusDays(1))
                 .user(user)
                 .product(product)
                 .build();
+    }
+
+    private static BigDecimal calculateFinalPrice(BigDecimal bidPrice) {
+        BigDecimal feeRate = BigDecimal.valueOf(0.1);
+        BigDecimal deliveryFee = BigDecimal.valueOf(3000);
+
+        BigDecimal fee = bidPrice.multiply(feeRate);
+        return bidPrice.add(deliveryFee).add(fee);
     }
 
     public void paid() {
