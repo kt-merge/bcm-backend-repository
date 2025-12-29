@@ -1,7 +1,16 @@
 package com.example.chicken.domain.order.controller;
 
-import static com.example.chicken.common.constant.PathConstant.Order.*;
+import static com.example.chicken.common.constant.PathConstant.Order.ORDER_ID;
+import static com.example.chicken.common.constant.PathConstant.Order.ORDER_PREFIX;
+import static com.example.chicken.common.constant.PathConstant.Order.SHIPPING_INFO;
 
+import com.example.chicken.domain.order.dto.OrderResponseDto;
+import com.example.chicken.domain.order.dto.OrderSearchCondition;
+import com.example.chicken.domain.order.dto.ShippingInfoRequestDto;
+import com.example.chicken.domain.order.service.OrderService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -10,33 +19,35 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.chicken.domain.order.dto.OrderResponseDto;
-import com.example.chicken.domain.order.dto.ShippingInfoRequestDto;
-import com.example.chicken.domain.order.service.OrderService;
-
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(ORDER_PREFIX)
 public class OrderController {
 
-	private final OrderService orderService;
+    private final OrderService orderService;
 
-	@PatchMapping(SHIPPING_INFO)
-	public ResponseEntity<OrderResponseDto> addShippingInfo(@PathVariable Long orderId,
-															@RequestBody ShippingInfoRequestDto requestDto) {
+    @PatchMapping(SHIPPING_INFO)
+    public ResponseEntity<OrderResponseDto> addShippingInfo(@PathVariable Long orderId,
+                                                            @RequestBody ShippingInfoRequestDto requestDto) {
 
-		OrderResponseDto result = this.orderService.addShippingInfo(orderId, requestDto);
+        OrderResponseDto result = this.orderService.addShippingInfo(orderId, requestDto);
 
-		return ResponseEntity.ok(result);
-	}
+        return ResponseEntity.ok(result);
+    }
 
-	@GetMapping(ORDER_ID)
-	public ResponseEntity<OrderResponseDto> getOrder(@PathVariable Long orderId) {
-		OrderResponseDto result = this.orderService.getOrder(orderId);
+    @GetMapping
+    public ResponseEntity<Page<OrderResponseDto>> getOrders(OrderSearchCondition condition, Pageable pageable) {
 
-		return ResponseEntity.ok(result);
-	}
+        Page<OrderResponseDto> result = this.orderService.getOrders(condition, pageable);
+
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping(ORDER_ID)
+    public ResponseEntity<OrderResponseDto> getOrder(@PathVariable Long orderId) {
+        OrderResponseDto result = this.orderService.getOrder(orderId);
+
+        return ResponseEntity.ok(result);
+    }
 
 }
