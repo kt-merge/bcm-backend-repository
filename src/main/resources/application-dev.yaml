@@ -38,3 +38,7 @@ s3:
   product-bucket-url: ${S3_BUCKET_URL:https://bcm-s3-storage.s3.ap-northeast-2.amazonaws.com/products/}
   access-key: ${AWS_ACCESS_KEY_ID}
   secret-key: ${AWS_SECRET_ACCESS_KEY}
+
+payment:
+  toss:
+    secret-key: ${TOSS_SECRET_KEY}
