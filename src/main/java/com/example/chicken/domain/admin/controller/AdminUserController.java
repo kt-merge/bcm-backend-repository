@@ -37,6 +37,13 @@ public class AdminUserController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/deleted")
+    public ResponseEntity<Page<UserResponseDto>> getDeletedUsers(Pageable pageable) {
+        Page<UserResponseDto> result = this.userService.getDeletedUsers(pageable);
+
+        return ResponseEntity.ok(result);
+    }
+
     @PatchMapping(ADMIN_USERS_ID)
     public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long userId,
                                                       @RequestBody @Valid UpdateUserInfoByAdminDto request) {

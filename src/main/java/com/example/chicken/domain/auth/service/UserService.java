@@ -108,6 +108,12 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public Page<UserResponseDto> getDeletedUsers(Pageable pageable) {
+        Page<User> users = this.userRepository.findDeletedUsers(pageable);
+
+        return users.map(userMapper::toResponse);
+    }
+    @Transactional(readOnly = true)
     public List<DailyUserRegistrationCountDto> getDailyUserRegistrationCounts(Integer daysAgo) {
         LocalDateTime startDate = LocalDate.now().minusDays(daysAgo - 1).atStartOfDay();
         LocalDateTime endDate = LocalDate.now().plusDays(1).atStartOfDay();
