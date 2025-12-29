@@ -18,4 +18,6 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderReposi
             + "WHERE o.id = :orderId AND o.user.email = :email and o.status NOT IN ('EXPIRED')")
     Optional<Order> findByIdAndUser(Long orderId, String email);
 
+    Optional<Order> findByOrderNumber(String orderNumber);
+
 }
