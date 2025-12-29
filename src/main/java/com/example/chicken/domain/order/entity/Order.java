@@ -80,7 +80,7 @@ public class Order extends BaseTimeEntity {
             DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
             int RANDOM_PART_LENGTH = 8;
 
-            String datePart = LocalDate.now().format(DATE_FORMATTER);
+            String datePart = LocalDate.now(ZoneOffset.UTC).format(DATE_FORMATTER);
             String randomPart = UUID.randomUUID().toString().replace("-", "").substring(0, RANDOM_PART_LENGTH)
                     .toUpperCase();
 
