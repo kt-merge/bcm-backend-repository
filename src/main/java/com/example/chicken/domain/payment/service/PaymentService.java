@@ -47,6 +47,7 @@ public class PaymentService {
 
         order.paid();
         payment.paid();
+        order.getProduct().completeBid();
     }
 
 }
