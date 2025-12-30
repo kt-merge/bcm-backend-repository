@@ -1,30 +1,31 @@
 package com.example.chicken.domain.product.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.product.entity.Product;
 import com.example.chicken.domain.product.entity.ProductBid;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public record ProductBidResponseDto(Long productId,
-									String productName,
-									BigDecimal price,
-									String bidderNickname,
-									Long bidCount,
-									LocalDateTime bidTime) {
+                                    String thumbnail,
+                                    String productName,
+                                    BigDecimal price,
+                                    String bidderNickname,
+                                    Long bidCount,
+                                    LocalDateTime bidTime) {
 
-	public static ProductBidResponseDto from(ProductBid productBid) {
+    public static ProductBidResponseDto from(ProductBid productBid) {
 
-		Product product = productBid.getProduct();
+        Product product = productBid.getProduct();
 
-		User user = productBid.getUser();
+        User user = productBid.getUser();
 
-		return new ProductBidResponseDto(product.getId(),
-										 product.getName(),
-										 productBid.getPrice(),
-										 user.getNickname(),
-										 product.getBidCount(),
-										 productBid.getCreatedAt());
-	}
+        return new ProductBidResponseDto(product.getId(),
+                product.getThumbnail(),
+                product.getName(),
+                productBid.getPrice(),
+                user.getNickname(),
+                product.getBidCount(),
+                productBid.getCreatedAt());
+    }
 }
