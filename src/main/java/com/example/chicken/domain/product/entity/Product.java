@@ -168,6 +168,10 @@ public class Product extends BaseTimeEntity {
         this.bidStatus = BidStatus.PAYMENT_WAITING;
     }
 
+    public void unSold() {
+        this.bidStatus = BidStatus.NO_BIDDER;
+    }
+
     public void completeBid() {
         this.bidStatus = BidStatus.COMPLETED;
     }

@@ -62,7 +62,7 @@ public class AuctionEndJobService {
         }
 
         if (product.getBidStatus().equals(BidStatus.NOT_BIDDED)) {
-            product.completeBid();
+            product.unSold();
         } else {
             product.waitPayment();
         }
