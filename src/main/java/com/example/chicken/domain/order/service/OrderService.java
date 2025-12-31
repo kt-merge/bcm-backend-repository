@@ -1,7 +1,5 @@
 package com.example.chicken.domain.order.service;
 
-import static com.example.chicken.common.util.SecurityUtil.getCurrentUserEmail;
-
 import com.example.chicken.domain.auth.entity.user.User;
 import com.example.chicken.domain.auth.service.UserMapper;
 import com.example.chicken.domain.auth.service.UserQueryService;
@@ -75,15 +73,12 @@ public class OrderService {
     @Transactional(readOnly = true)
     public Page<OrderResponseDto> getOrders(OrderSearchCondition condition, Pageable pageable) {
 
-        User user = this.userQueryService.getUserByEmail(getCurrentUserEmail());
-        OrderSearchCondition newCondition = new OrderSearchCondition(condition.orderStatus(), user.getId());
-
-        Page<Order> result = this.orderRepository.searchOrders(newCondition, pageable);
+        Page<Order> result = this.orderRepository.searchOrders(condition, pageable);
 
         return result.map((order) -> this.orderMapper.toDto(
                 order, this.productMapper.toResponseDto(
                         order.getProduct(),
-                        userMapper.toResponse(user),
+                        userMapper.toResponse(order.getUser()),
                         categoryMapper.toResponseDto(order.getProduct().getCategory()),
                         order.getProduct()
                                 .getImages()
@@ -91,6 +86,7 @@ public class OrderService {
                                 .map(this.productImageMapper::toResponseDto)
                                 .toList()
                 )));
+
     }
 
     @Transactional(readOnly = true)

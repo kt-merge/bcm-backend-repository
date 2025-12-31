@@ -15,6 +15,7 @@ public class PathConstant {
         public static final String SIGN_IN = "/sign-in";
         public static final String REISSUE = "/reissue";
         public static final String LOGOUT = "/logout";
+
         private Auth() {
             throw new IllegalStateException(ERROR_MESSAGE);
         }
@@ -25,6 +26,7 @@ public class PathConstant {
             public static final String REQUEST_RESET = PASSWORD_PREFIX + "/request-reset";
             public static final String VERIFY = PASSWORD_PREFIX + "/reset/verify";
             public static final String RESET = PASSWORD_PREFIX + "/reset";
+
             private Password() {
                 throw new IllegalStateException(ERROR_MESSAGE);
             }
@@ -37,6 +39,7 @@ public class PathConstant {
         public static final String USER_PREFIX = "/api/users";
         public static final String ME = "/me";
         public static final String MY_PRODUCTS = ME + "/products";
+
         private User() {
             throw new IllegalStateException(ERROR_MESSAGE);
         }
@@ -70,6 +73,7 @@ public class PathConstant {
         public static final String ORDER_PREFIX = "/api/orders";
         public static final String ORDER_ID = "/{orderId}";
         public static final String SHIPPING_INFO = ORDER_ID + "/shipping-info";
+
         private Order() {
             throw new IllegalStateException(ERROR_MESSAGE);
         }
@@ -88,6 +92,7 @@ public class PathConstant {
     public static class Announcement { // Notice 클래스 -> Announcement 클래스 변경
         public static final String ANNOUNCEMENT_PREFIX = "/api/announcements"; // NOTICE_PREFIX -> ANNOUNCEMENT_PREFIX 변경
         public static final String ANNOUNCEMENT_ID = "/{announcementId}"; // NOTICE_ID -> ANNOUNCEMENT_ID 변경
+
         private Announcement() {
             throw new IllegalStateException(ERROR_MESSAGE);
         }
@@ -96,6 +101,7 @@ public class PathConstant {
     public static class Faq {
         public static final String FAQ_PREFIX = "/api/faq";
         public static final String FAQ_ID = "/{faqId}";
+
         private Faq() {
             throw new IllegalStateException(ERROR_MESSAGE);
         }
@@ -104,6 +110,7 @@ public class PathConstant {
     public static class Qna {
         public static final String QNA_PREFIX = "/api/qna";
         public static final String QNA_ID = "/{qnaId}";
+
         private Qna() {
             throw new IllegalStateException(ERROR_MESSAGE);
         }
@@ -115,6 +122,7 @@ public class PathConstant {
         public static final String ADMIN_AUTH_PREFIX = ADMIN_PREFIX + "/auth";
         public static final String ADMIN_USERS_PREFIX = ADMIN_PREFIX + "/users";
         public static final String ADMIN_PRODUCTS_PREFIX = ADMIN_PREFIX + "/products";
+        public static final String ADMIN_ORDERS_PREFIX = ADMIN_PREFIX + "/orders";
         public static final String ADMIN_ANNOUNCEMENT_PREFIX = ADMIN_PREFIX + "/announcements";
         public static final String ADMIN_FAQ_PREFIX = ADMIN_PREFIX + "/faq";
         public static final String ADMIN_QNA_PREFIX = ADMIN_PREFIX + "/qna";
@@ -130,11 +138,11 @@ public class PathConstant {
         public static final String ADMIN_STATISTICS_USERS_DAILY_REGISTRATIONS = "/users/daily-registrations";
         public static final String ADMIN_STATISTICS_PRODUCTS_DAILY_REGISTRATIONS = "/products/daily-registrations";
         public static final String ADMIN_STATISTICS_BIDS_DAILY_REGISTRATIONS = "/bids/daily-registrations";
-      
+
         private Admin() {
             throw new IllegalStateException(ERROR_MESSAGE);
         }
-     
+
     }
 
 }

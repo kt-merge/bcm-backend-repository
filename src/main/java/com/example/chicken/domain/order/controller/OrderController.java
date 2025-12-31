@@ -5,12 +5,9 @@ import static com.example.chicken.common.constant.PathConstant.Order.ORDER_PREFI
 import static com.example.chicken.common.constant.PathConstant.Order.SHIPPING_INFO;
 
 import com.example.chicken.domain.order.dto.OrderResponseDto;
-import com.example.chicken.domain.order.dto.OrderSearchCondition;
 import com.example.chicken.domain.order.dto.ShippingInfoRequestDto;
 import com.example.chicken.domain.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -31,14 +28,6 @@ public class OrderController {
                                                             @RequestBody ShippingInfoRequestDto requestDto) {
 
         OrderResponseDto result = this.orderService.addShippingInfo(orderId, requestDto);
-
-        return ResponseEntity.ok(result);
-    }
-
-    @GetMapping
-    public ResponseEntity<Page<OrderResponseDto>> getOrders(OrderSearchCondition condition, Pageable pageable) {
-
-        Page<OrderResponseDto> result = this.orderService.getOrders(condition, pageable);
 
         return ResponseEntity.ok(result);
     }
