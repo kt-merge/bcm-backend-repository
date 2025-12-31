@@ -70,8 +70,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         return categoryId != null ? product.category.id.eq(categoryId) : null;
     }
 
-    private static Predicate equalsBidStatus(BidStatus bidStatus) {
-        return bidStatus != null ? product.bidStatus.eq(bidStatus) : null;
+    private static Predicate equalsBidStatus(List<BidStatus> bidStatuses) {
+        return (bidStatuses != null && !bidStatuses.isEmpty()) ? product.bidStatus.in(bidStatuses) : null;
     }
 
     @Override
