@@ -76,7 +76,7 @@ public class UserService {
                 .toList();
 
         List<OrderResponseDto> orderResponse = this.orderRepository.findByUser(user)
-                .stream().map(orderMapper::toDto)
+                .stream().map((order) -> orderMapper.toDto(order, this.productService.convertToDto(order.getProduct())))
                 .toList();
 
         return userMapper.toResponse(user, winnerResponse, productBids, productResponse, orderResponse);
@@ -122,7 +122,7 @@ public class UserService {
         if (user.getRole() == Role.ADMIN) {
             throw new WhyDeleteMeException();
         }
-        
+
         this.userRepository.delete(user);
     }
 
