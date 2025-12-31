@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -38,9 +39,11 @@ public class AdminAnnouncementController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<AnnouncementResponseDto>> getAnnouncements(Pageable pageable) {
-        log.info("관리자: 공지사항 목록 조회 요청");
-        return ResponseEntity.ok(announcementService.getAnnouncements(pageable));
+    public ResponseEntity<Page<AnnouncementResponseDto>> getAnnouncements(
+            @RequestParam(required = false) String keyword,
+            Pageable pageable) {
+        log.info("관리자: 공지사항 목록 조회 요청. keyword: {}", keyword);
+        return ResponseEntity.ok(announcementService.getAnnouncements(keyword, pageable));
     }
 
     @GetMapping(ADMIN_ANNOUNCEMENT_ID)
