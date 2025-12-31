@@ -24,10 +24,11 @@ public class AnnouncementRepositoryImpl implements AnnouncementRepositoryCustom 
     public Page<Announcement> searchAnnouncements(String keyword, Pageable pageable) {
 
         PathBuilder<Announcement> pathBuilder = new PathBuilder<>(announcement.getType(), announcement.getMetadata());
+        BooleanExpression predicate = containsKeyword(keyword);
 
         List<Announcement> result = queryFactory
                 .selectFrom(announcement)
-                .where(containsKeyword(keyword))
+                .where(predicate)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(QueryDslUtil.getOrderSpecifiers(pageable, pathBuilder))
@@ -36,7 +37,7 @@ public class AnnouncementRepositoryImpl implements AnnouncementRepositoryCustom 
         JPAQuery<Long> countQuery = queryFactory
                 .select(announcement.count())
                 .from(announcement)
-                .where(containsKeyword(keyword));
+                .where(predicate);
 
         return PageableExecutionUtils.getPage(result, pageable, countQuery::fetchOne);
     }
