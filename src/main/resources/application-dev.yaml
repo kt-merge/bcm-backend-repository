@@ -17,7 +17,7 @@ spring:
     show-sql: true
     database: postgresql
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
 
   datasource:
     url: jdbc:postgresql://${DB_HOST:postgres}/${DB_NAME:chicken_db}
